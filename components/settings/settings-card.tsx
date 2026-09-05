@@ -19,7 +19,7 @@ export function SettingsCard({
       <h2 className="px-1 text-sm font-semibold text-muted-foreground">
         {label}
       </h2>
-      <Card>
+      <Card className="overflow-hidden shadow-sm">
         <CardContent className="grid divide-y divide-border/70 p-0">{children}</CardContent>
       </Card>
     </section>

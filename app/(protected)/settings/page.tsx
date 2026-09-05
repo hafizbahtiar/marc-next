@@ -36,7 +36,7 @@ export default async function SettingsPage() {
       </header>
 
       <div className="grid gap-8 lg:grid-cols-[190px_minmax(0,1fr)] lg:items-start">
-        <nav className="flex gap-2 overflow-x-auto pb-1 lg:sticky lg:top-24 lg:grid lg:overflow-visible" aria-label="Bahagian tetapan">
+        <nav className="flex gap-1 overflow-x-auto rounded-xl border bg-card p-1 pb-1 lg:sticky lg:top-24 lg:grid lg:overflow-visible" aria-label="Bahagian tetapan">
           {[
             ["#appearance", "Paparan"],
             ["#connections", "Sambungan"],
@@ -49,7 +49,7 @@ export default async function SettingsPage() {
             <a
               key={href}
               href={href}
-              className="whitespace-nowrap rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="whitespace-nowrap rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {label}
             </a>
@@ -109,9 +109,7 @@ export default async function SettingsPage() {
             </SettingsCard>
           ) : null}
 
-          <div id="account" className="scroll-mt-24 grid gap-3">
-            <h2 className="px-1 text-sm font-semibold text-muted-foreground">Akaun</h2>
-            <SettingsCard label="Sesi & keselamatan">
+          <SettingsCard id="account" label="Akaun">
               <SettingNavItem
                 icon={BookOpenIcon}
                 label="Sesi aktif"
@@ -120,8 +118,7 @@ export default async function SettingsPage() {
               />
               <LogoutAllButton />
               <LogoutButton />
-            </SettingsCard>
-          </div>
+          </SettingsCard>
 
           <Suspense fallback={<Skeleton className="h-48 w-full" />}>
             <SessionList accessToken={accessToken} />

@@ -14,7 +14,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ u
   const name = member.display_name?.trim() || member.member_id || "Belum disahkan";
 
   return (
-    <div className="mx-auto grid max-w-5xl gap-6">
+    <div className="mx-auto grid max-w-6xl gap-6">
       <BackLink href="/members">Kembali ke Ahli</BackLink>
       <section className="flex flex-col gap-5 rounded-2xl border bg-card p-6 sm:flex-row sm:items-center">
         <Avatar className="size-20 ring-4 ring-secondary">

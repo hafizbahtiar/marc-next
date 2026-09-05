@@ -12,7 +12,7 @@ export default async function ActivityCategoriesPage() {
   }
   const { categories } = await listActivityCategories(accessToken);
   return (
-    <div className="mx-auto grid max-w-5xl gap-6">
+    <div className="mx-auto grid max-w-6xl gap-6">
       <BackLink href="/settings">Kembali ke Tetapan</BackLink>
       <header className="grid gap-2">
         <p className="flex items-center gap-2 text-sm font-medium text-primary"><Layers3Icon className="size-4" /> Aktiviti</p>
@@ -24,5 +24,5 @@ export default async function ActivityCategoriesPage() {
 }
 
 function AccessDenied({ title }: { title: string }) {
-  return <div className="mx-auto grid max-w-5xl gap-4"><BackLink href="/settings">Kembali ke Tetapan</BackLink><h1 className="font-heading text-3xl font-semibold tracking-tight">{title}</h1><p className="rounded-xl border bg-card px-6 py-12 text-center text-sm text-muted-foreground">Anda tiada akses ke skrin ini.</p></div>;
+  return <div className="mx-auto grid max-w-6xl gap-4"><BackLink href="/settings">Kembali ke Tetapan</BackLink><h1 className="font-heading text-3xl font-semibold tracking-tight">{title}</h1><p className="rounded-xl border bg-card px-6 py-12 text-center text-sm text-muted-foreground">Anda tiada akses ke skrin ini.</p></div>;
 }

@@ -15,7 +15,7 @@ export default async function PaymentHistoryPage() {
     !history.outstanding_registration_fee;
 
   return (
-    <div className="mx-auto grid max-w-5xl gap-6">
+    <div className="mx-auto grid max-w-6xl gap-6">
       <BackLink href="/profile">Kembali ke Profil</BackLink>
       <header className="grid gap-2">
         <p className="flex items-center gap-2 text-sm font-medium text-primary">
