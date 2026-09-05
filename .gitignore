@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...kecuali templat, yang memang patut dikomit — ia satu-satunya
+# tempat yang merekod pemboleh ubah mana yang wajib dan bentuknya.
+!.env.example
 
 # vercel
 .vercel

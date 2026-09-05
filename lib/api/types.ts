@@ -1,0 +1,63 @@
+/**
+ * Bentuk respons backend Go. Nama medan mengikut tag JSON Go secara
+ * verbatim (snake_case) — TIADA penukaran ke camelCase, supaya carian
+ * rentas repo untuk medan seperti `registration_payment_status` menemui
+ * kedua-dua belah sempadan.
+ */
+
+/** POST /auth/login, /auth/register, /auth/refresh. */
+export type TokenPair = {
+  access_token: string;
+  refresh_token: string;
+  /** Hayat access token dalam SAAT (bukan milisaat). */
+  expires_in: number;
+};
+
+/** Status kelulusan keahlian — `profiles.status` di backend. */
+export type MemberStatus = "pending" | "approved" | "rejected";
+
+/** GET /me — lihat profileResponse, internal/http/handlers/profile.go. */
+export type Profile = {
+  member_id: string | null;
+  email: string;
+  email_verified: boolean;
+  status: MemberStatus;
+  display_name: string | null;
+  phone: string | null;
+  role_key: string;
+  role_name: string;
+  category: string;
+  role_rank: number;
+  avatar_url: string | null;
+  /** Hanya diisi bila status !== "approved". */
+  registration_payment_status: string | null;
+  registration_fee_cents: number | null;
+  telegram_linked: boolean;
+  telegram_username: string | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
+  health_notes: string | null;
+  is_active: boolean;
+  department_code: string | null;
+  department_name: string | null;
+  position: string | null;
+  staff_id: string;
+  staff_id_verified_at: string | null;
+};
+
+/** GET /me/sessions — satu baris = satu peranti (satu family refresh token). */
+export type SessionRecord = {
+  id: string;
+  user_agent: string | null;
+  created_ip: string | null;
+  created_at: string;
+  expires_at: string;
+  is_current: boolean;
+};
+
+/** `authz.CategoryManagement` di backend. */
+export const CATEGORY_MANAGEMENT = "management";
+
+export function isManagement(profile: Profile): boolean {
+  return profile.category === CATEGORY_MANAGEMENT;
+}
