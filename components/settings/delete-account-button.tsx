@@ -1,25 +1,22 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { UserRoundXIcon } from "lucide-react";
 
+import { ConfirmationDialog } from "@/components/marc/confirmation-dialog";
 import { Button } from "@/components/ui/button";
 import { requestAccountDeletionAction } from "@/lib/profil/settings-actions";
 
 export function DeleteAccountButton() {
-  const [confirming, setConfirming] = useState(false);
   const [message, setMessage] = useState<string>();
-  const [pending, startTransition] = useTransition();
 
-  function requestDeletion() {
-    startTransition(async () => {
-      const result = await requestAccountDeletionAction();
-      setMessage(result.success ?? result.error);
-      if (result.success) setConfirming(false);
-    });
+  async function requestDeletion(): Promise<boolean> {
+    const result = await requestAccountDeletionAction();
+    setMessage(result.success ?? result.error);
+    return Boolean(result.success);
   }
 
-  if (message && !confirming) {
+  if (message) {
     return <p className="min-h-16 px-4 py-0 flex items-center text-sm text-muted-foreground">{message}</p>;
   }
 
@@ -32,20 +29,13 @@ export function DeleteAccountButton() {
           Hantar permintaan untuk diproses oleh pasukan MARC.
         </p>
       </div>
-      {!confirming ? (
-        <Button type="button" size="sm" variant="destructive" onClick={() => setConfirming(true)}>
-          Minta padam
-        </Button>
-      ) : (
-        <div className="flex shrink-0 gap-2">
-          <Button type="button" size="sm" variant="ghost" onClick={() => setConfirming(false)}>
-            Batal
-          </Button>
-          <Button type="button" size="sm" variant="destructive" disabled={pending} onClick={requestDeletion}>
-            {pending ? "Menghantar…" : "Sahkan"}
-          </Button>
-        </div>
-      )}
+      <ConfirmationDialog
+        title="Minta padam akaun?"
+        description="Permintaan akan dihantar kepada pasukan MARC untuk diproses. Tindakan ini tidak boleh dibuat asal semula selepas diluluskan."
+        confirmLabel="Minta padam"
+        trigger={<Button type="button" size="sm" variant="destructive">Minta padam</Button>}
+        onConfirm={requestDeletion}
+      />
     </div>
   );
 }

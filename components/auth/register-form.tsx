@@ -26,7 +26,7 @@ export function RegisterForm() {
         placeholder="nama@contoh.com"
         defaultValue={keadaan.nilai?.email}
         ralat={keadaan.medan?.email}
-        petunjuk="Guna emel kekal - emel sekali guna akan ditolak."
+        petunjuk="Guna emel kekal. MARC menyekat emel sekali guna daripada lebih 8,000 domain."
         required
       />
 

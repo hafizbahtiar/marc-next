@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { LikeButton } from "@/components/posts/like-button";
+import { ConfirmationDialog } from "@/components/marc/confirmation-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,7 +37,6 @@ export function PostCard({
   const router = useRouter();
   const [menyunting, setMenyunting] = useState(false);
   const [kandungan, setKandungan] = useState(post.content);
-  const [sahkanPadam, setSahkanPadam] = useState(false);
   const [pending, setPending] = useState(false);
 
   // Pemilik SENTIASA boleh edit/padam post sendiri; padam sahaja
@@ -59,14 +59,13 @@ export function PostCard({
     }
   }
 
-  async function deletePost() {
+  async function deletePost(): Promise<boolean> {
     setPending(true);
     try {
       const hasil = await padamPosAction(post.id);
       if (!hasil.ok) {
         toast.error(hasil.ralat);
-        setSahkanPadam(false);
-        return;
+        return false;
       }
       // Berjaya: beritahu ibu bapa supaya kad ini hilang serta-merta
       // (tanpa bergantung pada React mengesan semula render pelayan).
@@ -78,6 +77,7 @@ export function PostCard({
         router.push(ROUTES.pos);
       }
       selepasPadam?.();
+      return true;
     } finally {
       setPending(false);
     }
@@ -175,21 +175,23 @@ export function PostCard({
           </Button>
         ) : null}
         {bolehPadam ? (
-          sahkanPadam ? (
-          <Button type="button" size="sm" variant="destructive" onClick={deletePost} disabled={pending}>
-              Padam? Sahkan
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              className={bolehEdit ? "" : "ml-auto"}
-              onClick={() => setSahkanPadam(true)}
-            >
-              Padam
-            </Button>
-          )
+          <ConfirmationDialog
+            title="Padam post?"
+            description="Tindakan ini tidak boleh dibuat asal semula."
+            confirmLabel="Padam"
+            trigger={
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className={bolehEdit ? "" : "ml-auto"}
+                disabled={pending}
+              >
+                Padam
+              </Button>
+            }
+            onConfirm={deletePost}
+          />
         ) : null}
       </footer>
     </article>

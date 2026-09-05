@@ -6,6 +6,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { CheckIcon, PencilIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react";
 
 import { DataTable, DataTableColumnHeader } from "@/components/marc/data-table";
+import { ConfirmationDialog } from "@/components/marc/confirmation-dialog";
 import { ResponsiveFormSheet } from "@/components/marc/responsive-sheet";
 import { StatusBadge } from "@/components/marc/status-badge";
 import { Button } from "@/components/ui/button";
@@ -56,7 +57,6 @@ export function CategoryTable({ rows }: { rows: ActivityCategory[] }) {
 
 export function DomainTable({ rows }: { rows: BlockedDomain[] }) {
   const router = useRouter();
-  const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState("");
   const execute = useCallback(async (action: () => Promise<{ ok: boolean; message: string }>) => {
     const result = await action();
@@ -64,13 +64,23 @@ export function DomainTable({ rows }: { rows: BlockedDomain[] }) {
     if (result.ok) router.refresh();
     return result;
   }, [router]);
-  function run(action: () => Promise<{ ok: boolean; message: string }>) {
-    startTransition(() => { void execute(action); });
-  }
   const columns: ColumnDef<BlockedDomain>[] = [
     { accessorKey: "domain", header: ({ column }) => <DataTableColumnHeader column={column} title="Domain" /> },
     { accessorKey: "created_at", header: "Ditambah", cell: ({ row }) => new Date(row.original.created_at).toLocaleDateString("ms-MY") },
-    { id: "actions", header: "Tindakan", enableHiding: false, cell: ({ row }) => <Button size="sm" variant="destructive" disabled={pending} onClick={() => run(() => removeBlockedDomainAction(row.original.domain))}><Trash2Icon /> Buang</Button> },
+    {
+      id: "actions",
+      header: "Tindakan",
+      enableHiding: false,
+      cell: ({ row }) => (
+        <ConfirmationDialog
+          title="Buang sekatan domain?"
+          description={`Domain ${row.original.domain} akan dibenarkan semula untuk pendaftaran.`}
+          confirmLabel="Buang sekatan"
+          trigger={<Button size="sm" variant="destructive"><Trash2Icon /> Buang</Button>}
+          onConfirm={async () => (await execute(() => removeBlockedDomainAction(row.original.domain))).ok}
+        />
+      ),
+    },
   ];
   return <ManagementTableShell message={message} action={
     <ResponsiveFormSheet
@@ -86,7 +96,6 @@ export function DomainTable({ rows }: { rows: BlockedDomain[] }) {
 
 export function DepartmentTable({ rows }: { rows: Department[] }) {
   const router = useRouter();
-  const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState("");
   const execute = useCallback(async (action: () => Promise<{ ok: boolean; message: string }>) => {
     const result = await action();
@@ -94,9 +103,6 @@ export function DepartmentTable({ rows }: { rows: Department[] }) {
     if (result.ok) router.refresh();
     return result;
   }, [router]);
-  function run(action: () => Promise<{ ok: boolean; message: string }>) {
-    startTransition(() => { void execute(action); });
-  }
   const columns: ColumnDef<Department>[] = [
     { accessorKey: "code", header: ({ column }) => <DataTableColumnHeader column={column} title="Kod" /> },
     { accessorKey: "name", header: ({ column }) => <DataTableColumnHeader column={column} title="Nama" /> },
@@ -109,12 +115,18 @@ export function DepartmentTable({ rows }: { rows: Department[] }) {
           <ResponsiveFormSheet
             title="Edit bahagian"
             description={`Kemas kini nama untuk ${row.original.code}.`}
-            trigger={<Button size="sm" variant="outline" disabled={pending}><PencilIcon /> Edit</Button>}
+            trigger={<Button size="sm" variant="outline"><PencilIcon /> Edit</Button>}
             submitLabel="Simpan perubahan"
             fields={[{ name: "name", label: "Nama bahagian", defaultValue: row.original.name }]}
             onSubmit={(values) => execute(() => updateDepartmentAction(row.original.code, values.name.trim()))}
           />
-          <Button size="sm" variant="destructive" disabled={pending} onClick={() => run(() => deleteDepartmentAction(row.original.code))}><Trash2Icon /> Buang</Button>
+          <ConfirmationDialog
+            title="Buang bahagian?"
+            description={`Bahagian ${row.original.code} akan dibuang daripada rujukan organisasi.`}
+            confirmLabel="Buang bahagian"
+            trigger={<Button size="sm" variant="destructive"><Trash2Icon /> Buang</Button>}
+            onConfirm={async () => (await execute(() => deleteDepartmentAction(row.original.code))).ok}
+          />
         </div>
       ),
     },

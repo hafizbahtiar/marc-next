@@ -1,4 +1,4 @@
-import { BackLink } from "@/components/ui/back-link";
+import { PageBreadcrumb } from "@/components/marc/page-breadcrumb";
 import {
   Accordion,
   AccordionContent,
@@ -19,7 +19,7 @@ const faqs = [
 export default function FaqPage() {
   return (
     <div className="mx-auto grid max-w-6xl gap-6">
-      <BackLink href="/settings">Kembali ke Tetapan</BackLink>
+      <PageBreadcrumb items={[{ href: "/settings", label: "Tetapan" }]} current="Soalan lazim" />
       <header className="grid gap-2">
         <p className="text-sm font-medium text-primary">Bantuan</p>
         <h1 className="font-heading text-3xl font-semibold tracking-tight">Soalan lazim</h1>

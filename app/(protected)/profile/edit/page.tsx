@@ -1,4 +1,5 @@
 import { ProfileEditForm } from "@/components/profile/profile-edit-form";
+import { PageBreadcrumb } from "@/components/marc/page-breadcrumb";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { wajibSesi } from "@/lib/auth/session";
 
@@ -7,6 +8,7 @@ export default async function EditProfilePage() {
 
   return (
     <div className="mx-auto grid max-w-2xl gap-8">
+      <PageBreadcrumb items={[{ href: "/profile", label: "Profil" }]} current="Edit profil" />
       <header>
         <p className="text-sm font-medium text-primary">Akaun anda</p>
         <h1 className="mt-2 font-heading text-3xl font-semibold tracking-tight text-balance">

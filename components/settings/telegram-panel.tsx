@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { CheckIcon, Link2Icon, SendIcon, UnlinkIcon } from "lucide-react";
 
+import { ConfirmationDialog } from "@/components/marc/confirmation-dialog";
 import { Button } from "@/components/ui/button";
 import { generateTelegramLinkAction, unlinkTelegramAction } from "@/lib/profil/settings-actions";
 
@@ -28,16 +29,15 @@ export function TelegramPanel({
     });
   }
 
-  function disconnect() {
+  async function disconnect(): Promise<boolean> {
     setError(undefined);
-    startTransition(async () => {
-      const result = await unlinkTelegramAction();
-      if (result.error) {
-        setError(result.error);
-      } else {
-        window.location.reload();
-      }
-    });
+    const result = await unlinkTelegramAction();
+    if (result.error) {
+      setError(result.error);
+      return false;
+    }
+    window.location.reload();
+    return true;
   }
 
   return (
@@ -57,15 +57,20 @@ export function TelegramPanel({
         Sambungkan akaun Telegram anda ke MARC untuk ciri notifikasi dan pengesahan yang akan datang.
       </p>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
-      <Button
-        type="button"
-        variant={linked ? "destructive" : "default"}
-        disabled={pending}
-        onClick={linked ? disconnect : connect}
-      >
-        {linked ? <UnlinkIcon className="size-4" /> : <Link2Icon className="size-4" />}
-        {pending ? "Memproses…" : linked ? "Nyahikat Telegram" : "Sambung Telegram"}
-      </Button>
+      {linked ? (
+        <ConfirmationDialog
+          title="Nyahikat Telegram?"
+          description="Akaun Telegram tidak lagi dipautkan kepada akaun MARC anda."
+          confirmLabel="Nyahikat"
+          trigger={<Button type="button" variant="destructive" disabled={pending}><UnlinkIcon className="size-4" /> Nyahikat Telegram</Button>}
+          onConfirm={disconnect}
+        />
+      ) : (
+        <Button type="button" variant="default" disabled={pending} onClick={connect}>
+          <Link2Icon className="size-4" />
+          {pending ? "Memproses…" : "Sambung Telegram"}
+        </Button>
+      )}
     </div>
   );
 }

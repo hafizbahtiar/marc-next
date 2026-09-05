@@ -33,6 +33,49 @@ export function cancelRegistrationBill(accessToken: string, userId: string): Pro
   });
 }
 
+export type MemberRole = {
+  key: string;
+  name: string;
+  rank: number;
+};
+
+export type AssignableDepartment = {
+  code: string;
+  name: string;
+};
+
+export function listRoles(accessToken: string): Promise<MemberRole[]> {
+  return apiFetch<MemberRole[]>("/roles", { accessToken });
+}
+
+export function listAssignableDepartments(accessToken: string): Promise<AssignableDepartment[]> {
+  return apiFetch<AssignableDepartment[]>("/departments", { accessToken });
+}
+
+export function updateMemberRole(accessToken: string, userId: string, roleKey: string): Promise<void> {
+  return apiFetch<void>(`/members/${userId}/role`, {
+    method: "PATCH",
+    body: { role_key: roleKey },
+    accessToken,
+  });
+}
+
+export function updateMemberActive(accessToken: string, userId: string, isActive: boolean): Promise<void> {
+  return apiFetch<void>(`/members/${userId}/active`, {
+    method: "PATCH",
+    body: { is_active: isActive },
+    accessToken,
+  });
+}
+
+export function updateMemberDepartment(
+  accessToken: string,
+  userId: string,
+  body: { department_code: string | null; position: string | null },
+): Promise<void> {
+  return apiFetch<void>(`/members/${userId}/department`, { method: "PATCH", body, accessToken });
+}
+
 export type MemberDetail = MemberRow & {
   phone: string | null;
   emergency_contact_name: string | null;

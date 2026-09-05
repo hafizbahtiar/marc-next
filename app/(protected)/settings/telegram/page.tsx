@@ -1,5 +1,5 @@
 import { TelegramPanel } from "@/components/settings/telegram-panel";
-import { BackLink } from "@/components/ui/back-link";
+import { PageBreadcrumb } from "@/components/marc/page-breadcrumb";
 import { wajibSesi } from "@/lib/auth/session";
 
 export default async function TelegramPage() {
@@ -7,7 +7,7 @@ export default async function TelegramPage() {
 
   return (
     <div className="mx-auto grid max-w-6xl gap-6">
-      <BackLink href="/settings">Kembali ke Tetapan</BackLink>
+      <PageBreadcrumb items={[{ href: "/settings", label: "Tetapan" }]} current="Telegram" />
       <header className="grid gap-2">
         <p className="text-sm font-medium text-primary">Sambungan</p>
         <h1 className="font-heading text-3xl font-semibold tracking-tight">Telegram</h1>

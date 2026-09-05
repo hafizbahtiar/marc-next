@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { PencilIcon, SettingsIcon } from "lucide-react";
 
+import { ResponsiveDetailsSheet } from "@/components/marc/responsive-sheet";
+import { ProfileEditForm } from "@/components/profile/profile-edit-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,12 +36,18 @@ export function ProfileHeader({ profile }: { profile: Profile }) {
       </div>
 
       <div className="flex gap-2">
-        <Button asChild variant="outline" size="sm">
-          <Link href={ROUTES.profilEdit}>
+        <ResponsiveDetailsSheet
+          title="Edit profil"
+          description="Pastikan maklumat anda sentiasa tepat dan terkini."
+          trigger={
+            <Button type="button" variant="outline" size="sm">
             <PencilIcon />
             Edit
-          </Link>
-        </Button>
+            </Button>
+          }
+        >
+          <ProfileEditForm profile={profile} />
+        </ResponsiveDetailsSheet>
         <Button asChild variant="ghost" size="icon" aria-label="Tetapan">
           <Link href={ROUTES.tetapan}>
             <SettingsIcon />

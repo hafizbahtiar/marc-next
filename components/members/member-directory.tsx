@@ -2,18 +2,29 @@
 
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { StatusBadge } from "@/components/marc/status-badge";
+import { MemberActions } from "@/components/members/member-actions";
 import {
   DataTable,
   DataTableColumnHeader,
   type DataTableFilter,
 } from "@/components/marc/data-table";
-import type { MemberRow } from "@/lib/api/types";
+import type { MemberRow, Profile } from "@/lib/api/types";
+import type { AssignableDepartment, MemberRole } from "@/lib/members/api";
 
-export function MemberDirectory({ members }: { members: MemberRow[] }) {
+export function MemberDirectory({
+  members,
+  profile,
+  roles,
+  departments: assignableDepartments,
+}: {
+  members: MemberRow[];
+  profile: Profile;
+  roles: MemberRole[];
+  departments: AssignableDepartment[];
+}) {
   const departments = useMemo<[string, string][]>(
     () =>
       [...new Map<string, string>(
@@ -38,7 +49,7 @@ export function MemberDirectory({ members }: { members: MemberRow[] }) {
   return (
     <div className="grid gap-4">
       <DataTable
-        columns={memberColumns}
+        columns={createMemberColumns(profile, roles, assignableDepartments)}
         data={members}
         searchKey="display_name"
         searchPlaceholder="Cari nama ahli…"
@@ -50,7 +61,12 @@ export function MemberDirectory({ members }: { members: MemberRow[] }) {
   );
 }
 
-const memberColumns: ColumnDef<MemberRow>[] = [
+function createMemberColumns(
+  profile: Profile,
+  roles: MemberRole[],
+  departments: AssignableDepartment[],
+): ColumnDef<MemberRow>[] {
+  return [
   {
     accessorKey: "display_name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Nama" />,
@@ -96,10 +112,16 @@ const memberColumns: ColumnDef<MemberRow>[] = [
     id: "actions",
     header: "Tindakan",
     enableHiding: false,
-    cell: ({ row }) => <ButtonLink href={`/members/${row.original.user_id}`}>Lihat detail</ButtonLink>,
+    cell: ({ row }) => (
+      <MemberActions
+        member={row.original}
+        roleKey={profile.role_key}
+        roleRank={profile.role_rank}
+        roles={roles}
+        departments={departments}
+      />
+    ),
   },
-];
-
-function ButtonLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return <Link href={href} className="inline-flex h-8 items-center rounded-lg border px-3 text-xs font-medium transition-colors hover:bg-muted">{children}</Link>;
+  ];
 }
+

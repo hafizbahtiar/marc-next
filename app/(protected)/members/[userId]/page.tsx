@@ -1,6 +1,6 @@
 import { MailIcon, MapPinIcon, PhoneIcon, UserRoundIcon } from "lucide-react";
 
-import { BackLink } from "@/components/ui/back-link";
+import { PageBreadcrumb } from "@/components/marc/page-breadcrumb";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +15,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ u
 
   return (
     <div className="mx-auto grid max-w-6xl gap-6">
-      <BackLink href="/members">Kembali ke Ahli</BackLink>
+      <PageBreadcrumb items={[{ href: "/profile", label: "Profil" }, { href: "/members", label: "Ahli" }]} current={name} />
       <section className="flex flex-col gap-5 rounded-2xl border bg-card p-6 sm:flex-row sm:items-center">
         <Avatar className="size-20 ring-4 ring-secondary">
           {member.avatar_url ? <AvatarImage src={member.avatar_url} alt="" /> : null}

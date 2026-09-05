@@ -1,6 +1,6 @@
 import { MapPinIcon } from "lucide-react";
 
-import { BackLink } from "@/components/ui/back-link";
+import { PageBreadcrumb } from "@/components/marc/page-breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ export default async function AddressesPage() {
 
   return (
     <div className="mx-auto grid max-w-6xl gap-6">
-      <BackLink href="/profile">Kembali ke Profil</BackLink>
+      <PageBreadcrumb items={[{ href: "/profile", label: "Profil" }]} current="Alamat" />
       <header className="grid gap-2">
         <p className="flex items-center gap-2 text-sm font-medium text-primary">
           <MapPinIcon className="size-4" />

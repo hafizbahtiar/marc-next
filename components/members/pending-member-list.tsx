@@ -5,17 +5,8 @@ import { useCallback, useMemo, useState, useTransition } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { CheckCircle2Icon, MoreHorizontalIcon, ShieldCheckIcon, XCircleIcon } from "lucide-react";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ConfirmationDialog } from "@/components/marc/confirmation-dialog";
 import { StatusBadge, statusTone } from "@/components/marc/status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -118,7 +109,12 @@ export function PendingMemberList({
               <CheckCircle2Icon /> Lulus
             </Button>
             {canCancelBill && billPending ? (
-              <Button size="sm" variant="outline" disabled={pending} onClick={() => run(cancelRegistrationBillAction, member.user_id)}>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={pending}
+                onClick={() => setConfirmation({ question: `Batalkan bil pendaftaran ${name}?`, action: cancelRegistrationBillAction, id: member.user_id })}
+              >
                 <MoreHorizontalIcon /> Batal bil
               </Button>
             ) : null}
@@ -149,27 +145,16 @@ export function PendingMemberList({
         pageSizeOptions={[10, 20, 50]}
         initialPageSize={20}
       />
-      <AlertDialog open={Boolean(confirmation)} onOpenChange={(open) => !open && setConfirmation(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Sahkan tindakan</AlertDialogTitle>
-            <AlertDialogDescription>{confirmation?.question}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={pending}>Batal</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={pending}
-              onClick={() => {
-                if (!confirmation) return;
-                run(confirmation.action, confirmation.id);
-                setConfirmation(null);
-              }}
-            >
-              Teruskan
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmationDialog
+        open={Boolean(confirmation)}
+        onOpenChange={(open) => !open && setConfirmation(null)}
+        description={confirmation?.question ?? ""}
+        onConfirm={async () => {
+          if (!confirmation) return;
+          run(confirmation.action, confirmation.id);
+          setConfirmation(null);
+        }}
+      />
     </div>
   );
 }

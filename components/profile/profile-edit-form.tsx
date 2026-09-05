@@ -4,6 +4,7 @@ import { useActionState, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ConfirmationDialog } from "@/components/marc/confirmation-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -81,9 +82,15 @@ export function ProfileEditForm({ profile }: { profile: Profile }) {
               {memuatNaik ? "Memuat naik…" : "Tukar gambar"}
             </Button>
             {pratontonAvatar ? (
-              <Button type="button" size="sm" variant="ghost" onClick={removeAvatar}>
-                Buang
-              </Button>
+              <ConfirmationDialog
+                title="Buang gambar profil?"
+                description="Gambar profil yang dipilih akan dibuang daripada perubahan anda."
+                confirmLabel="Buang gambar"
+                trigger={<Button type="button" size="sm" variant="ghost">Buang</Button>}
+                onConfirm={async () => {
+                  removeAvatar();
+                }}
+              />
             ) : null}
           </div>
           {ralatAvatar ? <p className="text-xs text-destructive">{ralatAvatar}</p> : null}

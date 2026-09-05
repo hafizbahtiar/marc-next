@@ -1,7 +1,7 @@
 import { CreditCardIcon } from "lucide-react";
 
 import { PaymentHistoryTable } from "@/components/payments/payment-history-table";
-import { BackLink } from "@/components/ui/back-link";
+import { PageBreadcrumb } from "@/components/marc/page-breadcrumb";
 import { wajibSesi } from "@/lib/auth/session";
 import { getPaymentHistory } from "@/lib/payments/api";
 
@@ -16,7 +16,7 @@ export default async function PaymentHistoryPage() {
 
   return (
     <div className="mx-auto grid max-w-6xl gap-6">
-      <BackLink href="/profile">Kembali ke Profil</BackLink>
+      <PageBreadcrumb items={[{ href: "/profile", label: "Profil" }]} current="Sejarah bayaran" />
       <header className="grid gap-2">
         <p className="flex items-center gap-2 text-sm font-medium text-primary">
           <CreditCardIcon className="size-4" />

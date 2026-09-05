@@ -45,3 +45,28 @@ export async function cancelRegistrationBillAction(userId: string) {
     "Bil pendaftaran dibatalkan.",
   );
 }
+
+export async function updateMemberRoleAction(userId: string, roleKey: string) {
+  return runMemberAction(
+    (token) => membersApi.updateMemberRole(token, userId, roleKey),
+    "Role ahli dikemas kini.",
+  );
+}
+
+export async function updateMemberActiveAction(userId: string, isActive: boolean) {
+  return runMemberAction(
+    (token) => membersApi.updateMemberActive(token, userId, isActive),
+    isActive ? "Ahli diaktifkan." : "Ahli dinyahaktifkan.",
+  );
+}
+
+export async function updateMemberDepartmentAction(
+  userId: string,
+  departmentCode: string | null,
+  position: string | null,
+) {
+  return runMemberAction(
+    (token) => membersApi.updateMemberDepartment(token, userId, { department_code: departmentCode, position }),
+    "Bahagian dan jawatan ahli dikemas kini.",
+  );
+}
