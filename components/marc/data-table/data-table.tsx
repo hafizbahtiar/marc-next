@@ -24,18 +24,18 @@ import { AlertCircleIcon, ChevronDownIcon, ChevronsUpDownIcon, EyeIcon, InboxIco
 
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -47,6 +47,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DataTablePagination } from "./data-table-pagination";
+import { nextFilterValue } from "./data-table-filter";
 
 export type DataTableFilterOption = {
   label: string;
@@ -58,6 +59,7 @@ export type DataTableFilter = {
   columnId: string;
   title: string;
   options: DataTableFilterOption[];
+  multiple?: boolean;
 };
 
 export type DataTableProps<TData, TValue> = {
@@ -79,6 +81,7 @@ export type DataTableProps<TData, TValue> = {
   toolbar?: React.ReactNode | ((table: TableInstance<TData>) => React.ReactNode);
   footer?: React.ReactNode | ((table: TableInstance<TData>) => React.ReactNode);
   className?: string;
+  enablePagination?: boolean;
 };
 
 export function DataTable<TData, TValue>({
@@ -100,6 +103,7 @@ export function DataTable<TData, TValue>({
   toolbar,
   footer,
   className,
+  enablePagination = true,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -125,7 +129,7 @@ export function DataTable<TData, TValue>({
     getRowId,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    ...(enablePagination ? { getPaginationRowModel: getPaginationRowModel() } : {}),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
@@ -152,7 +156,13 @@ export function DataTable<TData, TValue>({
           {filters.map((filter) => {
             const column = table.getColumn(filter.columnId);
             return column ? (
-              <DataTableFacetedFilter key={filter.columnId} column={column} title={filter.title} options={filter.options} />
+              <DataTableFacetedFilter
+                key={filter.columnId}
+                column={column}
+                title={filter.title}
+                options={filter.options}
+                multiple={filter.multiple ?? true}
+              />
             ) : null;
           })}
           {columnFilters.length > 0 || sorting.length > 0 ? (
@@ -234,7 +244,7 @@ export function DataTable<TData, TValue>({
             </Table>
           </div>
           {footer ? <div>{typeof footer === "function" ? footer(table) : footer}</div> : null}
-          <DataTablePagination table={table} pageSizeOptions={pageSizeOptions} />
+          {enablePagination ? <DataTablePagination table={table} pageSizeOptions={pageSizeOptions} /> : null}
         </>
       )}
     </div>
@@ -291,40 +301,65 @@ function DataTableFacetedFilter<TData, TValue>({
   column,
   title,
   options,
+  multiple,
 }: {
   column: import("@tanstack/react-table").Column<TData, TValue>;
   title: string;
   options: DataTableFilterOption[];
+  multiple: boolean;
 }) {
-  const selected = new Set((column.getFilterValue() as string[]) ?? []);
+  const filterValue = column.getFilterValue();
+  const selected = new Set(
+    Array.isArray(filterValue)
+      ? (filterValue as string[])
+      : typeof filterValue === "string" && filterValue
+        ? [filterValue]
+        : [],
+  );
+  const optionValues = options.map((option) => option.value);
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-9 border-dashed">
-          {title}
-          {selected.size > 0 ? <Badge variant="secondary" className="ml-1 rounded-sm px-1 font-normal">{selected.size}</Badge> : null}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-52">
-        <DropdownMenuLabel>{title}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {options.map((option) => (
-          <DropdownMenuCheckboxItem
-            key={option.value}
-            checked={selected.has(option.value)}
-            onCheckedChange={(checked) => {
-              const next = new Set(selected);
-              if (checked) next.add(option.value);
-              else next.delete(option.value);
-              column.setFilterValue(next.size ? Array.from(next) : undefined);
-            }}
-          >
-            {option.icon ? <option.icon className="mr-2 size-4 text-muted-foreground" /> : null}
-            {option.label}
-          </DropdownMenuCheckboxItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Combobox
+      items={optionValues}
+      multiple={multiple}
+      value={multiple ? Array.from(selected) : Array.from(selected)[0] ?? null}
+      onValueChange={(value) => {
+        if (multiple) {
+          const next = Array.isArray(value) ? value : value ? [value] : [];
+          column.setFilterValue(next.length ? next : undefined);
+          return;
+        }
+
+        column.setFilterValue(
+          typeof value === "string"
+            ? nextFilterValue([], value, true, false)
+            : undefined,
+        );
+      }}
+    >
+      <ComboboxInput
+        placeholder={selected.size ? `${title} · ${selected.size}` : title}
+        showTrigger
+        showClear={selected.size > 0}
+        className="h-9 w-52"
+        aria-label={title}
+      />
+      <ComboboxContent>
+        <ComboboxEmpty>Tiada pilihan ditemui.</ComboboxEmpty>
+        <ComboboxList>
+          {(value) => {
+            const option = options.find((item) => item.value === value);
+            if (!option) return null;
+            return (
+              <ComboboxItem key={option.value} value={option.value}>
+                {option.icon ? <option.icon className="text-muted-foreground" /> : null}
+                {option.label}
+              </ComboboxItem>
+            );
+          }}
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
   );
 }
 

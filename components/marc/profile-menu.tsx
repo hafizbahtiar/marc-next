@@ -2,7 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 import Link from "next/link";
-import { LogOutIcon, SettingsIcon, UserIcon } from "lucide-react";
+import { CalendarDaysIcon, ClipboardCheckIcon, LogOutIcon, SettingsIcon, UserIcon } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -55,6 +55,21 @@ export function ProfileMenu({ profile }: { profile: Profile }) {
           <Link href={ROUTES.tetapan}>
             <SettingsIcon />
             Tetapan
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem asChild>
+          <Link href={ROUTES.activities}>
+            <CalendarDaysIcon />
+            Aktiviti
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href={ROUTES.myActivities}>
+            <ClipboardCheckIcon />
+            Aktiviti saya
           </Link>
         </DropdownMenuItem>
 
