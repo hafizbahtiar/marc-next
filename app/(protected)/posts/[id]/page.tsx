@@ -24,7 +24,7 @@ export default async function PostDetailPage({ params }: PageProps<"/posts/[id]"
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="mx-auto grid max-w-3xl gap-6">
       <PostCard post={pos} profileSemasa={profile} pautanKeDetail={false} />
 
       <div>

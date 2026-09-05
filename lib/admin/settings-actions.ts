@@ -29,6 +29,13 @@ export async function toggleCategoryAction(id: string, isActive: boolean) {
   return withToken((token) => api.updateActivityCategory(token, id, { is_active: isActive }), "Status kategori dikemas kini.");
 }
 
+export async function updateCategoryAction(id: string, name: string, sortOrder: number) {
+  return withToken(
+    (token) => api.updateActivityCategory(token, id, { name, sort_order: sortOrder }),
+    "Kategori dikemas kini.",
+  );
+}
+
 export async function addBlockedDomainAction(domain: string) {
   return withToken((token) => api.createBlockedDomain(token, domain), "Domain disekat.");
 }

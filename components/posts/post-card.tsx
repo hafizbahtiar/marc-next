@@ -154,6 +154,17 @@ export function PostCard({
         </div>
       ) : null}
 
+      {post.comment_count > 0 && post.comment_previews?.length ? (
+        <div className="grid gap-2 border-t border-border/60 pt-3">
+          {post.comment_previews.map((comment) => <CommentPreview key={comment.id} comment={comment} />)}
+          {post.comment_count > post.comment_previews.length ? (
+            <Link href={`/posts/${post.id}`} className="text-xs font-medium text-muted-foreground hover:text-foreground">
+              Lihat semua {post.comment_count} komen
+            </Link>
+          ) : null}
+        </div>
+      ) : null}
+
       <footer className="flex items-center gap-2">
           <LikeButton
           id={post.id}
@@ -195,6 +206,32 @@ export function PostCard({
         ) : null}
       </footer>
     </article>
+  );
+}
+
+function CommentPreview({ comment }: { comment: NonNullable<Post["comment_previews"]>[number] }) {
+  const [expanded, setExpanded] = useState(false);
+  const nama = comment.author.display_name?.trim() || comment.author.member_id;
+  const isLong = comment.content.length > 220;
+
+  return (
+    <div className="flex items-start gap-2.5">
+      <Avatar size="sm">
+        {comment.author.avatar_url ? <AvatarImage src={comment.author.avatar_url} alt="" /> : null}
+        <AvatarFallback>{nama.slice(0, 2).toUpperCase()}</AvatarFallback>
+      </Avatar>
+      <div className="min-w-0 flex-1 rounded-2xl bg-muted/70 px-3 py-2">
+        <p className="text-xs font-semibold">{nama}</p>
+        <p className={expanded ? "mt-0.5 text-sm whitespace-pre-wrap" : "mt-0.5 line-clamp-3 text-sm whitespace-pre-wrap"}>
+          {comment.content}
+        </p>
+        {isLong ? (
+          <button type="button" className="mt-1 text-xs font-medium text-muted-foreground hover:text-foreground" onClick={() => setExpanded((value) => !value)}>
+            {expanded ? "Ringkaskan" : "Lihat lagi"}
+          </button>
+        ) : null}
+      </div>
+    </div>
   );
 }
 

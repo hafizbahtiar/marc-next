@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState, useTransition } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { CheckIcon, PencilIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react";
+import { CheckIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 
 import { DataTable, DataTableColumnHeader } from "@/components/marc/data-table";
 import { ConfirmationDialog } from "@/components/marc/confirmation-dialog";
@@ -11,7 +11,7 @@ import { ResponsiveFormSheet } from "@/components/marc/responsive-sheet";
 import { StatusBadge } from "@/components/marc/status-badge";
 import { Button } from "@/components/ui/button";
 import type { ActivityCategory, BlockedDomain, Department } from "@/lib/admin/settings-api";
-import { addBlockedDomainAction, createCategoryAction, createDepartmentAction, deleteDepartmentAction, removeBlockedDomainAction, toggleCategoryAction, updateDepartmentAction } from "@/lib/admin/settings-actions";
+import { addBlockedDomainAction, createCategoryAction, createDepartmentAction, deleteDepartmentAction, removeBlockedDomainAction, toggleCategoryAction, updateCategoryAction, updateDepartmentAction } from "@/lib/admin/settings-actions";
 
 export function CategoryTable({ rows }: { rows: ActivityCategory[] }) {
   const router = useRouter();
@@ -36,13 +36,35 @@ export function CategoryTable({ rows }: { rows: ActivityCategory[] }) {
       header: "Tindakan",
       enableHiding: false,
       cell: ({ row }) => (
-        <Button size="sm" variant="outline" disabled={pending} onClick={() => run(async () => toggleCategoryAction(row.original.id, !row.original.is_active))}>
-          {row.original.is_active ? <XIcon /> : <CheckIcon />}
-          {row.original.is_active ? "Nyahaktif" : "Aktifkan"}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <ResponsiveFormSheet
+            title="Edit kategori"
+            description={`Kemas kini kategori ${row.original.key}.`}
+            trigger={<Button size="sm" variant="outline" disabled={pending}><PencilIcon /> Edit</Button>}
+            submitLabel="Simpan perubahan"
+            fields={[
+              { name: "name", label: "Nama kategori", defaultValue: row.original.name },
+              { name: "sort_order", label: "Susunan", defaultValue: String(row.original.sort_order), placeholder: "0" },
+            ]}
+            onSubmit={(values) => execute(() => updateCategoryAction(row.original.id, values.name.trim(), Number(values.sort_order) || 0))}
+          />
+          {row.original.is_active ? (
+            <ConfirmationDialog
+              title="Padam kategori?"
+              description={`Kategori ${row.original.name} akan dinyahaktifkan. Aktiviti sedia ada tidak akan terjejas.`}
+              confirmLabel="Padam kategori"
+              trigger={<Button size="sm" variant="destructive" disabled={pending}><Trash2Icon /> Padam</Button>}
+              onConfirm={async () => (await execute(() => toggleCategoryAction(row.original.id, false))).ok}
+            />
+          ) : (
+            <Button size="sm" variant="outline" disabled={pending} onClick={() => run(() => toggleCategoryAction(row.original.id, true))}>
+              <CheckIcon /> Pulihkan
+            </Button>
+          )}
+        </div>
       ),
     },
-  ], [pending, run]);
+  ], [execute, pending, run]);
   return <ManagementTableShell message={message} action={
     <ResponsiveFormSheet
       title="Kategori baharu"

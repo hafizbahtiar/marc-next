@@ -17,8 +17,8 @@ setiap laluan ahli **tiada CORS**. `fetch()` silang-origin daripada
 pelayar akan gagal pada preflight.
 
 Jadi pelayar **tak pernah** bercakap dengan Go. Setiap panggilan berlaku
-pada pelayan Next (`lib/api/client.ts` ialah satu-satunya tempat yang
-memanggil `API_URL`), dan token duduk dalam kuki `httpOnly` yang skrip
+Pada pelayan Next (`lib/api/client.ts` ialah satu-satunya tempat yang
+memanggil `API_INTERNAL_URL`), dan token duduk dalam kuki `httpOnly` yang skrip
 klien tak boleh baca. `MARC_API_URL` sengaja **tiada** awalan
 `NEXT_PUBLIC_`.
 
@@ -150,14 +150,13 @@ balas per-medan sebelum satu pun permintaan rangkaian.
 
 | Nama | Wajib | Nota |
 |---|---|---|
-| `MARC_API_URL` | ya* | URL yang **pelayan** Next guna. Railway: rangkaian peribadi. |
-| `MARC_API_PUBLIC_URL` | ya* | Origin **awam** `marc_go`. Sandaran untuk `MARC_API_URL`. |
+| `MARC_API_URL` | ya | URL internal yang **pelayan** Next guna. Railway: rangkaian peribadi. |
+| `MARC_API_PUBLIC_URL` | ya | Origin **awam** `marc_go`, hanya untuk trigger/pautan luaran. Bukan fallback. |
 | `MARC_REFRESH_TTL_DAYS` | tidak (30) | Padankan dengan `REFRESH_TTL` backend. Kuki yang hidup lebih lama daripada baris DB hanya menghasilkan 401 yang mengelirukan. |
 
-\* Sekurang-kurangnya **satu** daripada dua yang pertama. `MARC_API_URL`
-menang bila kedua-duanya ada; `MARC_API_PUBLIC_URL` mengambil alih bila
-ia tiada, supaya persekitaran tanpa rangkaian peribadi berjalan tanpa
-perubahan kod. Kedua-duanya server sahaja - tiada `NEXT_PUBLIC_`.
+Kedua-dua URL wajib ditetapkan. `MARC_API_URL` digunakan untuk semua
+panggilan server-to-server; `MARC_API_PUBLIC_URL` hanya untuk capaian
+luaran. Kedua-duanya server sahaja - tiada `NEXT_PUBLIC_`.
 
 ### Railway
 

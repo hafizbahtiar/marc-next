@@ -26,6 +26,21 @@ Gantikan `marc_go` dengan nama perkhidmatan sebenar kalau ia berbeza;
 rujukan `${{...}}` diselesaikan mengikut **nama perkhidmatan**, bukan
 nama repo.
 
+### Internal vs public API URL
+
+`MARC_API_URL` dan `MARC_API_PUBLIC_URL` mempunyai tugas yang berbeza:
+
+- `MARC_API_URL` digunakan oleh `lib/api/client.ts` dan semua server action
+  Next yang memanggil backend Go. Ia mesti menggunakan Railway private
+  domain dan `http://` dengan port eksplisit.
+- `MARC_API_PUBLIC_URL` hanya digunakan untuk trigger atau URL yang perlu
+  dicapai oleh browser, payment gateway, webhook, atau sistem luar.
+
+`MARC_API_PUBLIC_URL` bukan fallback kepada `MARC_API_URL`. Kedua-duanya
+wajib ditetapkan supaya salah konfigurasi dikesan semasa boot, bukan
+bertukar secara senyap kepada route yang lebih perlahan atau tidak boleh
+dicapai.
+
 Penjelasan penuh setiap satu ada dalam
 [`.env.example`](../.env.example) dan [`docs/auth.md`](./auth.md).
 
@@ -117,9 +132,9 @@ salah faham tentang seni bina; lihat [`docs/auth.md`](./auth.md).
 
 **Env diperlukan semasa BUILD, bukan runtime sahaja.** `/daftar` dan
 `/lupa-kata-laluan` dipra-render pada masa build, dan ia mengimport
-`lib/env.ts`, yang melempar bila kedua-dua URL kosong. Kalau build gagal
-dengan *"Tetapkan MARC_API_URL…"*, pemboleh ubah itu tiada pada
-perkhidmatan - bukan pepijat kod.
+`lib/env.ts`, yang melempar bila `MARC_API_URL` atau
+`MARC_API_PUBLIC_URL` kosong. Kalau build gagal dengan mesej env
+tersebut, pemboleh ubah itu tiada pada perkhidmatan - bukan pepijat kod.
 
 **DNS peribadi ialah runtime sahaja.** `*.railway.internal` tak
 menyelesaikan semasa fasa build. Membaca URL itu sebagai rentetan

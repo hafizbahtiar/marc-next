@@ -105,6 +105,7 @@ export type Post = {
   images: string[];
   like_count: number;
   comment_count: number;
+  comment_previews?: Comment[];
   liked_by_me: boolean;
 };
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BackLink } from "@/components/ui/back-link";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,16 +18,19 @@ export function PageBreadcrumb({
   current: string;
 }) {
   return (
-    <Breadcrumb>
-      <BreadcrumbList>
-        {items.map((item) => (
-          <BreadcrumbItem key={item.href}>
-            <BreadcrumbLink asChild><Link href={item.href}>{item.label}</Link></BreadcrumbLink>
-            <BreadcrumbSeparator />
-          </BreadcrumbItem>
-        ))}
-        <BreadcrumbItem><BreadcrumbPage>{current}</BreadcrumbPage></BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
+    <div className="grid gap-2">
+      <BackLink href={items[items.length - 1]?.href ?? "/"}>Kembali</BackLink>
+      <Breadcrumb>
+        <BreadcrumbList>
+          {items.map((item) => (
+            <BreadcrumbItem key={item.href}>
+              <BreadcrumbLink asChild><Link href={item.href}>{item.label}</Link></BreadcrumbLink>
+              <BreadcrumbSeparator />
+            </BreadcrumbItem>
+          ))}
+          <BreadcrumbItem><BreadcrumbPage>{current}</BreadcrumbPage></BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    </div>
   );
 }

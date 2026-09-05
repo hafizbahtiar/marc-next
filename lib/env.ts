@@ -12,7 +12,7 @@
  * kuki httpOnly yang JavaScript pelayar tak boleh baca.
  */
 
-/** Buang slash di hujung supaya `${API_URL}${path}` tak jadi `//auth`. */
+/** Buang slash di hujung supaya `${API_INTERNAL_URL}${path}` tak jadi `//auth`. */
 function kemas(url: string): string {
   return url.replace(/\/+$/, "");
 }
@@ -20,38 +20,29 @@ function kemas(url: string): string {
 const peribadi = process.env.MARC_API_URL?.trim();
 const awam = process.env.MARC_API_PUBLIC_URL?.trim();
 
-if (!peribadi && !awam) {
-  throw new Error(
-    "Tetapkan MARC_API_URL (atau sekurang-kurangnya MARC_API_PUBLIC_URL). " +
-      "Salin .env.example ke .env.local dan isi nilainya.",
-  );
+if (!peribadi) {
+  throw new Error("Tetapkan MARC_API_URL untuk panggilan server-to-server. Salin .env.example ke .env.local.");
+}
+if (!awam) {
+  throw new Error("Tetapkan MARC_API_PUBLIC_URL untuk trigger atau URL yang dicapai dari luar.");
 }
 
 /**
- * URL yang panggilan sisi pelayan gunakan.
- *
- * `MARC_API_PUBLIC_URL` ialah sandaran yang BERFUNGSI, bukan hiasan: di
- * Railway, laluan pantas ialah rangkaian peribadi, tetapi persekitaran
- * tanpa rangkaian itu - mesin tempatan, atau preview dalam projek lain -
- * mesti tetap boleh berjalan tanpa menukar kod. Menetapkan satu pemboleh
- * ubah sudah memadai.
+ * URL dalaman yang panggilan sisi pelayan gunakan. Jangan tukar kepada
+ * URL public sebagai fallback: Railway perlu menggunakan rangkaian
+ * private untuk process-to-process traffic.
  */
-export const API_URL = kemas(peribadi || awam!);
+export const API_INTERNAL_URL = kemas(peribadi);
 
 /**
  * Origin AWAM backend - untuk apa-apa yang mesti dicapai dari LUAR
  * rangkaian peribadi: pautan yang dibuka pelayar, dan nilai yang
  * diserahkan kepada gateway pembayaran.
  *
- * BELUM ADA pemanggil hari ini; setiap laluan semasa berjalan melalui
- * `API_URL` di sisi pelayan. Ia didedahkan supaya keutamaan sandaran
- * ditakrifkan di SATU tempat bila laluan begitu ditambah - bukan
- * diterbitkan semula, mungkin secara terbalik, di tempat panggilan.
- *
- * Ia jatuh balik kepada `API_URL` supaya penyediaan tempatan (satu
- * backend, satu URL) tak perlu menetapkan kedua-duanya.
+ * Gunakan hanya untuk trigger/pautan yang perlu dicapai dari luar Railway.
+ * Ia tidak boleh digunakan oleh apiFetch untuk panggilan process-to-process.
  */
-export const API_PUBLIC_URL = kemas(awam || peribadi!);
+export const API_PUBLIC_URL = kemas(awam);
 
 /**
  * Nama `.railway.internal` TIADA sijil TLS - rangkaian peribadi Railway
@@ -60,7 +51,7 @@ export const API_PUBLIC_URL = kemas(awam || peribadi!);
  * ralat handshake yang tak menyebut TLS langsung, jadi ia ditangkap di
  * sini di mana pembetulannya jelas.
  */
-if (API_URL.startsWith("https://") && API_URL.includes(".railway.internal")) {
+if (API_INTERNAL_URL.startsWith("https://") && API_INTERNAL_URL.includes(".railway.internal")) {
   throw new Error(
     "MARC_API_URL menggunakan https:// pada hos .railway.internal. " +
       "Rangkaian peribadi Railway tiada TLS - guna http:// dan sertakan port, " +
@@ -73,7 +64,7 @@ if (API_URL.startsWith("https://") && API_URL.includes(".railway.internal")) {
  * proksi di depan perkhidmatan dalaman, jadi tiada 80/443 yang tersirat.
  * Tanpa semakan ini, kegagalannya ialah tamat masa sambungan yang senyap.
  */
-if (API_URL.includes(".railway.internal") && !/:\d+$/.test(API_URL)) {
+if (API_INTERNAL_URL.includes(".railway.internal") && !/:\d+$/.test(API_INTERNAL_URL)) {
   throw new Error(
     "MARC_API_URL menunjuk ke hos .railway.internal tanpa port. " +
       "Sertakan port yang perkhidmatan Go dengar, cth :8080",

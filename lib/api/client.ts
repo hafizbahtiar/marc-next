@@ -1,6 +1,6 @@
 import "server-only";
 
-import { API_URL } from "@/lib/env";
+import { API_INTERNAL_URL } from "@/lib/env";
 import { ApiError, ApiUnreachableError } from "./errors";
 
 /**
@@ -83,7 +83,7 @@ export async function apiFetch<T>(
 
   let response: Response;
   try {
-    response = await fetch(`${API_URL}${path}`, {
+    response = await fetch(`${API_INTERNAL_URL}${path}`, {
       method,
       headers: finalHeaders,
       body: body === undefined ? undefined : JSON.stringify(body),
