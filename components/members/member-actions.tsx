@@ -24,6 +24,8 @@ import {
   updateMemberActiveAction,
   updateMemberDepartmentAction,
   updateMemberRoleAction,
+  correctMemberIdAction,
+  correctStaffIdAction,
 } from "@/lib/members/actions";
 
 export function MemberActions({
@@ -43,9 +45,12 @@ export function MemberActions({
   const [selectedRole, setSelectedRole] = useState(member.role_key);
   const [departmentCode, setDepartmentCode] = useState(member.department_code ?? "none");
   const [position, setPosition] = useState(member.position ?? "");
+  const [staffId, setStaffId] = useState(member.staff_id ?? "");
+  const [memberId, setMemberId] = useState(member.member_id ?? "");
   const name = member.display_name?.trim() || member.member_id || "ahli ini";
   const canEditRank = roleRank > member.role_rank;
   const canEditDepartment = ["manager", "admin", "superadmin"].includes(roleKey) && roleRank >= member.role_rank;
+  const canCorrectIds = ["admin", "superadmin"].includes(roleKey) && roleRank > member.role_rank;
 
   async function updateRole() {
     const result = await updateMemberRoleAction(member.user_id, selectedRole);
@@ -59,6 +64,18 @@ export function MemberActions({
       departmentCode === "none" ? null : departmentCode,
       position.trim() || null,
     );
+    toast[result.ok ? "success" : "error"](result.mesej);
+    if (result.ok) router.refresh();
+  }
+
+  async function correctStaffId() {
+    const result = await correctStaffIdAction(member.user_id, staffId);
+    toast[result.ok ? "success" : "error"](result.mesej);
+    if (result.ok) router.refresh();
+  }
+
+  async function correctMemberId() {
+    const result = await correctMemberIdAction(member.user_id, memberId);
     toast[result.ok ? "success" : "error"](result.mesej);
     if (result.ok) router.refresh();
   }
@@ -149,6 +166,40 @@ export function MemberActions({
             <Button type="submit"><PencilIcon /> Simpan bahagian</Button>
           </form>
         </ResponsiveDetailsSheet>
+      ) : null}
+
+      {canCorrectIds ? (
+        <>
+          <ResponsiveDetailsSheet
+            title="Betulkan nombor staff"
+            description={`Nombor staff untuk ${name}.`}
+            trigger={<Button size="sm" variant="ghost"><PencilIcon /> ID staff</Button>}
+          >
+            <form className="grid gap-4" onSubmit={(event) => { event.preventDefault(); void correctStaffId(); }}>
+              <div className="grid gap-2">
+                <Label htmlFor={`staff-id-${member.user_id}`}>Nombor staff</Label>
+                <Input id={`staff-id-${member.user_id}`} value={staffId} onChange={(event) => setStaffId(event.target.value)} maxLength={64} required />
+                <p className="text-xs text-muted-foreground">Maksimum 64 aksara dan tidak boleh mengandungi `/`.</p>
+              </div>
+              <Button type="submit" disabled={!staffId.trim()}><PencilIcon /> Simpan ID staff</Button>
+            </form>
+          </ResponsiveDetailsSheet>
+          {member.member_id ? (
+            <ResponsiveDetailsSheet
+              title="Betulkan nombor ahli"
+              description={`Nombor ahli untuk ${name}.`}
+              trigger={<Button size="sm" variant="ghost"><PencilIcon /> ID ahli</Button>}
+            >
+              <form className="grid gap-4" onSubmit={(event) => { event.preventDefault(); void correctMemberId(); }}>
+                <div className="grid gap-2">
+                  <Label htmlFor={`member-id-${member.user_id}`}>Nombor ahli</Label>
+                  <Input id={`member-id-${member.user_id}`} value={memberId} onChange={(event) => setMemberId(event.target.value)} maxLength={128} required />
+                </div>
+                <Button type="submit" disabled={!memberId.trim()}><PencilIcon /> Simpan ID ahli</Button>
+              </form>
+            </ResponsiveDetailsSheet>
+          ) : null}
+        </>
       ) : null}
     </div>
   );

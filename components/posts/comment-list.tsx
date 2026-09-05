@@ -5,16 +5,31 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { LikeButton } from "@/components/posts/like-button";
+import { ConfirmationDialog } from "@/components/marc/confirmation-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import type { Comment, Profile } from "@/lib/api/types";
-import { createCommentAction, likeCommentAction, unlikeCommentAction } from "@/lib/posts/actions";
+import {
+  createCommentAction,
+  deleteCommentAction,
+  likeCommentAction,
+  unlikeCommentAction,
+  updateCommentAction,
+} from "@/lib/posts/actions";
+import { isManagement } from "@/lib/api/types";
+import { MoreHorizontalIcon, PencilIcon, Trash2Icon } from "lucide-react";
 
 export function CommentList({
   postId,
   komenAwal,
-  profileSemasa: _profileSemasa,
+  profileSemasa,
 }: {
   postId: string;
   komenAwal: Comment[];
@@ -24,6 +39,14 @@ export function CommentList({
 
   function addComment(newComment: Comment) {
     setKomen((k) => [...k, newComment]);
+  }
+
+  function replaceComment(updated: Comment) {
+    setKomen((current) => current.map((comment) => comment.id === updated.id ? updated : comment));
+  }
+
+  function removeComment(id: string) {
+    setKomen((current) => current.filter((comment) => comment.id !== id));
   }
 
   const utama = komen.filter((k) => !k.parent_comment_id);
@@ -39,11 +62,24 @@ export function CommentList({
         <div className="grid gap-4">
           {utama.map((k) => (
             <div key={k.id} className="grid gap-3">
-              <CommentRow komen={k} />
+              <CommentRow
+                postId={postId}
+                komen={k}
+                profileSemasa={profileSemasa}
+                onUpdated={replaceComment}
+                onDeleted={removeComment}
+              />
               {balasanBagiInduk(k.id).length > 0 ? (
                 <div className="ml-8 grid gap-3 border-l border-border/70 pl-3">
                   {balasanBagiInduk(k.id).map((balasan) => (
-                    <CommentRow key={balasan.id} komen={balasan} />
+                    <CommentRow
+                      key={balasan.id}
+                      postId={postId}
+                      komen={balasan}
+                      profileSemasa={profileSemasa}
+                      onUpdated={replaceComment}
+                      onDeleted={removeComment}
+                    />
                   ))}
                 </div>
               ) : null}
@@ -58,8 +94,56 @@ export function CommentList({
   );
 }
 
-function CommentRow({ komen }: { komen: Comment }) {
+function CommentRow({
+  postId,
+  komen,
+  profileSemasa,
+  onUpdated,
+  onDeleted,
+}: {
+  postId: string;
+  komen: Comment;
+  profileSemasa: Profile;
+  onUpdated: (comment: Comment) => void;
+  onDeleted: (id: string) => void;
+}) {
   const nama = komen.author.display_name?.trim() || komen.author.member_id;
+  const isOwner = profileSemasa.member_id !== null && profileSemasa.member_id === komen.author.member_id;
+  const canDelete = isOwner || isManagement(profileSemasa);
+  const [editing, setEditing] = useState(false);
+  const [content, setContent] = useState(komen.content);
+  const [pending, setPending] = useState(false);
+
+  async function saveEdit() {
+    if (!content.trim() || content.trim() === komen.content) {
+      setEditing(false);
+      return;
+    }
+    setPending(true);
+    try {
+      const result = await updateCommentAction(postId, komen.id, content.trim());
+      if (!result.ok) {
+        toast.error(result.ralat);
+        return;
+      }
+      onUpdated(result.data);
+      setEditing(false);
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function remove() {
+    const result = await deleteCommentAction(postId, komen.id);
+    if (!result.ok) {
+      toast.error(result.ralat);
+      return false;
+    }
+    onDeleted(komen.id);
+    toast.success("Komen dipadam.");
+    return true;
+  }
+
   return (
     <div className="flex items-start gap-2.5">
       <Link
@@ -73,6 +157,15 @@ function CommentRow({ komen }: { komen: Comment }) {
         </Avatar>
       </Link>
       <div className="min-w-0 flex-1">
+        {editing ? (
+          <div className="grid gap-2">
+            <Textarea value={content} onChange={(event) => setContent(event.target.value)} maxLength={2000} disabled={pending} />
+            <div className="flex justify-end gap-2">
+              <Button type="button" size="sm" variant="ghost" onClick={() => { setContent(komen.content); setEditing(false); }} disabled={pending}>Batal</Button>
+              <Button type="button" size="sm" onClick={() => void saveEdit()} disabled={pending || !content.trim()}>Simpan</Button>
+            </div>
+          </div>
+        ) : (
         <p className="text-sm">
           <Link
             href={`/members/${encodeURIComponent(komen.author.user_id)}`}
@@ -81,7 +174,30 @@ function CommentRow({ komen }: { komen: Comment }) {
             {nama}
           </Link>{" "}
           <span className="whitespace-pre-wrap">{komen.content}</span>
+          {komen.edited_at ? <span className="ml-1 text-xs text-muted-foreground">(disunting)</span> : null}
         </p>
+        )}
+        {isOwner || canDelete ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" variant="ghost" size="icon-sm" className="float-right -mt-7" aria-label="Tindakan komen" disabled={pending}>
+                <MoreHorizontalIcon />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {isOwner ? <DropdownMenuItem onClick={() => setEditing(true)}><PencilIcon /> Edit</DropdownMenuItem> : null}
+              {canDelete ? (
+                <ConfirmationDialog
+                  title="Padam komen?"
+                  description="Komen ini akan dipadam dan tindakan ini tidak boleh dibuat asal."
+                  confirmLabel="Padam"
+                  trigger={<DropdownMenuItem onSelect={(event) => event.preventDefault()} className="text-destructive"><Trash2Icon /> Padam</DropdownMenuItem>}
+                  onConfirm={remove}
+                />
+              ) : null}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
               <LikeButton
           id={komen.id}
           kiraanAwal={komen.like_count}

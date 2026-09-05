@@ -76,6 +76,18 @@ export function unlikeComment(accessToken: string, id: string): Promise<void> {
   return apiFetch<void>(`/comments/${id}/like`, { method: "DELETE", accessToken });
 }
 
+export function updateComment(accessToken: string, id: string, content: string): Promise<Comment> {
+  return apiFetch<Comment>(`/comments/${id}`, {
+    method: "PATCH",
+    body: { content },
+    accessToken,
+  });
+}
+
+export function deleteComment(accessToken: string, id: string): Promise<void> {
+  return apiFetch<void>(`/comments/${id}`, { method: "DELETE", accessToken });
+}
+
 export function requestUploadUrl(
   accessToken: string,
   contentType: string,

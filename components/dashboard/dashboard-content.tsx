@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { StatusBadge, statusTone } from "@/components/marc/status-badge";
+import { ActivityRegistrationChart, AdminDashboardCharts } from "@/components/dashboard/dashboard-charts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -89,6 +90,7 @@ export function DashboardContent({ profile, data }: { profile: Profile; data: Da
         )}
       </section>
 
+      <ActivityRegistrationChart activities={data.member.open_activities} />
       {data.admin ? <AdminDashboard data={data.admin} /> : null}
     </div>
   );
@@ -137,6 +139,7 @@ function AdminDashboard({ data }: { data: NonNullable<DashboardData["admin"]> })
           </CardContent>
         </Card>
       </div>
+      <AdminDashboardCharts data={data} />
     </section>
   );
 }

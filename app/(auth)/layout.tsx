@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { Logo } from "@/components/marc/logo";
-import { ThemeSwitch } from "@/components/marc/theme-switch";
 
 /**
  * Susun atur dua panel untuk setiap skrin auth.
@@ -44,17 +43,15 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
         />
 
         <div className="relative">
-          {/*
-            Wordmark PUTIH, bukan logo penuh: teks "Kelab Sukan dan
-            Rekreasi MAIWP" dalam fail penuh itu navy gelap dan akan
-            hilang atas panel ini. Baris di bawahnya membawa semula nama
-            penuh sebagai teks sebenar - boleh dibaca pembaca skrin, dan
-            kekal tajam pada mana-mana ketumpatan skrin.
-          */}
-          <Logo varian="wordmark" className="h-7" priority />
-          <p className="mt-2 text-[11px] tracking-[0.18em] text-brand-navy-foreground/55 uppercase">
-            Kelab Sukan dan Rekreasi MAIWP
-          </p>
+          <div className="flex items-center gap-3">
+            <Logo varian="jata" className="h-12 w-12" priority />
+            <div>
+              <p className="text-lg font-semibold tracking-[0.2em]">MARC</p>
+              <p className="mt-1 text-[10px] tracking-[0.16em] text-brand-navy-foreground/55 uppercase">
+                Kelab Sukan dan Rekreasi MAIWP
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="relative max-w-sm">
@@ -62,28 +59,17 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
             Satu akaun untuk aktiviti, keahlian dan sijil anda.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-brand-navy-foreground/65">
-            Daftar sekali, guna di web dan di aplikasi mudah alih MARC.
+            Dibangunkan oleh Hafiz, bekas pelajar Kompleks Darul Kifayah,
+            MAIWP, secara sukarela untuk membantu kelab dan ahli MARC.
           </p>
         </div>
-
-        <p className="relative text-xs text-brand-navy-foreground/50">
-          Glories Spur People · Since 2014
-        </p>
       </aside>
 
       <main className="relative flex flex-col justify-center px-6 py-10 sm:px-10">
-        <div className="absolute top-4 right-4">
-          <ThemeSwitch />
-        </div>
-
         <div className="mx-auto w-full max-w-sm">
-          {/*
-            Logo PENUH di sini - latar krim, jadi wordmark navy terbina
-            dalam fail itu boleh dibaca. Ia hanya muncul di bawah `lg`,
-            tempat panel jenama disembunyikan.
-          */}
-          <Link href="/" className="mb-8 inline-flex lg:hidden">
-            <Logo varian="penuh" className="h-20" priority />
+          <Link href="/" className="mb-8 inline-flex items-center gap-3 lg:hidden">
+            <Logo varian="jata" className="h-14 w-14" priority />
+            <span className="text-lg font-semibold tracking-[0.2em]">MARC</span>
           </Link>
           {children}
         </div>

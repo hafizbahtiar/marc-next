@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 
 import { StatusStep, type KeadaanLangkah } from "@/components/marc/status-step";
+import { RegistrationPaymentAction } from "@/components/payments/registration-payment-action";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ROUTES } from "@/lib/auth/routes";
@@ -92,6 +93,20 @@ export default async function PendingApprovalPage() {
           </ol>
         </CardContent>
       </Card>
+
+      {bayaran !== "succeeded" ? (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="text-base">Bayar yuran pendaftaran</CardTitle>
+            <CardDescription>
+              Selesaikan bayaran melalui ToyyibPay untuk melengkapkan permohonan.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RegistrationPaymentAction amountCents={p.registration_fee_cents} />
+          </CardContent>
+        </Card>
+      ) : null}
 
       <p className="mt-6 text-sm text-muted-foreground">
         Butiran anda tersalah?{" "}

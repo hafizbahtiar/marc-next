@@ -1,4 +1,4 @@
-import { Clock3Icon, CreditCardIcon, FileSearchIcon, MapPinIcon, UsersIcon } from "lucide-react";
+import { Clock3Icon, CreditCardIcon, FileSearchIcon, HeartIcon, MapPinIcon, UsersIcon } from "lucide-react";
 
 import { SettingNavItem } from "@/components/settings/setting-nav-item";
 import { SettingsCard } from "@/components/settings/settings-card";
@@ -42,6 +42,12 @@ export default async function ProfilePage() {
             />
           </SettingsCard>
           <SettingsCard label="Kewangan">
+            <SettingNavItem
+              icon={HeartIcon}
+              label="Sokong MARC"
+              description="Bantu kos hosting dan penyelenggaraan"
+              href="/donate"
+            />
             <SettingNavItem
               icon={CreditCardIcon}
               label="Sejarah bayaran saya"

@@ -76,6 +76,7 @@ function laluanAwamProxy(pathname: string): boolean {
     pathname === ROUTES.sahkanEmel ||
     pathname === ROUTES.tamatSesi ||
     pathname === ROUTES.pelayanLuarTalian ||
+    pathname === ROUTES.sokongMARC ||
     // Pemeriksaan kesihatan Railway tiba tanpa kuki. Tanpa baris ini ia
     // dapat 307 ke /log-masuk dan setiap penggunaan ditandakan gagal.
     pathname === ROUTES.sihat

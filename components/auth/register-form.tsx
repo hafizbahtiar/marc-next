@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { InfoIcon } from "lucide-react";
 
 import { SubmitButton } from "@/components/auth/submit-button";
 import { FormField } from "@/components/auth/form-field";
 import { Notice } from "@/components/auth/notice";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { KEADAAN_AWAL } from "@/lib/auth/borang";
 import { daftarAction } from "@/lib/auth/actions";
 import { ROUTES } from "@/lib/auth/routes";
@@ -17,6 +19,18 @@ export function RegisterForm() {
     <form action={action} className="grid gap-4" noValidate>
       <Notice ralat={keadaan.ralat} />
 
+      <Alert className="border-primary/20 bg-primary/5">
+        <InfoIcon className="text-primary" aria-hidden />
+        <div>
+          <AlertTitle>Sebelum mendaftar</AlertTitle>
+          <AlertDescription className="mt-1">
+            Gunakan emel kekal kerana emel sekali guna daripada lebih 8,000
+            domain disekat. Nombor staf akan disahkan oleh pengurusan, manakala
+            nombor telefon diperlukan untuk bayaran yuran.
+          </AlertDescription>
+        </div>
+      </Alert>
+
       <FormField
         name="email"
         label="Emel"
@@ -26,7 +40,6 @@ export function RegisterForm() {
         placeholder="nama@contoh.com"
         defaultValue={keadaan.nilai?.email}
         ralat={keadaan.medan?.email}
-        petunjuk="Guna emel kekal. MARC menyekat emel sekali guna daripada lebih 8,000 domain."
         required
       />
 
@@ -36,7 +49,6 @@ export function RegisterForm() {
         autoComplete="off"
         defaultValue={keadaan.nilai?.staff_id}
         ralat={keadaan.medan?.staff_id}
-        petunjuk="Pihak pengurusan akan sahkan nombor ini sebelum ID ahli anda dijana."
         required
       />
 
@@ -49,7 +61,6 @@ export function RegisterForm() {
         placeholder="012-345 6789"
         defaultValue={keadaan.nilai?.phone}
         ralat={keadaan.medan?.phone}
-        petunjuk="Nombor mudah alih Malaysia. Diperlukan untuk pembayaran yuran."
         required
       />
 

@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BellIcon, HouseIcon, NewspaperIcon, SettingsIcon, UserIcon } from "lucide-react";
+import {
+  BellIcon,
+  CalendarDaysIcon,
+  ClipboardCheckIcon,
+  HouseIcon,
+  NewspaperIcon,
+  SettingsIcon,
+  UserIcon,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/lib/auth/routes";
@@ -10,6 +18,8 @@ import { ROUTES } from "@/lib/auth/routes";
 const items = [
   { href: ROUTES.utama, label: "Utama", icon: HouseIcon },
   { href: ROUTES.pos, label: "Feed", icon: NewspaperIcon },
+  { href: ROUTES.activities, label: "Aktiviti", icon: CalendarDaysIcon },
+  { href: ROUTES.myActivities, label: "Saya", icon: ClipboardCheckIcon },
   { href: ROUTES.notifikasi, label: "Notifikasi", icon: BellIcon },
   { href: ROUTES.profil, label: "Profil", icon: UserIcon },
   { href: ROUTES.tetapan, label: "Tetapan", icon: SettingsIcon },
@@ -23,7 +33,7 @@ export function MobileNav() {
       aria-label="Navigasi utama"
       className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 px-2 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_rgba(0,0,0,0.06)] backdrop-blur-md md:hidden"
     >
-      <div className="mx-auto grid h-16 max-w-md grid-cols-5 items-stretch">
+      <div className="mx-auto grid h-16 max-w-xl grid-cols-7 items-stretch">
         {items.map(({ href, label, icon: Icon }) => {
           const active = pathname === href || (href !== ROUTES.utama && pathname.startsWith(`${href}/`));
           return (

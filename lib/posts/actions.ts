@@ -112,6 +112,30 @@ export async function unlikeCommentAction(id: string): Promise<HasilTindakan> {
   }
 }
 
+export async function updateCommentAction(
+  postId: string,
+  id: string,
+  content: string,
+): Promise<HasilTindakan<Comment>> {
+  try {
+    const comment = await postsApi.updateComment(await token(), id, content);
+    revalidatePath(`/posts/${postId}`);
+    return { ok: true, data: comment };
+  } catch (error) {
+    return { ok: false, ralat: ralatDaripada(error) };
+  }
+}
+
+export async function deleteCommentAction(postId: string, id: string): Promise<HasilTindakan> {
+  try {
+    await postsApi.deleteComment(await token(), id);
+    revalidatePath(`/posts/${postId}`);
+    return { ok: true, data: undefined };
+  } catch (error) {
+    return { ok: false, ralat: ralatDaripada(error) };
+  }
+}
+
 export async function requestUploadUrlAction(
   contentType: string,
 ): Promise<HasilTindakan<{ upload_url: string; r2_key: string }>> {

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CalendarDaysIcon, ClipboardCheckIcon } from "lucide-react";
 
 import { Logo } from "@/components/marc/logo";
 import { MobileNav } from "@/components/marc/mobile-nav";
@@ -49,9 +50,29 @@ export function AppShell({
             <Link href={ROUTES.pos} className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:bg-background hover:text-foreground">
               Feed
             </Link>
+            <Link href={ROUTES.activities} className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:bg-background hover:text-foreground">
+              Aktiviti
+            </Link>
+            <Link href={ROUTES.myActivities} className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:bg-background hover:text-foreground">
+              Aktiviti saya
+            </Link>
           </nav>
 
           <div className="flex items-center gap-2">
+            <Link
+              href={ROUTES.activities}
+              className="hidden rounded-full p-2 text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring sm:block"
+              aria-label="Aktiviti"
+            >
+              <CalendarDaysIcon className="size-5" />
+            </Link>
+            <Link
+              href={ROUTES.myActivities}
+              className="hidden rounded-full p-2 text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring sm:block"
+              aria-label="Aktiviti saya"
+            >
+              <ClipboardCheckIcon className="size-5" />
+            </Link>
             <NotificationPreview items={notificationPreview} unreadCount={unreadCount} />
             <div className="hidden sm:block">
               <ThemeSwitch />

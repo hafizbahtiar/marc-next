@@ -118,7 +118,7 @@ export async function apiFetch<T>(
   }
 
   if (!response.ok) {
-    throw new ApiError(response.status, errorMessage(parsed, response.status));
+    throw new ApiError(response.status, errorMessage(parsed, response.status), errorCode(parsed));
   }
 
   return parsed as T;
@@ -142,4 +142,16 @@ function errorMessage(parsed: unknown, status: number): string {
   if (status === 429) return "Terlalu banyak percubaan. Cuba sebentar lagi.";
   if (status >= 500) return "Pelayan MARC menghadapi masalah. Cuba sebentar lagi.";
   return "Permintaan gagal.";
+}
+
+function errorCode(parsed: unknown): string | undefined {
+  if (
+    typeof parsed === "object" &&
+    parsed !== null &&
+    "code" in parsed &&
+    typeof (parsed as { code: unknown }).code === "string"
+  ) {
+    return (parsed as { code: string }).code;
+  }
+  return undefined;
 }

@@ -31,6 +31,20 @@ export async function verifyStaffAction(userId: string) {
   );
 }
 
+export async function correctStaffIdAction(userId: string, staffId: string) {
+  return runMemberAction(
+    (token) => membersApi.correctStaffId(token, userId, staffId.trim()),
+    "Nombor staff dibetulkan.",
+  );
+}
+
+export async function correctMemberIdAction(userId: string, memberId: string) {
+  return runMemberAction(
+    (token) => membersApi.correctMemberId(token, userId, memberId.trim()),
+    "Nombor ahli dibetulkan.",
+  );
+}
+
 export async function approveMemberAction(userId: string) {
   return runMemberAction((token) => membersApi.approveMember(token, userId), "Ahli diluluskan.");
 }

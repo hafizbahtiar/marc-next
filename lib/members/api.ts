@@ -18,6 +18,22 @@ export function verifyStaff(accessToken: string, userId: string): Promise<void> 
   });
 }
 
+export function correctStaffId(accessToken: string, userId: string, staffId: string): Promise<void> {
+  return apiFetch<void>(`/members/${userId}/staff-id`, {
+    method: "PATCH",
+    body: { staff_id: staffId },
+    accessToken,
+  });
+}
+
+export function correctMemberId(accessToken: string, userId: string, memberId: string): Promise<void> {
+  return apiFetch<void>(`/members/${userId}/member-id`, {
+    method: "PATCH",
+    body: { member_id: memberId },
+    accessToken,
+  });
+}
+
 export function approveMember(accessToken: string, userId: string): Promise<void> {
   return apiFetch<void>(`/members/${userId}/approve`, { method: "POST", accessToken });
 }

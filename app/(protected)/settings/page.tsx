@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import {
   BookOpenIcon,
   Building2Icon,
+  CreditCardIcon,
   Layers3Icon,
   MailWarningIcon,
 } from "lucide-react";
@@ -65,6 +66,12 @@ export default async function SettingsPage() {
                 label="Urus kategori"
                 description="Kategori yang digunakan untuk aktiviti"
                 href="/settings/activity-categories"
+              />
+              <SettingNavItem
+                icon={CreditCardIcon}
+                label="Log bayaran"
+                description="Pantau bayaran dan reconcile gateway"
+                href="/admin/payments"
               />
             </SettingsCard>
           ) : null}
