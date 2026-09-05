@@ -3,7 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { DataTable, DataTableColumnHeader } from "@/components/marc/data-table";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge, statusTone } from "@/components/marc/status-badge";
 import type { PaymentHistory } from "@/lib/payments/api";
 
 type PaymentRow = {
@@ -35,7 +35,7 @@ const columns: ColumnDef<PaymentRow>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => <Badge variant={row.original.status === "failed" ? "destructive" : "secondary"}>{statusLabel(row.original.status)}</Badge>,
+    cell: ({ row }) => <StatusBadge label={statusLabel(row.original.status)} tone={statusTone(row.original.status)} />,
   },
   {
     accessorKey: "date",

@@ -7,7 +7,7 @@ import { CheckIcon, PencilIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react
 
 import { DataTable, DataTableColumnHeader } from "@/components/marc/data-table";
 import { ResponsiveFormSheet } from "@/components/marc/responsive-sheet";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/marc/status-badge";
 import { Button } from "@/components/ui/button";
 import type { ActivityCategory, BlockedDomain, Department } from "@/lib/admin/settings-api";
 import { addBlockedDomainAction, createCategoryAction, createDepartmentAction, deleteDepartmentAction, removeBlockedDomainAction, toggleCategoryAction, updateDepartmentAction } from "@/lib/admin/settings-actions";
@@ -29,7 +29,7 @@ export function CategoryTable({ rows }: { rows: ActivityCategory[] }) {
     { accessorKey: "key", header: ({ column }) => <DataTableColumnHeader column={column} title="Key" /> },
     { accessorKey: "name", header: ({ column }) => <DataTableColumnHeader column={column} title="Nama" /> },
     { accessorKey: "sort_order", header: "Susunan" },
-    { accessorKey: "is_active", header: "Status", cell: ({ row }) => row.original.is_active ? <Badge variant="outline">Aktif</Badge> : <Badge variant="secondary">Tidak aktif</Badge> },
+    { accessorKey: "is_active", header: "Status", cell: ({ row }) => row.original.is_active ? <StatusBadge label="Aktif" tone="success" /> : <StatusBadge label="Tidak aktif" tone="danger" /> },
     {
       id: "actions",
       header: "Tindakan",

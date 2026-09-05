@@ -2,11 +2,8 @@ import { Suspense } from "react";
 import {
   BookOpenIcon,
   Building2Icon,
-  CircleHelpIcon,
-  InfoIcon,
   Layers3Icon,
   MailWarningIcon,
-  SendIcon,
 } from "lucide-react";
 
 import { SessionList } from "@/components/auth/session-list";
@@ -58,7 +55,7 @@ export default async function SettingsPage() {
         <div className="grid min-w-0 gap-8">
           <SettingsCard id="connections" label="Sambungan">
             <ResponsiveSheetItem
-              icon={SendIcon}
+              icon="send"
               label="Telegram"
               description={profile.telegram_linked ? "Akaun Telegram disambungkan" : "Sambungkan akaun Telegram"}
             >
@@ -110,10 +107,10 @@ export default async function SettingsPage() {
           </Suspense>
 
           <SettingsCard id="help" label="Bantuan">
-            <ResponsiveSheetItem icon={CircleHelpIcon} label="Soalan lazim" description="Jawapan untuk perkara biasa">
+            <ResponsiveSheetItem icon="help" label="Soalan lazim" description="Jawapan untuk perkara biasa">
               <SettingsFaqSheetContent />
             </ResponsiveSheetItem>
-            <ResponsiveSheetItem icon={InfoIcon} label="Tentang" description="Maklumat ringkas tentang MARC">
+            <ResponsiveSheetItem icon="info" label="Tentang" description="Maklumat ringkas tentang MARC">
               <SettingsAboutSheetContent />
             </ResponsiveSheetItem>
           </SettingsCard>

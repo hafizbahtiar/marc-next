@@ -16,7 +16,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge, statusTone } from "@/components/marc/status-badge";
 import { Button } from "@/components/ui/button";
 import {
   DataTable,
@@ -81,7 +81,7 @@ export function PendingMemberList({
       cell: ({ row }) => (
         <div>
           <p>{row.original.staff_id ?? "—"}</p>
-          {row.original.staff_id_verified_at ? <Badge variant="outline" className="mt-1">Disahkan</Badge> : null}
+          {row.original.staff_id_verified_at ? <StatusBadge label="Disahkan" tone="success" className="mt-1" /> : null}
         </div>
       ),
     },
@@ -90,7 +90,8 @@ export function PendingMemberList({
       header: "Bayaran",
       cell: ({ row }) => {
         const status = row.original.registration_payment_status;
-        return <Badge variant={status === "pending" ? "outline" : "secondary"}>{status === "pending" ? "Bil aktif" : status === "succeeded" ? "Dibayar" : "Belum bayar"}</Badge>;
+        const label = status === "pending" ? "Bil aktif" : status === "succeeded" ? "Dibayar" : "Belum bayar";
+        return <StatusBadge label={label} tone={statusTone(status === "succeeded" ? "succeeded" : "pending")} />;
       },
     },
     {

@@ -3,7 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { DataTable, DataTableColumnHeader } from "@/components/marc/data-table";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/marc/status-badge";
 import { RevokeSessionButton } from "@/components/auth/revoke-session-button";
 import type { SessionRecord } from "@/lib/api/types";
 
@@ -26,7 +26,7 @@ const columns: ColumnDef<SessionRecord>[] = [
   {
     accessorKey: "is_current",
     header: "Status",
-    cell: ({ row }) => row.original.is_current ? <Badge variant="secondary" className="text-primary">Peranti ini</Badge> : "Aktif",
+    cell: ({ row }) => row.original.is_current ? <StatusBadge label="Peranti ini" tone="info" /> : <StatusBadge label="Aktif" tone="success" />,
   },
   {
     id: "actions",

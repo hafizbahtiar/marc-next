@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import type { LucideIcon } from "lucide-react";
-import { ChevronRightIcon } from "lucide-react";
+import { CircleHelpIcon, ChevronRightIcon, InfoIcon, SendIcon } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -22,23 +21,27 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { InfoIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function ResponsiveSheetItem({
-  icon: Icon,
+  icon,
   label,
   description,
   children,
 }: {
-  icon: LucideIcon;
+  icon: "send" | "help" | "info";
   label: string;
   description?: string;
   children: React.ReactNode;
 }) {
   const isMobile = useIsMobile();
+  const Icon = {
+    send: SendIcon,
+    help: CircleHelpIcon,
+    info: InfoIcon,
+  }[icon];
   const trigger = (
     <button
       type="button"
@@ -76,6 +79,48 @@ export function ResponsiveSheetItem({
       <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>{label}</SheetTitle>
+          {description ? <SheetDescription>{description}</SheetDescription> : null}
+        </SheetHeader>
+        <div className="px-4 pb-6">{children}</div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+export function ResponsiveDetailsSheet({
+  title,
+  description,
+  trigger,
+  children,
+}: {
+  title: string;
+  description?: string;
+  trigger: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <Drawer>
+        <DrawerTrigger asChild>{trigger}</DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader className="text-left">
+            <DrawerTitle>{title}</DrawerTitle>
+            {description ? <DrawerDescription>{description}</DrawerDescription> : null}
+          </DrawerHeader>
+          <div className="max-h-[70vh] overflow-y-auto px-4 pb-6">{children}</div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  return (
+    <Sheet>
+      <SheetTrigger asChild>{trigger}</SheetTrigger>
+      <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">
+        <SheetHeader>
+          <SheetTitle>{title}</SheetTitle>
           {description ? <SheetDescription>{description}</SheetDescription> : null}
         </SheetHeader>
         <div className="px-4 pb-6">{children}</div>

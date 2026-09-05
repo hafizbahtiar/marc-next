@@ -5,7 +5,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/marc/status-badge";
 import {
   DataTable,
   DataTableColumnHeader,
@@ -85,12 +85,12 @@ const memberColumns: ColumnDef<MemberRow>[] = [
   {
     accessorKey: "role_name",
     header: "Role",
-    cell: ({ row }) => row.original.category === "management" ? <Badge variant="secondary">{row.original.role_name}</Badge> : "Ahli",
+    cell: ({ row }) => row.original.category === "management" ? <StatusBadge label={row.original.role_name} tone="info" /> : <StatusBadge label="Ahli" />,
   },
   {
     accessorKey: "is_active",
     header: "Status",
-    cell: ({ row }) => row.original.is_active ? <Badge variant="outline">Aktif</Badge> : <Badge variant="destructive">Tidak aktif</Badge>,
+    cell: ({ row }) => row.original.is_active ? <StatusBadge label="Aktif" tone="success" /> : <StatusBadge label="Tidak aktif" tone="danger" />,
   },
   {
     id: "actions",
