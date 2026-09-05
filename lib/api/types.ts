@@ -45,6 +45,27 @@ export type Profile = {
   staff_id_verified_at: string | null;
 };
 
+/** GET /members - directory row returned according to caller visibility. */
+export type MemberRow = {
+  user_id: string;
+  member_id: string | null;
+  display_name: string | null;
+  email: string | null;
+  role_key: string;
+  role_name: string;
+  role_rank: number;
+  category: string;
+  status: MemberStatus;
+  is_active: boolean;
+  avatar_url: string | null;
+  department_code: string | null;
+  department_name: string | null;
+  position: string | null;
+  staff_id: string | null;
+  staff_id_verified_at: string | null;
+  registration_payment_status: string | null;
+};
+
 /** GET /me/sessions - satu baris = satu peranti (satu family refresh token). */
 export type SessionRecord = {
   id: string;

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PencilIcon } from "lucide-react";
+import { PencilIcon, SettingsIcon } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -33,12 +33,19 @@ export function ProfileHeader({ profile }: { profile: Profile }) {
         </div>
       </div>
 
-      <Button asChild variant="outline" size="sm">
-        <Link href={ROUTES.profilEdit}>
-          <PencilIcon />
-          Edit
-        </Link>
-      </Button>
+      <div className="flex gap-2">
+        <Button asChild variant="outline" size="sm">
+          <Link href={ROUTES.profilEdit}>
+            <PencilIcon />
+            Edit
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" size="icon" aria-label="Tetapan">
+          <Link href={ROUTES.tetapan}>
+            <SettingsIcon />
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 }

@@ -1,12 +1,17 @@
+import { Clock3Icon, UsersIcon } from "lucide-react";
+
+import { SettingNavItem } from "@/components/settings/setting-nav-item";
+import { SettingsCard } from "@/components/settings/settings-card";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { ProfileInfoCard } from "@/components/profile/profile-info-card";
+import { isManagement } from "@/lib/api/types";
 import { wajibSesi } from "@/lib/auth/session";
 
 export default async function ProfilePage() {
   const { profile } = await wajibSesi();
 
   return (
-    <div className="mx-auto grid max-w-4xl gap-8">
+    <div className="mx-auto grid max-w-4xl gap-6">
       <header className="grid gap-2">
         <p className="text-sm font-medium text-primary">Akaun anda</p>
         <h1 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -18,6 +23,24 @@ export default async function ProfilePage() {
       </header>
       <ProfileHeader profile={profile} />
       <ProfileInfoCard profile={profile} />
+      <SettingsCard label="Komuniti">
+        <SettingNavItem
+          icon={UsersIcon}
+          label="Ahli"
+          description="Lihat direktori ahli MARC"
+          href="/members"
+        />
+      </SettingsCard>
+      {isManagement(profile) ? (
+        <SettingsCard label="Pengurusan">
+          <SettingNavItem
+            icon={Clock3Icon}
+            label="Ahli pending"
+            description="Semak dan luluskan pendaftaran baharu"
+            href="/members/pending"
+          />
+        </SettingsCard>
+      ) : null}
     </div>
   );
 }
