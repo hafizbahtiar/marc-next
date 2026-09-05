@@ -6,22 +6,22 @@
  * pecah).
  */
 export const ROUTES = {
-  logMasuk: "/log-masuk",
-  daftar: "/daftar",
-  lupaKataLaluan: "/lupa-kata-laluan",
-  tetapKataLaluan: "/tetap-kata-laluan",
-  sahkanEmel: "/sahkan-emel",
+  logMasuk: "/login",
+  daftar: "/register",
+  lupaKataLaluan: "/forgot-password",
+  tetapKataLaluan: "/reset-password",
+  sahkanEmel: "/verify-email",
   utama: "/",
   pos: "/posts",
-  profil: "/profil",
-  tetapan: "/tetapan",
-  profilEdit: "/profil/edit",
-  menungguKelulusan: "/menunggu-kelulusan",
-  akaunDitolak: "/akaun-ditolak",
-  sahkanEmelAnda: "/sahkan-emel-anda",
-  tamatSesi: "/api/sesi/tamat",
-  pelayanLuarTalian: "/pelayan-luar-talian",
-  sihat: "/api/sihat",
+  profil: "/profile",
+  tetapan: "/settings",
+  profilEdit: "/profile/edit",
+  menungguKelulusan: "/pending-approval",
+  akaunDitolak: "/account-rejected",
+  sahkanEmelAnda: "/email-verification",
+  tamatSesi: "/api/session/end",
+  pelayanLuarTalian: "/offline",
+  sihat: "/api/health",
 } as const;
 
 /**
