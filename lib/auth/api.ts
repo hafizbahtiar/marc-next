@@ -71,6 +71,21 @@ export function batalkanSesi(accessToken: string, id: string): Promise<void> {
   return apiFetch<void>(`/me/sessions/${id}`, { method: "DELETE", accessToken });
 }
 
+export function janaPautanTelegram(accessToken: string): Promise<{ deep_link: string }> {
+  return apiFetch<{ deep_link: string }>("/me/telegram-link/token", {
+    method: "POST",
+    accessToken,
+  });
+}
+
+export function nyahikatTelegram(accessToken: string): Promise<void> {
+  return apiFetch<void>("/me/telegram-link", { method: "DELETE", accessToken });
+}
+
+export function mintaPadamAkaun(accessToken: string): Promise<void> {
+  return apiFetch<void>("/me/deletion-request", { method: "POST", accessToken });
+}
+
 /**
  * Minta emel pengesahan baharu.
  *

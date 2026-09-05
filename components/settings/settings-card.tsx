@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 export function SettingsCard({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid gap-2">
-      <h2 className="px-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+      <h2 className="px-1 text-sm font-semibold text-muted-foreground">
         {label}
       </h2>
       <Card>
