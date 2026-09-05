@@ -1,6 +1,6 @@
 /**
  * Bentuk respons backend Go. Nama medan mengikut tag JSON Go secara
- * verbatim (snake_case) — TIADA penukaran ke camelCase, supaya carian
+ * verbatim (snake_case) - TIADA penukaran ke camelCase, supaya carian
  * rentas repo untuk medan seperti `registration_payment_status` menemui
  * kedua-dua belah sempadan.
  */
@@ -13,10 +13,10 @@ export type TokenPair = {
   expires_in: number;
 };
 
-/** Status kelulusan keahlian — `profiles.status` di backend. */
+/** Status kelulusan keahlian - `profiles.status` di backend. */
 export type MemberStatus = "pending" | "approved" | "rejected";
 
-/** GET /me — lihat profileResponse, internal/http/handlers/profile.go. */
+/** GET /me - lihat profileResponse, internal/http/handlers/profile.go. */
 export type Profile = {
   member_id: string | null;
   email: string;
@@ -45,7 +45,7 @@ export type Profile = {
   staff_id_verified_at: string | null;
 };
 
-/** GET /me/sessions — satu baris = satu peranti (satu family refresh token). */
+/** GET /me/sessions - satu baris = satu peranti (satu family refresh token). */
 export type SessionRecord = {
   id: string;
   user_agent: string | null;
@@ -62,10 +62,10 @@ export function isManagement(profile: Profile): boolean {
   return profile.category === CATEGORY_MANAGEMENT;
 }
 
-/** `type` pada post — `postResponse.Type`, internal/http/handlers/posts_common.go. */
+/** `type` pada post - `postResponse.Type`, internal/http/handlers/posts_common.go. */
 export type PostType = "normal" | "announcement";
 
-/** Blok `author` sepunya pada post & comment — `authorResponse`. */
+/** Blok `author` sepunya pada post & comment - `authorResponse`. */
 export type PostAuthor = {
   user_id: string;
   member_id: string;
@@ -73,7 +73,7 @@ export type PostAuthor = {
   avatar_url: string | null;
 };
 
-/** GET /posts, GET /posts/:id, POST /posts, PATCH /posts/:id — `postResponse`. */
+/** GET /posts, GET /posts/:id, POST /posts, PATCH /posts/:id - `postResponse`. */
 export type Post = {
   id: string;
   type: PostType;
@@ -87,7 +87,7 @@ export type Post = {
   liked_by_me: boolean;
 };
 
-/** GET /posts/:id/comments, POST /posts/:id/comments, PATCH /comments/:id — `commentResponse`. */
+/** GET /posts/:id/comments, POST /posts/:id/comments, PATCH /comments/:id - `commentResponse`. */
 export type Comment = {
   id: string;
   parent_comment_id: string | null;
@@ -99,7 +99,7 @@ export type Comment = {
   liked_by_me: boolean;
 };
 
-/** GET /posts — keyset pagination, `next_cursor` null pada halaman terakhir. */
+/** GET /posts - keyset pagination, `next_cursor` null pada halaman terakhir. */
 export type SenaraiPosRespons = {
   posts: Post[];
   next_cursor: string | null;

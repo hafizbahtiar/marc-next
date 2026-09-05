@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-import { BorangLogMasuk } from "@/components/auth/borang-log-masuk";
-import { Notis } from "@/components/auth/notis";
-import { TajukAuth } from "@/components/auth/tajuk";
+import { LoginForm } from "@/components/auth/login-form";
+import { Notice } from "@/components/auth/notice";
+import { AuthHeading } from "@/components/auth/auth-heading";
 import { destinasiSelamat } from "@/lib/auth/routes";
 import { paramPertama } from "@/lib/search-params";
 
@@ -15,18 +15,18 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
   return (
     <>
-      <TajukAuth
+      <AuthHeading
         tajuk="Log masuk"
         perihal="Masukkan emel dan kata laluan akaun MARC anda."
       />
 
       {selepasReset ? (
         <div className="mb-4">
-          <Notis berjaya="Kata laluan anda telah ditukar. Sila log masuk dengan kata laluan baharu." />
+          <Notice berjaya="Kata laluan anda telah ditukar. Sila log masuk dengan kata laluan baharu." />
         </div>
       ) : null}
 
-      <BorangLogMasuk next={next} />
+      <LoginForm next={next} />
     </>
   );
 }

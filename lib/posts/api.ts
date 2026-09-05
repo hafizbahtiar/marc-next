@@ -11,7 +11,7 @@ import type {
 
 /**
  * Pembalut nipis atas laluan `/posts`, `/comments` dan `/uploads/presign`
- * backend Go — padanan `lib/auth/api.ts` untuk domain post/feed.
+ * backend Go - padanan `lib/auth/api.ts` untuk domain post/feed.
  */
 
 export function senaraiPos(

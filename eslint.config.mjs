@@ -16,7 +16,7 @@ const eslintConfig = defineConfig([
   {
     rules: {
       // Tindakan `useActionState` menerima `(prevState, formData)` walaupun
-      // ia tak menggunakan salah satunya — tandatangan itu ditetapkan oleh
+      // ia tak menggunakan salah satunya - tandatangan itu ditetapkan oleh
       // React, bukan oleh kami. Awalan garis bawah ialah cara isyarat
       // "sengaja tak digunakan" yang standard.
       "@typescript-eslint/no-unused-vars": [

@@ -8,7 +8,7 @@ import { senaraiPos } from "@/lib/posts/api";
  * Proksi halaman KEDUA dan seterusnya feed (GET /posts?cursor=).
  *
  * Halaman PERTAMA dimuat oleh `app/(dilindungi)/posts/page.tsx` (komponen
- * pelayan). Halaman berikutnya dicetuskan oleh scroll di klien — Server
+ * pelayan). Halaman berikutnya dicetuskan oleh scroll di klien - Server
  * Action tak sesuai untuk GET yang dipacu scroll (ia direka untuk
  * mutasi/borang), jadi laluan API biasa ini yang dipanggil terus daripada
  * `SuapanPos` guna `fetch`.

@@ -8,10 +8,10 @@ import { Label } from "@/components/ui/label";
  *
  * `aria-invalid` dan `aria-describedby` dipasang bersama, bukan salah
  * satu. Tanpa `describedby`, pembaca skrin mengumumkan bahawa medan itu
- * tak sah tetapi tidak mengapa yang salah — pengguna dengar amaran tanpa
+ * tak sah tetapi tidak mengapa yang salah - pengguna dengar amaran tanpa
  * arahan.
  */
-export function Medan({
+export function FormField({
   name,
   label,
   ralat,

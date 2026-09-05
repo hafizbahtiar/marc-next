@@ -15,7 +15,7 @@ import { kemaskiniProfilAction } from "@/lib/profil/actions";
 
 const JENIS_DIBENARKAN = new Set(["image/jpeg", "image/png", "image/webp"]);
 
-export function BorangEditProfil({ profile }: { profile: Profile }) {
+export function ProfileEditForm({ profile }: { profile: Profile }) {
   const [keadaan, formAction] = useActionState(kemaskiniProfilAction, KEADAAN_AWAL);
   const [pratontonAvatar, setPratontonAvatar] = useState<string | null>(profile.avatar_url);
   const [avatarR2Key, setAvatarR2Key] = useState<string | undefined>(undefined);
@@ -23,27 +23,27 @@ export function BorangEditProfil({ profile }: { profile: Profile }) {
   const [memuatNaik, setMemuatNaik] = useState(false);
   const inputFailRef = useRef<HTMLInputElement>(null);
 
-  async function pilihAvatar(fail: File | undefined) {
-    if (!fail) return;
-    if (!JENIS_DIBENARKAN.has(fail.type)) {
+  async function chooseAvatar(file: File | undefined) {
+    if (!file) return;
+    if (!JENIS_DIBENARKAN.has(file.type)) {
       setRalatAvatar("Jenis fail tidak disokong.");
       return;
     }
     setRalatAvatar(null);
     setMemuatNaik(true);
     try {
-      const hasilPresign = await mintaUploadURLAction(fail.type);
+      const hasilPresign = await mintaUploadURLAction(file.type);
       if (!hasilPresign.ok) {
         setRalatAvatar(hasilPresign.ralat);
         return;
       }
       const respons = await fetch(hasilPresign.data.upload_url, {
         method: "PUT",
-        headers: { "Content-Type": fail.type },
-        body: fail,
+        headers: { "Content-Type": file.type },
+        body: file,
       });
       if (!respons.ok) throw new Error("upload gagal");
-      setPratontonAvatar(URL.createObjectURL(fail));
+      setPratontonAvatar(URL.createObjectURL(file));
       setAvatarR2Key(hasilPresign.data.r2_key);
     } catch {
       setRalatAvatar("Gagal muat naik gambar.");
@@ -53,7 +53,7 @@ export function BorangEditProfil({ profile }: { profile: Profile }) {
     }
   }
 
-  function buangAvatar() {
+  function removeAvatar() {
     setPratontonAvatar(null);
     setAvatarR2Key("");
   }
@@ -81,7 +81,7 @@ export function BorangEditProfil({ profile }: { profile: Profile }) {
               {memuatNaik ? "Memuat naik…" : "Tukar gambar"}
             </Button>
             {pratontonAvatar ? (
-              <Button type="button" size="sm" variant="ghost" onClick={buangAvatar}>
+              <Button type="button" size="sm" variant="ghost" onClick={removeAvatar}>
                 Buang
               </Button>
             ) : null}
@@ -93,7 +93,7 @@ export function BorangEditProfil({ profile }: { profile: Profile }) {
           type="file"
           accept="image/jpeg,image/png,image/webp"
           className="hidden"
-          onChange={(e) => pilihAvatar(e.target.files?.[0])}
+          onChange={(e) => chooseAvatar(e.target.files?.[0])}
         />
       </div>
       {avatarR2Key !== undefined ? (
@@ -179,12 +179,12 @@ export function BorangEditProfil({ profile }: { profile: Profile }) {
         ) : null}
       </div>
 
-      <ButangSimpan />
+      <SaveButton />
     </form>
   );
 }
 
-function ButangSimpan() {
+function SaveButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className="justify-self-start">

@@ -1,13 +1,13 @@
 import Link from "next/link";
 
 import { Logo } from "@/components/marc/logo";
-import { SuisTema } from "@/components/marc/suis-tema";
+import { ThemeSwitch } from "@/components/marc/theme-switch";
 
 /**
  * Susun atur dua panel untuk setiap skrin auth.
  *
  * Panel jenama menggunakan NAVY (`brandNavy`, #223145) dan bukan merah
- * jenama. Merah ialah warna TINDAKAN dalam sistem ini — butang utama,
+ * jenama. Merah ialah warna TINDAKAN dalam sistem ini - butang utama,
  * cincin fokus; satu panel penuh dengannya menenggelamkan butang yang
  * sepatutnya menonjol, dan wordmark putih memang dilukis untuk duduk
  * atas navy (lihat `marc-wordmark-putih.png`).
@@ -35,7 +35,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
             backgroundSize: "22px 22px",
           }}
         />
-        {/* Semburan merah jenama — satu-satunya merah pada panel ini,
+        {/* Semburan merah jenama - satu-satunya merah pada panel ini,
             cukup untuk mengikat navy kepada jata tanpa bersaing dengan
             butang utama di sebelah kanan. */}
         <div
@@ -48,7 +48,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
             Wordmark PUTIH, bukan logo penuh: teks "Kelab Sukan dan
             Rekreasi MAIWP" dalam fail penuh itu navy gelap dan akan
             hilang atas panel ini. Baris di bawahnya membawa semula nama
-            penuh sebagai teks sebenar — boleh dibaca pembaca skrin, dan
+            penuh sebagai teks sebenar - boleh dibaca pembaca skrin, dan
             kekal tajam pada mana-mana ketumpatan skrin.
           */}
           <Logo varian="wordmark" className="h-7" priority />
@@ -73,12 +73,12 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
 
       <main className="relative flex flex-col justify-center px-6 py-10 sm:px-10">
         <div className="absolute top-4 right-4">
-          <SuisTema />
+          <ThemeSwitch />
         </div>
 
         <div className="mx-auto w-full max-w-sm">
           {/*
-            Logo PENUH di sini — latar krim, jadi wordmark navy terbina
+            Logo PENUH di sini - latar krim, jadi wordmark navy terbina
             dalam fail itu boleh dibaca. Ia hanya muncul di bawah `lg`,
             tempat panel jenama disembunyikan.
           */}

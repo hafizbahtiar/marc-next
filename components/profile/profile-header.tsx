@@ -8,16 +8,16 @@ import { isManagement } from "@/lib/api/types";
 import type { Profile } from "@/lib/api/types";
 import { ROUTES } from "@/lib/auth/routes";
 
-export function HeaderProfil({ profile }: { profile: Profile }) {
+export function ProfileHeader({ profile }: { profile: Profile }) {
   const nama = profile.display_name?.trim() || profile.email;
 
   return (
-    <div className="flex items-center justify-between gap-4">
-      <div className="flex items-center gap-3">
-        <Avatar className="size-14">
+    <div className="flex flex-col justify-between gap-5 rounded-xl border bg-card p-5 shadow-sm sm:flex-row sm:items-center">
+      <div className="flex items-center gap-4">
+        <Avatar className="size-16 ring-4 ring-secondary">
           {profile.avatar_url ? <AvatarImage src={profile.avatar_url} alt="" /> : null}
           <AvatarFallback className="bg-accent text-base font-semibold text-accent-foreground">
-            {inisial(nama)}
+            {getInitials(nama)}
           </AvatarFallback>
         </Avatar>
         <div>
@@ -44,9 +44,9 @@ export function HeaderProfil({ profile }: { profile: Profile }) {
 }
 
 /** Dua huruf pertama, atau satu bila hanya ada satu perkataan. */
-function inisial(nama: string): string {
-  const bahagian = nama.split(/[\s@.]+/).filter(Boolean);
-  if (bahagian.length === 0) return "?";
-  if (bahagian.length === 1) return bahagian[0].slice(0, 2).toUpperCase();
-  return (bahagian[0][0] + bahagian[1][0]).toUpperCase();
+function getInitials(name: string): string {
+  const parts = name.split(/[\s@.]+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
 }

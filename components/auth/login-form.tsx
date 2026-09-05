@@ -3,19 +3,19 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
-import { ButangHantar } from "@/components/auth/butang-hantar";
-import { Medan } from "@/components/auth/medan";
-import { Notis } from "@/components/auth/notis";
+import { SubmitButton } from "@/components/auth/submit-button";
+import { FormField } from "@/components/auth/form-field";
+import { Notice } from "@/components/auth/notice";
 import { KEADAAN_AWAL } from "@/lib/auth/borang";
 import { logMasukAction } from "@/lib/auth/actions";
 import { ROUTES } from "@/lib/auth/routes";
 
-export function BorangLogMasuk({ next }: { next: string }) {
+export function LoginForm({ next }: { next: string }) {
   const [keadaan, action] = useActionState(logMasukAction, KEADAAN_AWAL);
 
   return (
     <form action={action} className="grid gap-4" noValidate>
-      <Notis ralat={keadaan.ralat} />
+      <Notice ralat={keadaan.ralat} />
 
       {/*
         Destinasi dibawa dalam medan tersembunyi dan bukan dibaca semula
@@ -24,7 +24,7 @@ export function BorangLogMasuk({ next }: { next: string }) {
       */}
       <input type="hidden" name="next" value={next} />
 
-      <Medan
+      <FormField
         name="email"
         label="Emel"
         type="email"
@@ -37,7 +37,7 @@ export function BorangLogMasuk({ next }: { next: string }) {
       />
 
       <div className="grid gap-1.5">
-        <Medan
+        <FormField
           name="password"
           label="Kata laluan"
           type="password"
@@ -53,7 +53,7 @@ export function BorangLogMasuk({ next }: { next: string }) {
         </Link>
       </div>
 
-      <ButangHantar>Log masuk</ButangHantar>
+      <SubmitButton>Log masuk</SubmitButton>
 
       <p className="text-center text-sm text-muted-foreground">
         Belum ada akaun?{" "}

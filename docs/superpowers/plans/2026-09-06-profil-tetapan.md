@@ -4,7 +4,7 @@
 
 **Goal:** Add a profile view page, a profile edit page (with avatar upload), and a settings hub to `marc_next`, matching the scope of the approved spec.
 
-**Architecture:** Server-rendered pages under `app/(dilindungi)/profil/` and `app/(dilindungi)/tetapan/`, backed by a `lib/profil/` data layer (`api.ts` thin backend wrapper, `actions.ts` Server Action, `schemas.ts` Zod validation) mirroring `lib/auth/`'s existing structure. Avatar upload reuses the posts module's generic presign action (`mintaUploadURLAction` in `lib/posts/actions.ts`) rather than duplicating it. The `marc_go` backend already implements every endpoint this feature calls (`GET/PATCH /me`, `POST /uploads/presign`, `POST /auth/logout-all`, `GET /me/sessions`) — no backend changes.
+**Architecture:** Server-rendered pages under `app/(dilindungi)/profil/` and `app/(dilindungi)/tetapan/`, backed by a `lib/profil/` data layer (`api.ts` thin backend wrapper, `actions.ts` Server Action, `schemas.ts` Zod validation) mirroring `lib/auth/`'s existing structure. Avatar upload reuses the posts module's generic presign action (`mintaUploadURLAction` in `lib/posts/actions.ts`) rather than duplicating it. The `marc_go` backend already implements every endpoint this feature calls (`GET/PATCH /me`, `POST /uploads/presign`, `POST /auth/logout-all`, `GET /me/sessions`) - no backend changes.
 
 **Tech Stack:** Next.js 16 (App Router, Server Actions), React 19, TypeScript, Tailwind v4, shadcn/radix primitives, Zod, `bun`.
 
@@ -12,14 +12,14 @@
 
 ## Global Constraints
 
-- Field names in all API payloads are verbatim snake_case, copied from the Go backend's JSON tags — never camelCase (see `lib/api/types.ts` header comment; `Profile` type already covers every field this feature needs, no new types required).
+- Field names in all API payloads are verbatim snake_case, copied from the Go backend's JSON tags - never camelCase (see `lib/api/types.ts` header comment; `Profile` type already covers every field this feature needs, no new types required).
 - Every new server-side-only file starts with `import "server-only";`.
-- Server Action files (`"use server"` at the top) may only export async functions — no top-level constants or types.
-- This slice uses `KeadaanBorang`/`useActionState` (from `lib/auth/borang.ts`, already shared infrastructure) for the edit-profile form — NOT the posts module's `HasilTindakan` pattern. This is a classic single-submit form, unlike the posts composer's multi-step list-mutation flow.
+- Server Action files (`"use server"` at the top) may only export async functions - no top-level constants or types.
+- This slice uses `KeadaanBorang`/`useActionState` (from `lib/auth/borang.ts`, already shared infrastructure) for the edit-profile form - NOT the posts module's `HasilTindakan` pattern. This is a classic single-submit form, unlike the posts composer's multi-step list-mutation flow.
 - Backend `PATCH /me` limits (validate client-side to match exactly): `display_name` ≤100 chars, `phone`/`emergency_contact_phone` ≤30 chars and must pass `normalkanTelefonMY` if non-empty, `emergency_contact_name` ≤100 chars, `health_notes` ≤500 chars. Empty string clears a field; the edit form always submits every field (never omits one for "unchanged"), since the form is always fully seeded with current values.
-- No automated tests exist in this repo and none are being added — do not flag missing test coverage as a defect; this is an explicit, approved decision carried over from the posts module's spec.
+- No automated tests exist in this repo and none are being added - do not flag missing test coverage as a defect; this is an explicit, approved decision carried over from the posts module's spec.
 - Follow existing conventions exactly: `cn` imported from `"cn"`, Malay identifier names, `ApiError`/`ApiUnreachableError` from `lib/api/errors.ts` for backend error handling, ROUTES named once in `lib/auth/routes.ts`.
-- Work directly on the current branch (`staging`), no worktree. Every "commit" step in the task template below is replaced with `git add <files>` (stage only) — the user stages/commits at their own pace.
+- Work directly on the current branch (`staging`), no worktree. Every "commit" step in the task template below is replaced with `git add <files>` (stage only) - the user stages/commits at their own pace.
 
 ---
 
@@ -31,7 +31,7 @@
 
 **Interfaces:**
 - Consumes: `normalkanTelefonMY(raw: string): string | null` from `lib/auth/phone.ts`.
-- Produces: `ROUTES.profilEdit = "/profil/edit"`; `skemaKemaskiniProfil` (Zod schema) — consumed by Task 3 (`lib/profil/actions.ts`).
+- Produces: `ROUTES.profilEdit = "/profil/edit"`; `skemaKemaskiniProfil` (Zod schema) - consumed by Task 3 (`lib/profil/actions.ts`).
 
 - [ ] **Step 1: Add the route constant**
 
@@ -52,12 +52,12 @@ import { normalkanTelefonMY } from "./phone";
 
 /**
  * Peraturan di sini MENCERMINKAN had backend PATCH /me
- * (updateMeRequest, internal/http/handlers/profile.go) — bukan sumber
+ * (updateMeRequest, internal/http/handlers/profile.go) - bukan sumber
  * kebenaran, tetapi maklum balas per-medan sebelum permintaan rangkaian.
  *
  * Borang ini SENTIASA menghantar SETIAP medan (bukan patch separa):
  * medan kosong bermaksud ahli sengaja buang nilai itu, bukan "tak
- * diubah" — borang sentiasa disemai dgn nilai semasa dahulu.
+ * diubah" - borang sentiasa disemai dgn nilai semasa dahulu.
  */
 
 const namaPilihan = z
@@ -105,7 +105,7 @@ git add lib/auth/routes.ts lib/profil/schemas.ts
 
 **Interfaces:**
 - Consumes: `apiFetch<T>` from `lib/api/client.ts`, `Profile` from `lib/api/types.ts`.
-- Produces: `kemaskiniProfil(accessToken, body): Promise<Profile>` — consumed by Task 3.
+- Produces: `kemaskiniProfil(accessToken, body): Promise<Profile>` - consumed by Task 3.
 
 - [ ] **Step 1: Write the file**
 
@@ -116,7 +116,7 @@ import { apiFetch } from "@/lib/api/client";
 import type { Profile } from "@/lib/api/types";
 
 /**
- * Pembalut nipis atas `PATCH /me` — padanan `lib/auth/api.ts`/`lib/posts/api.ts`
+ * Pembalut nipis atas `PATCH /me` - padanan `lib/auth/api.ts`/`lib/posts/api.ts`
  * untuk domain profil. `GET /me` sudah wujud sebagai `lib/auth/api.ts`'s
  * `me()`; fail ni cuma tambah bahagian TULIS.
  */
@@ -157,7 +157,7 @@ git add lib/profil/api.ts
 
 **Interfaces:**
 - Consumes: `kemaskiniProfil` from Task 2, `skemaKemaskiniProfil` from Task 1, `KeadaanBorang` from `lib/auth/borang.ts`, `ApiError`/`ApiUnreachableError` from `lib/api/errors.ts`, `accessToken` from `lib/auth/session.ts`, `ROUTES` from `lib/auth/routes.ts`.
-- Produces: `kemaskiniProfilAction(_prev: KeadaanBorang, formData: FormData): Promise<KeadaanBorang>` — consumed by Task 8 (`borang-edit-profil.tsx`).
+- Produces: `kemaskiniProfilAction(_prev: KeadaanBorang, formData: FormData): Promise<KeadaanBorang>` - consumed by Task 8 (`borang-edit-profil.tsx`).
 
 - [ ] **Step 1: Write the file**
 
@@ -210,7 +210,7 @@ export async function kemaskiniProfilAction(
   }
 
   // Hadir hanya bila ahli berinteraksi dengan pemilih avatar dalam sesi
-  // edit ini (lihat BorangEditProfil, Task 8) — string kosong bermaksud
+  // edit ini (lihat BorangEditProfil, Task 8) - string kosong bermaksud
   // "buang avatar", ketiadaan medan ni langsung bermaksud "jangan sentuh".
   const avatarR2Key = formData.has("avatar_r2_key")
     ? String(formData.get("avatar_r2_key"))
@@ -259,7 +259,7 @@ git add lib/profil/actions.ts
 
 **Interfaces:**
 - Consumes: `Profile`, `isManagement` from `lib/api/types.ts`, `Avatar`/`AvatarImage`/`AvatarFallback` from `components/ui/avatar.tsx`, `Badge` from `components/ui/badge.tsx`, `Button` from `components/ui/button.tsx`, `ROUTES` from `lib/auth/routes.ts`.
-- Produces: `HeaderProfil` component with props `{ profile: Profile }` — consumed by Task 9 (profile page).
+- Produces: `HeaderProfil` component with props `{ profile: Profile }` - consumed by Task 9 (profile page).
 
 - [ ] **Step 1: Write the file**
 
@@ -340,7 +340,7 @@ git add components/profil/header-profil.tsx
 
 **Interfaces:**
 - Consumes: `Profile` from `lib/api/types.ts`, `Card`/`CardHeader`/`CardTitle`/`CardContent` from `components/ui/card.tsx`.
-- Produces: `KadInfoProfil` component with props `{ profile: Profile }` — consumed by Task 9 (profile page).
+- Produces: `KadInfoProfil` component with props `{ profile: Profile }` - consumed by Task 9 (profile page).
 
 - [ ] **Step 1: Write the file**
 
@@ -357,7 +357,7 @@ export function KadInfoProfil({ profile }: { profile: Profile }) {
       <CardContent>
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
           <Baris label="Emel" nilai={profile.email} />
-          <Baris label="No. telefon" nilai={profile.phone ?? "—"} />
+          <Baris label="No. telefon" nilai={profile.phone ?? "-"} />
           <Baris label="No. ahli" nilai={profile.member_id ?? "Belum dijana"} />
           <Baris
             label="Status emel"
@@ -405,7 +405,7 @@ git add components/profil/kad-info-profil.tsx
 
 **Interfaces:**
 - Consumes: `Card`/`CardContent` from `components/ui/card.tsx`.
-- Produces: `KadTetapan` component with props `{ label: string; children: React.ReactNode }` — consumed by Task 11 (settings page).
+- Produces: `KadTetapan` component with props `{ label: string; children: React.ReactNode }` - consumed by Task 11 (settings page).
 
 - [ ] **Step 1: Write the file**
 
@@ -413,7 +413,7 @@ git add components/profil/kad-info-profil.tsx
 import { Card, CardContent } from "@/components/ui/card";
 
 /**
- * Kumpulan tetapan berlabel — padanan `SettingsGroupLabel` + `SettingsCard`
+ * Kumpulan tetapan berlabel - padanan `SettingsGroupLabel` + `SettingsCard`
  * Flutter (shared/ui/widgets/settings_section.dart), digabung jadi SATU
  * komponen supaya jarak antara label dan kad tak boleh terlepas.
  */
@@ -452,8 +452,8 @@ git add components/tetapan/kad-tetapan.tsx
 - Create: `components/tetapan/butang-log-keluar-semua.tsx`
 
 **Interfaces:**
-- Consumes: `logKeluarSemuaAction` from `lib/auth/actions.ts` (signature: `(): Promise<void>` — always clears cookies and redirects, never returns to the caller on success), `Button` from `components/ui/button.tsx`.
-- Produces: `ButangLogKeluarSemua` component (no props) — consumed by Task 11 (settings page).
+- Consumes: `logKeluarSemuaAction` from `lib/auth/actions.ts` (signature: `(): Promise<void>` - always clears cookies and redirects, never returns to the caller on success), `Button` from `components/ui/button.tsx`.
+- Produces: `ButangLogKeluarSemua` component (no props) - consumed by Task 11 (settings page).
 
 - [ ] **Step 1: Write the file**
 
@@ -468,7 +468,7 @@ import { Button } from "@/components/ui/button";
 import { logKeluarSemuaAction } from "@/lib/auth/actions";
 
 /**
- * Dua-langkah dalam-baris (bukan modal) — padanan corak padam post
+ * Dua-langkah dalam-baris (bukan modal) - padanan corak padam post
  * (KadPos, modul feed): klik pertama sedia, klik kedua sahkan.
  */
 export function ButangLogKeluarSemua() {
@@ -534,7 +534,7 @@ git add components/tetapan/butang-log-keluar-semua.tsx
 
 **Interfaces:**
 - Consumes: `kemaskiniProfilAction` from Task 3, `mintaUploadURLAction` from `lib/posts/actions.ts` (signature: `(contentType: string) => Promise<HasilTindakan<{ upload_url: string; r2_key: string }>>`), `HasilTindakan` from `lib/posts/hasil.ts`, `KEADAAN_AWAL`/`KeadaanBorang` from `lib/auth/borang.ts`, `Input`/`Textarea`/`Label`/`Button`/`Avatar`/`AvatarImage`/`AvatarFallback` from `components/ui/`, `Profile` from `lib/api/types.ts`.
-- Produces: `BorangEditProfil` component with props `{ profile: Profile }` — consumed by Task 10 (edit page).
+- Produces: `BorangEditProfil` component with props `{ profile: Profile }` - consumed by Task 10 (edit page).
 
 - [ ] **Step 1: Write the file**
 
@@ -735,7 +735,7 @@ function ButangSimpan() {
 }
 ```
 
-Note: avatar upload/type errors are shown inline (`ralatAvatar`), matching the posts composer's per-file error pattern from the spec — there is no toast-worthy transient event in this form (unlike likes), so `sonner` is not used here.
+Note: avatar upload/type errors are shown inline (`ralatAvatar`), matching the posts composer's per-file error pattern from the spec - there is no toast-worthy transient event in this form (unlike likes), so `sonner` is not used here.
 
 - [ ] **Step 2: Type-check**
 

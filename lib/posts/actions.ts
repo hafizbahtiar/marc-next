@@ -14,7 +14,7 @@ async function token(): Promise<string> {
   return t;
 }
 
-/** Ralat "tiada sesi" (lihat `token()`) — bukan `ApiError`, jadi dikesan berasingan. */
+/** Ralat "tiada sesi" (lihat `token()`) - bukan `ApiError`, jadi dikesan berasingan. */
 const MESEJ_SESI_TAK_SAH = "Sesi tidak sah.";
 
 /** Tukar ralat lapisan API kepada mesej. Ralat tak dikenali dilempar semula. */

@@ -4,7 +4,7 @@
  * `theme_mode` dipilih supaya ia SEPADAN dengan kunci SharedPreferences
  * dalam marc_flutter (`_prefsKey`, lib/core/theme_mode_provider.dart).
  * Kedua-dua klien tak berkongsi storan, jadi ia tak menjimatkan apa-apa
- * secara teknikal — ia menjadikan pilihan itu boleh dicari merentas
+ * secara teknikal - ia menjadikan pilihan itu boleh dicari merentas
  * kedua-dua repo dengan satu grep.
  */
 export const KUNCI_TEMA = "theme_mode";

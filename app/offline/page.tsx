@@ -10,8 +10,8 @@ export const metadata: Metadata = { title: "Pelayan tidak dapat dihubungi" };
  * Dipaparkan melalui tulis-semula daripada `proxy.ts` apabila backend
  * MARC tak dapat dihubungi semasa memutar token.
  *
- * Halaman ini SENGAJA tidak menyentuh kuki. Sesi ahli masih sah — yang
- * gagal ialah rangkaian antara Next dan Go — jadi satu muat semula
+ * Halaman ini SENGAJA tidak menyentuh kuki. Sesi ahli masih sah - yang
+ * gagal ialah rangkaian antara Next dan Go - jadi satu muat semula
  * selepas backend pulih akan meneruskan sesi yang sama.
  */
 export default function OfflinePage() {
@@ -30,7 +30,7 @@ export default function OfflinePage() {
         Pelayan MARC tidak dapat dihubungi
       </h1>
       <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground text-pretty">
-        Ini biasanya sementara. Anda masih log masuk — cuba muat semula
+        Ini biasanya sementara. Anda masih log masuk - cuba muat semula
         sebentar lagi.
       </p>
 

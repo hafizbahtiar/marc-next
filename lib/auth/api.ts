@@ -5,7 +5,7 @@ import type { Profile, SessionRecord, TokenPair } from "@/lib/api/types";
 
 /**
  * Pembalut nipis atas laluan `/auth` backend Go. Nilai pulangan `void`
- * bermakna backend menjawab 204 tanpa badan — lihat komen 204 dalam
+ * bermakna backend menjawab 204 tanpa badan - lihat komen 204 dalam
  * lib/api/client.ts.
  */
 
@@ -76,7 +76,7 @@ export function batalkanSesi(accessToken: string, id: string): Promise<void> {
  *
  * Laluan ini duduk di bawah `RequireAuth` + `RequireApprovedStatus` di
  * backend (lihat protectedAuthGroup, internal/http/router.go), jadi ahli
- * yang masih `pending` akan dapat 403 — bukan ralat, tetapi keadaan
+ * yang masih `pending` akan dapat 403 - bukan ralat, tetapi keadaan
  * produk sebenar yang UI mesti terangkan dan bukan cuba semula.
  */
 export function mintaPengesahanEmel(accessToken: string): Promise<void> {

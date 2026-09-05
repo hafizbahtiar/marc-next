@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
  *
  * Ia menyemak SATU perkara: proses Next ini hidup dan boleh menjawab.
  * Ia SENGAJA tidak menghubungi backend Go. Railway menggunakan
- * pemeriksaan ini sebagai pintu pagar penggunaan — kalau ia turut
+ * pemeriksaan ini sebagai pintu pagar penggunaan - kalau ia turut
  * menguji backend, gangguan pada perkhidmatan Go akan menyekat setiap
  * penggunaan web, termasuk penggunaan yang membaiki gangguan itu.
  *

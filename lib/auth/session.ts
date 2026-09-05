@@ -20,7 +20,7 @@ export type Sesi = {
  *
  * TIADA refresh berlaku di sini. Komponen dan susun atur pelayan tak
  * boleh menulis kuki dalam Next, jadi refresh yang dicuba dari sini akan
- * mendapat token baharu yang tak dapat disimpan — dan memulakan pusingan
+ * mendapat token baharu yang tak dapat disimpan - dan memulakan pusingan
  * yang sama pada permintaan seterusnya, membakar satu token setiap kali
  * sehingga pengesanan guna-semula backend membatalkan seluruh family.
  * Refresh berlaku dalam `proxy.ts` sahaja, yang memang boleh menulis
@@ -40,7 +40,7 @@ export async function refreshToken(): Promise<string | null> {
  * Profil ahli semasa, atau null bila tiada sesi sah.
  *
  * Dibalut `cache()` React supaya susun atur, halaman dan komponen dalam
- * SATU render berkongsi satu panggilan GET /me — bukan cache merentas
+ * SATU render berkongsi satu panggilan GET /me - bukan cache merentas
  * permintaan, jadi tiada data ahli yang bocor antara pelawat.
  */
 export const dapatkanSesi = cache(async (): Promise<Sesi | null> => {
@@ -59,7 +59,7 @@ export const dapatkanSesi = cache(async (): Promise<Sesi | null> => {
 
     // Backend tak dapat dihubungi walaupun access token masih ada.
     // Melaporkannya sebagai "tiada sesi" akan menghantar ahli ke
-    // /api/sesi/tamat dan membuang kuki yang sah — gangguan rangkaian
+    // /api/sesi/tamat dan membuang kuki yang sah - gangguan rangkaian
     // sekejap tak patut menjadi log keluar. Padanan pengendalian yang
     // sama dalam proxy.ts.
     if (error instanceof ApiUnreachableError) redirect(ROUTES.pelayanLuarTalian);
@@ -87,7 +87,7 @@ export async function wajibSesi(destinasiAsal?: string): Promise<Sesi> {
  * Urutan padanan lapisan middleware backend: `RequireApprovedStatus`
  * berjalan SEBELUM `RequireVerifiedEmail` (internal/http/router.go), jadi
  * ahli pending yang emelnya belum disahkan mesti nampak skrin kelulusan
- * dahulu — memaparkan skrin "sahkan emel" kepadanya akan menjanjikan
+ * dahulu - memaparkan skrin "sahkan emel" kepadanya akan menjanjikan
  * akses yang kelulusan masih tahan, dan butang hantar semula pada skrin
  * itu memang akan gagal dengan 403 untuknya (lihat
  * mintaPengesahanEmel, lib/auth/api.ts).

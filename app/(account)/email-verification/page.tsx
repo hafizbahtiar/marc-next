@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { MailIcon } from "lucide-react";
 
-import { BorangHantarSemulaPengesahan } from "@/components/auth/borang-hantar-semula-pengesahan";
+import { ResendVerificationForm } from "@/components/auth/resend-verification-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ROUTES } from "@/lib/auth/routes";
 import { dapatkanSesi } from "@/lib/auth/session";
@@ -16,7 +16,7 @@ export default async function EmailVerificationPage() {
   const p = sesi.profile;
   // Halaman ini hanya terpakai kepada ahli yang SUDAH diluluskan tetapi
   // emelnya belum disahkan. Ahli pending mesti melihat skrin kelulusan
-  // dahulu — lihat `skrinGate`, dan perhatikan bahawa butang hantar
+  // dahulu - lihat `skrinGate`, dan perhatikan bahawa butang hantar
   // semula di bawah memang akan gagal dengan 403 untuknya.
   if (p.email_verified || p.status !== "approved") redirect(ROUTES.utama);
 
@@ -46,15 +46,15 @@ export default async function EmailVerificationPage() {
           <CardDescription>
             Kami menghantar pautan pengesahan ke{" "}
             <span className="font-medium text-foreground">{p.email}</span>. Buka
-            emel itu dan klik pautannya — ia sah selama 1 jam.
+            emel itu dan klik pautannya - ia sah selama 1 jam.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-5">
           <p className="text-sm leading-relaxed text-muted-foreground text-pretty">
             Tak nampak emel itu? Semak folder spam dahulu. Kalau masih tiada,
-            minta pautan baharu di bawah — pautan lama akan terbatal.
+            minta pautan baharu di bawah - pautan lama akan terbatal.
           </p>
-          <BorangHantarSemulaPengesahan />
+          <ResendVerificationForm />
         </CardContent>
       </Card>
     </div>

@@ -10,7 +10,7 @@ const TEMPOH_MS = 450;
 const LENGKUNG = "cubic-bezier(0.645, 0.045, 0.355, 1)";
 
 /**
- * Suis tema dengan pendedahan bulat dari titik klik — padanan
+ * Suis tema dengan pendedahan bulat dari titik klik - padanan
  * `ThemeSwitchReveal` (marc_flutter/lib/core/theme_switch_reveal.dart),
  * yang meniru peralihan tema Telegram.
  *
@@ -24,14 +24,14 @@ const LENGKUNG = "cubic-bezier(0.645, 0.045, 0.355, 1)";
  * (Firefox, pada masa penulisan) menukar tema serta-merta, begitu juga
  * pengguna yang meminta kurang gerakan.
  */
-export function SuisTema() {
+export function ThemeSwitch() {
   // TIADA keadaan React di sini dengan sengaja. Tema sebenar hidup dalam
   // kelas `<html>`, ditetapkan oleh skrip sebaris sebelum React berjalan
-  // (lihat SkripTemaAwal), jadi pelayan tak boleh mengetahuinya —
+  // (lihat InitialThemeScript), jadi pelayan tak boleh mengetahuinya -
   // menyalinnya ke dalam keadaan komponen hanya mencipta salinan kedua
   // yang boleh menyimpang, dan menjamin ketidakpadanan hidrasi pada
   // bingkai pertama. Ikon ditukar oleh CSS; pengendali membaca DOM.
-  function tukar(event: React.MouseEvent<HTMLButtonElement>) {
+  function toggleTheme(event: React.MouseEvent<HTMLButtonElement>) {
     const baharu: Tema = temaSemasa() === "dark" ? "light" : "dark";
 
     const guna = () => {
@@ -51,7 +51,7 @@ export function SuisTema() {
     }
 
     // Bulatan bermula pada butang dan mesti membesar sehingga mencapai
-    // penjuru skrin yang PALING JAUH — kalau tidak, satu bucu kekal
+    // penjuru skrin yang PALING JAUH - kalau tidak, satu bucu kekal
     // dalam tema lama apabila animasi tamat.
     const { top, left, width, height } = event.currentTarget.getBoundingClientRect();
     const x = left + width / 2;
@@ -84,7 +84,7 @@ export function SuisTema() {
       type="button"
       variant="ghost"
       size="icon-sm"
-      onClick={tukar}
+      onClick={toggleTheme}
       // Label statik: ia mesti sama pada pelayan dan klien, dan pelayan
       // tak tahu tema pelawat. "Tukar tema" menerangkan apa yang butang
       // BUAT, yang betul dalam kedua-dua arah.

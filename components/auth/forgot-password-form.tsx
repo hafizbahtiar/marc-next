@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
-import { ButangHantar } from "@/components/auth/butang-hantar";
-import { Medan } from "@/components/auth/medan";
-import { Notis } from "@/components/auth/notis";
+import { SubmitButton } from "@/components/auth/submit-button";
+import { FormField } from "@/components/auth/form-field";
+import { Notice } from "@/components/auth/notice";
 import { KEADAAN_AWAL } from "@/lib/auth/borang";
 import { lupaKataLaluanAction } from "@/lib/auth/actions";
 import { ROUTES } from "@/lib/auth/routes";
 
-export function BorangLupaKataLaluan() {
+export function ForgotPasswordForm() {
   const [keadaan, action] = useActionState(lupaKataLaluanAction, KEADAAN_AWAL);
 
   // Selepas berjaya, borang diganti sepenuhnya dan bukan sekadar diberi
@@ -20,7 +20,7 @@ export function BorangLupaKataLaluan() {
   if (keadaan.berjaya) {
     return (
       <div className="grid gap-4">
-        <Notis berjaya={keadaan.berjaya} />
+        <Notice berjaya={keadaan.berjaya} />
         <Link
           href={ROUTES.logMasuk}
           className="text-sm font-medium text-primary underline-offset-4 hover:underline"
@@ -33,9 +33,9 @@ export function BorangLupaKataLaluan() {
 
   return (
     <form action={action} className="grid gap-4" noValidate>
-      <Notis ralat={keadaan.ralat} />
+      <Notice ralat={keadaan.ralat} />
 
-      <Medan
+      <FormField
         name="email"
         label="Emel"
         type="email"
@@ -47,7 +47,7 @@ export function BorangLupaKataLaluan() {
         required
       />
 
-      <ButangHantar>Hantar pautan reset</ButangHantar>
+      <SubmitButton>Hantar pautan reset</SubmitButton>
 
       <p className="text-center text-sm text-muted-foreground">
         Teringat semula?{" "}

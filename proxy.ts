@@ -19,7 +19,7 @@ import { laluanTetamu, ROUTES } from "@/lib/auth/routes";
  * Komponen dan susun atur pelayan boleh MEMBACA kuki tetapi tak boleh
  * menulisnya, jadi refresh yang cuba berlaku semasa render akan
  * menghanguskan satu refresh token setiap permintaan tanpa pernah dapat
- * menyimpan penggantinya — dan pengesanan guna-semula backend akhirnya
+ * menyimpan penggantinya - dan pengesanan guna-semula backend akhirnya
  * membatalkan seluruh family, menendang ahli keluar. Di sini, sebelum
  * render bermula, kuki masih boleh ditulis.
  *
@@ -27,7 +27,7 @@ import { laluanTetamu, ROUTES } from "@/lib/auth/routes";
  * sini. Ia memerlukan GET /me, dan dokumentasi Next menegaskan proxy
  * bukan tempat untuk pengambilan data yang perlahan. Gate itu duduk dalam
  * susun atur `(dilindungi)`, tempat backend tetap menjadi penguat kuasa
- * sebenar — proxy cuma mengelakkan lawatan yang jelas sia-sia.
+ * sebenar - proxy cuma mengelakkan lawatan yang jelas sia-sia.
  */
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
@@ -37,7 +37,7 @@ export async function proxy(request: NextRequest) {
 
   // Kuki akses luput lebih awal daripada kuki refresh (lihat
   // JURANG_LUPUT_SAAT), jadi keadaan "tiada akses, ada refresh" ialah
-  // isyarat putaran yang biasa — bukan pengecualian.
+  // isyarat putaran yang biasa - bukan pengecualian.
   if (!adaAkses && rt) {
     return await putarToken(request, rt);
   }
@@ -89,7 +89,7 @@ async function putarToken(request: NextRequest, rt: string) {
       labelPeranti(request.headers.get("user-agent")),
       // `next/headers` tiada di sini, jadi rantaian diserahkan terus
       // daripada permintaan. Tanpanya, backend merekod alamat pelayan
-      // Next sebagai `created_ip` sesi — dan skrin "peranti yang log
+      // Next sebagai `created_ip` sesi - dan skrin "peranti yang log
       // masuk" memaparkan IP yang sama untuk setiap peranti.
       request.headers.get("x-forwarded-for"),
     );
@@ -105,7 +105,7 @@ async function putarToken(request: NextRequest, rt: string) {
     simpanToken(response.cookies, tokens);
     return response;
   } catch (error) {
-    // 401 di sini bermakna token refresh itu mati — luput, dilog keluar
+    // 401 di sini bermakna token refresh itu mati - luput, dilog keluar
     // di tempat lain, atau familynya dibatalkan selepas guna-semula
     // dikesan. Tiada apa yang boleh dipulihkan; buang kuki dan minta log
     // masuk semula.
@@ -121,13 +121,13 @@ async function putarToken(request: NextRequest, rt: string) {
       return response;
     }
 
-    // Backend tak dapat dihubungi. Kuki DIKEKALKAN — memadamnya di sini
+    // Backend tak dapat dihubungi. Kuki DIKEKALKAN - memadamnya di sini
     // akan menjadikan gangguan pelayan sementara sebagai log keluar
     // besar-besaran untuk setiap ahli yang sedang dalam talian.
     //
     // Permintaan itu juga TAK BOLEH diteruskan. Tanpa access token, susun
     // atur yang dilindungi akan melihat "tiada sesi", mengubah hala ke
-    // /api/sesi/tamat, dan membuang kuki yang baru sahaja kita pelihara —
+    // /api/sesi/tamat, dan membuang kuki yang baru sahaja kita pelihara -
     // gangguan seminit menjadi log masuk semula untuk semua orang.
     // Tulis-semula (bukan ubah hala) mengekalkan URL, jadi muat semula
     // membawa ahli kembali ke tempat asalnya sebaik backend pulih.

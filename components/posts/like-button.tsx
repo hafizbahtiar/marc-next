@@ -9,11 +9,11 @@ import { cn } from "@/lib/utils";
 import type { HasilTindakan } from "@/lib/posts/hasil";
 
 /**
- * Butang suka generik — dikongsi antara post dan comment. Ia tak tahu
+ * Butang suka generik - dikongsi antara post dan comment. Ia tak tahu
  * yang mana satu; pemanggil hantar `suka`/`nyahSuka` (tindakan pelayan
  * yang betul untuk jenis entiti itu) sebagai prop.
  */
-export function ButangSuka({
+export function LikeButton({
   id,
   kiraanAwal,
   disukaAwal,
@@ -30,7 +30,7 @@ export function ButangSuka({
   const [kiraan, setKiraan] = useState(kiraanAwal);
   const [pending, startTransition] = useTransition();
 
-  function togol() {
+  function toggleLike() {
     const disukaBaharu = !disuka;
     setDisuka(disukaBaharu);
     setKiraan((k) => k + (disukaBaharu ? 1 : -1));
@@ -39,13 +39,13 @@ export function ButangSuka({
       try {
         const hasil = disukaBaharu ? await suka(id) : await nyahSuka(id);
         if (!hasil.ok) {
-          // Undur balik keadaan optimistik — permintaan sebenar gagal.
+          // Undur balik keadaan optimistik - permintaan sebenar gagal.
           setDisuka(!disukaBaharu);
           setKiraan((k) => k - (disukaBaharu ? 1 : -1));
           toast.error(hasil.ralat);
         }
       } catch {
-        // Belt-and-suspenders — tindakan sepatutnya tidak lagi lempar
+        // Belt-and-suspenders - tindakan sepatutnya tidak lagi lempar
         // (lihat `ralatDaripada` dalam lib/posts/actions.ts), tapi undur
         // keadaan optimistik di sini juga sekiranya ia berlaku.
         setDisuka(!disukaBaharu);
@@ -61,7 +61,7 @@ export function ButangSuka({
       variant="ghost"
       size="sm"
       disabled={pending}
-      onClick={togol}
+      onClick={toggleLike}
       aria-pressed={disuka}
     >
       <HeartIcon className={cn("size-4", disuka && "fill-primary text-primary")} />

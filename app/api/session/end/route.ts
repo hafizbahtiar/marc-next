@@ -9,13 +9,13 @@ import { destinasiSelamat, ROUTES } from "@/lib/auth/routes";
  * Komponen pelayan boleh membaca kuki tetapi tak boleh memadamnya, jadi
  * apabila GET /me menjawab 401 dengan kuki yang masih ada (rahsia JWT
  * diputar, akaun dipadam), susun atur tak dapat membersihkannya sendiri
- * — ia mengubah hala ke sini, di mana pengendali laluan memang boleh
+ * - ia mengubah hala ke sini, di mana pengendali laluan memang boleh
  * menulis kuki.
  *
  * Ini BUKAN butang log keluar. `logKeluarAction` yang memberitahu backend
  * supaya membatalkan refresh token; laluan ini hanya membuang kuki
  * tempatan yang sudah tak bernilai, jadi ia selamat sebagai GET (ia tak
- * boleh dipacu oleh tapak lain untuk membatalkan sesi sebenar sesiapa —
+ * boleh dipacu oleh tapak lain untuk membatalkan sesi sebenar sesiapa -
  * paling teruk ia memaksa satu log masuk semula).
  */
 export function GET(request: NextRequest) {

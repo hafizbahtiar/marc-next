@@ -74,7 +74,7 @@ export async function logMasukAction(
   }
 
   // `redirect` melempar isyarat kawalan dalaman, jadi ia MESTI berada di
-  // luar `try` di atas — `catch` akan menangkapnya dan menjadikan log
+  // luar `try` di atas - `catch` akan menangkapnya dan menjadikan log
   // masuk yang berjaya kelihatan seperti ralat yang tak dikenali.
   redirect(destinasiSelamat(String(formData.get("next") ?? "")));
 }
@@ -106,7 +106,7 @@ export async function daftarAction(
   try {
     const { email, password, phone, staff_id } = disahkan.data;
     const tokens = await authApi.register({ email, password, phone, staff_id }, await label());
-    // Backend mengeluarkan token terus pada 201 — ahli baharu log masuk
+    // Backend mengeluarkan token terus pada 201 - ahli baharu log masuk
     // serta-merta, dan skrin "menunggu kelulusan" itulah yang
     // memberitahunya apa yang berlaku seterusnya.
     simpanToken(await cookies(), tokens);
@@ -194,7 +194,7 @@ export async function lupaKataLaluanAction(
 
   // Backend menjawab 204 sama ada akaun itu wujud atau tidak, supaya
   // titik akhir ini tak boleh digunakan untuk menyenaraikan emel yang
-  // berdaftar. Mesej di sini mesti mengekalkan sifat itu — "kalau emel
+  // berdaftar. Mesej di sini mesti mengekalkan sifat itu - "kalau emel
   // itu berdaftar", bukan "emel dihantar".
   return {
     berjaya:
@@ -255,7 +255,7 @@ export async function hantarSemulaPengesahanAction(
  * Ini ialah tindakan (POST) dan bukan kesan sampingan semasa memuatkan
  * halaman, walaupun backend turut menyediakan laluan GET yang menebus
  * token. Sebabnya: penebusan itu memadam token, dan pemuatan halaman
- * berlaku tanpa niat pengguna — pengimbas pautan klien emel, pra-ambil
+ * berlaku tanpa niat pengguna - pengimbas pautan klien emel, pra-ambil
  * pelayar, atau lawatan semula daripada sejarah akan menghanguskan
  * pautan dan menunjukkan "token tidak sah" kepada ahli yang belum pun
  * mengklik apa-apa.
@@ -273,7 +273,7 @@ export async function sahkanEmelAction(
     return keadaanRalat(error);
   }
 
-  // Kelayakan tak berubah — status `email_verified` yang berubah, dan itu
+  // Kelayakan tak berubah - status `email_verified` yang berubah, dan itu
   // dibaca semula oleh GET /me pada render seterusnya.
   revalidatePath(ROUTES.utama);
   return { berjaya: "Emel anda telah disahkan." };

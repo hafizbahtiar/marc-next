@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist_Mono, Inter } from "next/font/google";
 
-import { SkripTemaAwal } from "@/components/marc/skrip-tema-awal";
+import { InitialThemeScript } from "@/components/marc/initial-theme-script";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 /**
- * Inter untuk teks, Fraunces untuk tajuk — padanan `AppTheme._build`
+ * Inter untuk teks, Fraunces untuk tajuk - padanan `AppTheme._build`
  * (marc_flutter), yang menggunakan `GoogleFonts.interTextTheme` dengan
  * `GoogleFonts.fraunces` pada `displaySmall`/`headlineSmall`. Web dan
  * aplikasi mudah alih membaca sebagai produk yang sama.
@@ -34,7 +34,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    // `suppressHydrationWarning` — `SkripTemaAwal` menambah kelas `dark`
+    // `suppressHydrationWarning` - `SkripTemaAwal` menambah kelas `dark`
     // pada elemen ini sebelum React hidrat, jadi HTML pelayan dan DOM
     // klien memang berbeza di sini dengan sengaja.
     <html
@@ -43,7 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${fraunces.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        <SkripTemaAwal />
+          <InitialThemeScript />
       </head>
       <body className="flex min-h-full flex-col">
         {children}

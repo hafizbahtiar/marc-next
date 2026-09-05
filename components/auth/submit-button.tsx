@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
  * Ini mengelakkan setiap borang daripada memacu keadaan `pending`nya
  * sendiri.
  */
-export function ButangHantar({
+export function SubmitButton({
   children,
   className,
 }: {

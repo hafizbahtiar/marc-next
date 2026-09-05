@@ -14,7 +14,7 @@ export type KeadaanBorang = {
   medan?: Record<string, string>;
   /**
    * Nilai untuk mengisi semula borang selepas gagal. Medan kata laluan
-   * SENGAJA tak pernah dimasukkan — menghantarnya semula ke klien
+   * SENGAJA tak pernah dimasukkan - menghantarnya semula ke klien
    * meletakkannya dalam muatan HTML dan sejarah pelayar.
    */
   nilai?: Record<string, string>;

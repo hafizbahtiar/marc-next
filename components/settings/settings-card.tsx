@@ -1,11 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 
 /**
- * Kumpulan tetapan berlabel — padanan `SettingsGroupLabel` + `SettingsCard`
+ * Kumpulan tetapan berlabel - padanan `SettingsGroupLabel` + `SettingsCard`
  * Flutter (shared/ui/widgets/settings_section.dart), digabung jadi SATU
  * komponen supaya jarak antara label dan kad tak boleh terlepas.
  */
-export function KadTetapan({ label, children }: { label: string; children: React.ReactNode }) {
+export function SettingsCard({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid gap-2">
       <h2 className="px-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">

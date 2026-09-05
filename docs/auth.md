@@ -1,4 +1,4 @@
-# Modul Auth — marc_next
+# Modul Auth - marc_next
 
 Modul ini menghubungkan portal web MARC kepada backend Go (`marc_go`).
 Dokumen ini merekod keputusan yang **tak dapat dibaca daripada kod**.
@@ -28,19 +28,19 @@ mengambil sesi, tak seperti token dalam `localStorage`.
 ## IP klien: kenapa `X-Forwarded-For` disiarkan semula
 
 Seni bina BFF mempunyai satu harga yang mesti dibayar secara eksplisit:
-backend melihat setiap pengguna web tiba dari **satu** alamat — pelayan
+backend melihat setiap pengguna web tiba dari **satu** alamat - pelayan
 Next.
 
 Dua sistem dalam `marc_go` menggunakan `c.ClientIP()` sebagai identiti:
 
 - **Had kadar.** `RateLimiter.Limit` kunci baldinya pada IP. Satu alamat
   bermakna baldi `auth` (12s/5 burst) menjadi kuota yang dikongsi
-  **seluruh portal** — lima cubaan log masuk seminit untuk semua orang.
+  **seluruh portal** - lima cubaan log masuk seminit untuk semua orang.
 - **Pengesanan token dicuri.** `consumedIPMatches`
   (`internal/http/handlers/auth.go`) hanya memaafkan guna-semula refresh
   token sebagai perlumbaan bila ia datang dari IP yang sama dengan
   permintaan yang menang. Satu alamat bermakna **setiap** guna-semula web
-  lulus semakan itu — tepat perlindungan yang komennya dibina untuk
+  lulus semakan itu - tepat perlindungan yang komennya dibina untuk
   menangkap.
 
 Jadi `apiFetch` menyiarkan semula rantaian `X-Forwarded-For` permintaan
@@ -50,14 +50,14 @@ Rantaian itu **tidak dihuraikan di sini**. Gin sudah melakukannya:
 `validateHeader` melelar dari **kanan ke kiri** dan memulangkan IP
 pertama yang bukan proksi dipercayai, jadi entri yang disuntik klien di
 sebelah kiri kalah. Memilih satu entri di Next bermakna menulis semula
-algoritma itu dalam TypeScript — dan versi yang salah (ambil `[0]` tanpa
+algoritma itu dalam TypeScript - dan versi yang salah (ambil `[0]` tanpa
 syarat) membenarkan sesiapa memintas had kadar dengan menghantar
 `X-Forwarded-For: <rawak>` pada setiap percubaan.
 
 Tiada perubahan backend diperlukan: `trustedProxyRanges`
 (`internal/http/router.go`) sudah mengandungi `100.64.0.0/10`, julat
 rangkaian peribadi Railway yang Next berhubung daripadanya. Kontrak itu
-dikunci oleh `TestClientIPMerentasProksi` dalam repo `marc_go` — menambah
+dikunci oleh `TestClientIPMerentasProksi` dalam repo `marc_go` - menambah
 atau membuang julat dalam senarai itu menggagalkan ujian dan bukan
 menyebabkan pepijat senyap.
 
@@ -75,7 +75,7 @@ menyebabkan pepijat senyap.
 
 Komponen dan susun atur pelayan boleh **membaca** kuki tetapi tak boleh
 **menulisnya**. Refresh yang dicuba semasa render akan menghanguskan satu
-refresh token setiap permintaan tanpa dapat menyimpan penggantinya — dan
+refresh token setiap permintaan tanpa dapat menyimpan penggantinya - dan
 pengesanan guna-semula backend (`refreshReuseGraceWindow`,
 `internal/http/handlers/auth.go`) akhirnya membatalkan seluruh *family*,
 menendang ahli keluar dari semua peranti.
@@ -97,7 +97,7 @@ Permintaan juga tak diteruskan: tanpa access token, susun atur yang
 dilindungi akan melihat "tiada sesi" dan mengubah hala ke
 `/api/sesi/tamat`, yang memadam kuki yang baru sahaja dipelihara. Sebab
 itu proxy **menulis-semula** (bukan mengubah hala) ke
-`/pelayan-luar-talian` dengan status 503 — URL kekal, jadi muat semula
+`/pelayan-luar-talian` dengan status 503 - URL kekal, jadi muat semula
 membawa ahli kembali ke tempat asalnya.
 
 ## Lapisan gate
@@ -105,7 +105,7 @@ membawa ahli kembali ke tempat asalnya.
 | Lapisan | Tempat | Menyemak |
 |---|---|---|
 | Kewujudan kuki | `proxy.ts` | Ada sesi atau tidak. Tiada panggilan DB. |
-| Status akaun | `app/(dilindungi)/layout.tsx` | `skrinGate()` — pending / rejected / emel belum sah |
+| Status akaun | `app/(dilindungi)/layout.tsx` | `skrinGate()` - pending / rejected / emel belum sah |
 | Kuat kuasa sebenar | backend Go | `RequireAuth` → `RequireApprovedStatus` → `RequireVerifiedEmail` |
 
 Dua lapisan pertama **bukan sempadan keselamatan**. Ia wujud supaya ahli
@@ -114,7 +114,7 @@ melihat penjelasan dan bukan 403. Backend yang menguatkuasakan.
 Urutan dalam `skrinGate()` mengikut urutan middleware backend: kelulusan
 **sebelum** pengesahan emel. Terbalikkannya dan ahli pending akan
 dihantar ke skrin "sahkan emel" yang butang hantar semulanya memang akan
-gagal dengan 403 — laluan `POST /auth/verify-email/request` duduk di
+gagal dengan 403 - laluan `POST /auth/verify-email/request` duduk di
 bawah `RequireApprovedStatus`.
 
 ## Perangkap yang sudah ditemui (jangan ulang)
@@ -139,11 +139,11 @@ mengklik apa-apa.
 
 `lib/auth/phone.ts` ialah port **tepat** `phone.NormalizeMY`
 (`internal/phone/phone.go`). Salinan ketiga ada dalam `shared/phone.dart`
-(marc_flutter). Ketiga-tiganya mesti berubah bersama — perbezaan
+(marc_flutter). Ketiga-tiganya mesti berubah bersama - perbezaan
 bermakna borang menerima nombor yang backend tolak.
 
 `lib/auth/schemas.ts` mencerminkan tag `binding` struct Go. Ia bukan
-sumber kebenaran (backend mengesahkan semula) — ia yang memberi maklum
+sumber kebenaran (backend mengesahkan semula) - ia yang memberi maklum
 balas per-medan sebelum satu pun permintaan rangkaian.
 
 ## Env
@@ -157,7 +157,7 @@ balas per-medan sebelum satu pun permintaan rangkaian.
 \* Sekurang-kurangnya **satu** daripada dua yang pertama. `MARC_API_URL`
 menang bila kedua-duanya ada; `MARC_API_PUBLIC_URL` mengambil alih bila
 ia tiada, supaya persekitaran tanpa rangkaian peribadi berjalan tanpa
-perubahan kod. Kedua-duanya server sahaja — tiada `NEXT_PUBLIC_`.
+perubahan kod. Kedua-duanya server sahaja - tiada `NEXT_PUBLIC_`.
 
 ### Railway
 
@@ -167,9 +167,9 @@ MARC_API_PUBLIC_URL=https://${{marc_go.RAILWAY_PUBLIC_DOMAIN}}
 ```
 
 Rangkaian peribadi ada tiga syarat yang `lib/env.ts` kuatkuasakan atau
-dokumenkan: `http://` sahaja (tiada TLS pada `.railway.internal` —
+dokumenkan: `http://` sahaja (tiada TLS pada `.railway.internal` -
 trafik sudah disulitkan Wireguard), **port wajib** (tiada proksi di
-depan, jadi tiada 443 tersirat), dan ia **runtime sahaja** — DNS
+depan, jadi tiada 443 tersirat), dan ia **runtime sahaja** - DNS
 peribadi tak wujud semasa build, jadi jangan sekali-kali memanggil API
 semasa fasa itu.
 

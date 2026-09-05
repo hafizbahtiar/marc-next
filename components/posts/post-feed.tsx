@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { KadPos } from "@/components/posts/kad-pos";
+import { PostCard } from "@/components/posts/post-card";
 import type { Post, Profile, SenaraiPosRespons } from "@/lib/api/types";
 
-export function SuapanPos({
+export function PostFeed({
   pos,
   cursorSeterusnya,
   profileSemasa,
@@ -16,7 +16,7 @@ export function SuapanPos({
   pos: Post[];
   cursorSeterusnya: string | null;
   profileSemasa: Profile;
-  /** Dipanggil dengan post halaman seterusnya selepas berjaya dimuat — ibu bapa yang gabungkan ke senarai dimiliki. */
+  /** Dipanggil dengan post halaman seterusnya selepas berjaya dimuat - ibu bapa yang gabungkan ke senarai dimiliki. */
   onMuatLanjut: (posBaharu: Post[]) => void;
   onDipadam?: (id: string) => void;
   onDikemaskini?: (post: Post) => void;
@@ -34,7 +34,7 @@ export function SuapanPos({
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting) muatHalamanSeterusnya();
+        if (entries[0]?.isIntersecting) loadNextPage();
       },
       { rootMargin: "200px" },
     );
@@ -43,7 +43,7 @@ export function SuapanPos({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- muatHalamanSeterusnya ditakrif semula setiap render dengan sengaja (baca `cursor` terkini); guard "sedang memuat" guna `memuatRef` (bukan state `memuat`) supaya tidak terjejas oleh stale closure. Observer dipasang semula bila `cursor` berubah, yang cukup untuk elak pemasangan berulang tanpa henti.
   }, [cursor]);
 
-  async function muatHalamanSeterusnya() {
+  async function loadNextPage() {
     if (memuatRef.current || !cursor) return;
     memuatRef.current = true;
     setMemuat(true);
@@ -78,7 +78,7 @@ export function SuapanPos({
   return (
     <div className="grid gap-4">
       {pos.map((p) => (
-        <KadPos
+        <PostCard
           key={p.id}
           post={p}
           profileSemasa={profileSemasa}
@@ -91,15 +91,15 @@ export function SuapanPos({
       {cursor ? (
         <div ref={sentinelRef} className="py-4 text-center text-sm text-muted-foreground">
           {ralat ? (
-            <button type="button" onClick={muatHalamanSeterusnya} className="underline">
-              {ralat} — cuba lagi
+            <button type="button" onClick={loadNextPage} className="underline">
+              {ralat} - cuba lagi
             </button>
           ) : memuat ? (
             "Memuat…"
           ) : null}
         </div>
       ) : (
-        <p className="py-4 text-center text-xs text-muted-foreground">— hujung feed —</p>
+        <p className="py-4 text-center text-xs text-muted-foreground">- hujung feed -</p>
       )}
     </div>
   );

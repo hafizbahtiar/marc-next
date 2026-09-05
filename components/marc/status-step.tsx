@@ -6,11 +6,11 @@ export type KeadaanLangkah = "selesai" | "menunggu" | "gagal";
 /**
  * Satu langkah dalam senarai kemajuan keahlian.
  *
- * Keadaan disampaikan oleh ikon DAN teks, bukan warna sahaja — seorang
+ * Keadaan disampaikan oleh ikon DAN teks, bukan warna sahaja - seorang
  * ahli yang tak dapat membezakan hijau daripada merah tetap perlu tahu
  * langkah mana yang gagal.
  */
-export function LangkahStatus({
+export function StatusStep({
   keadaan,
   tajuk,
   perihal,

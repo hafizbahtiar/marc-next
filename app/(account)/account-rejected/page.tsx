@@ -37,13 +37,13 @@ export default async function AccountRejectedPage() {
         <CardContent className="grid gap-3 text-sm">
           <DataRow label="Emel" nilai={p.email} />
           <DataRow label="Nombor staf" nilai={p.staff_id} />
-          <DataRow label="Nombor telefon" nilai={p.phone ?? "—"} />
+          <DataRow label="Nombor telefon" nilai={p.phone ?? "-"} />
         </CardContent>
       </Card>
 
       <p className="mt-6 text-sm leading-relaxed text-muted-foreground text-pretty">
-        Jika anda percaya ini satu kesilapan — contohnya nombor staf yang
-        tersalah taip — hubungi pihak pengurusan MARC dengan butiran di atas.
+        Jika anda percaya ini satu kesilapan - contohnya nombor staf yang
+        tersalah taip - hubungi pihak pengurusan MARC dengan butiran di atas.
         Mereka boleh menyemak semula permohonan anda.
       </p>
     </div>

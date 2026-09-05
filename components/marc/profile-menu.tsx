@@ -18,12 +18,12 @@ import { ROUTES } from "@/lib/auth/routes";
 import type { Profile } from "@/lib/api/types";
 
 /**
- * Menu profil di bar atas — pemicu avatar membuka satu dropdown yang
+ * Menu profil di bar atas - pemicu avatar membuka satu dropdown yang
  * membawa identiti, pautan Profil/Tetapan, dan log keluar. Menggantikan
  * kelompok avatar + nama + log keluar yang sebelum ini terapung berasingan
  * di bar atas dengan satu titik masuk yang jelas.
  */
-export function MenuProfil({ profile }: { profile: Profile }) {
+export function ProfileMenu({ profile }: { profile: Profile }) {
   const nama = profile.display_name?.trim() || profile.email;
 
   return (
@@ -32,7 +32,7 @@ export function MenuProfil({ profile }: { profile: Profile }) {
         <Avatar className="size-8">
           {profile.avatar_url ? <AvatarImage src={profile.avatar_url} alt="" /> : null}
           <AvatarFallback className="bg-accent text-[11px] font-semibold text-accent-foreground">
-            {inisial(nama)}
+            {getInitials(nama)}
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
@@ -62,7 +62,7 @@ export function MenuProfil({ profile }: { profile: Profile }) {
 
         <DropdownMenuItem asChild variant="destructive">
           <form action={logKeluarAction} className="w-full">
-            <ButangKeluar />
+          <LogoutButton />
           </form>
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -71,11 +71,11 @@ export function MenuProfil({ profile }: { profile: Profile }) {
 }
 
 /**
- * Butang sebenar dalam borang log keluar — berasingan daripada
- * `MenuProfil` supaya `useFormStatus` (yang cuma berfungsi dalam anak
+ * Butang sebenar dalam borang log keluar - berasingan daripada
+ * `ProfileMenu` supaya `useFormStatus` (yang cuma berfungsi dalam anak
  * `<form>`) boleh membaca status borang induknya.
  */
-function ButangKeluar() {
+function LogoutButton() {
   const { pending } = useFormStatus();
   return (
     <button type="submit" disabled={pending} className="flex w-full items-center gap-1.5">
@@ -86,9 +86,9 @@ function ButangKeluar() {
 }
 
 /** Dua huruf pertama, atau satu bila hanya ada satu perkataan. */
-function inisial(nama: string): string {
-  const bahagian = nama.split(/[\s@.]+/).filter(Boolean);
-  if (bahagian.length === 0) return "?";
-  if (bahagian.length === 1) return bahagian[0].slice(0, 2).toUpperCase();
-  return (bahagian[0][0] + bahagian[1][0]).toUpperCase();
+function getInitials(name: string): string {
+  const parts = name.split(/[\s@.]+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
 }

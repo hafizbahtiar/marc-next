@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { ButangSuka } from "@/components/posts/butang-suka";
+import { LikeButton } from "@/components/posts/like-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { isManagement } from "@/lib/api/types";
 import type { Post, Profile } from "@/lib/api/types";
 import { kemaskiniPosAction, padamPosAction, sukaPosAction, nyahSukaPosAction } from "@/lib/posts/actions";
 
-export function KadPos({
+export function PostCard({
   post,
   profileSemasa,
   pautanKeDetail = true,
@@ -44,7 +44,7 @@ export function KadPos({
   const bolehEdit = post.author.member_id === profileSemasa.member_id;
   const bolehPadam = bolehEdit || isManagement(profileSemasa);
 
-  async function simpanEdit() {
+  async function saveEdit() {
     setPending(true);
     try {
       const hasil = await kemaskiniPosAction(post.id, kandungan.trim());
@@ -59,7 +59,7 @@ export function KadPos({
     }
   }
 
-  async function padam() {
+  async function deletePost() {
     setPending(true);
     try {
       const hasil = await padamPosAction(post.id);
@@ -73,7 +73,7 @@ export function KadPos({
       if (onDipadam) {
         onDipadam(post.id);
       } else if (!pautanKeDetail) {
-        // Kita berada pada halaman detail post ini — tiada senarai untuk
+        // Kita berada pada halaman detail post ini - tiada senarai untuk
         // dibuang kad daripadanya, jadi navigasi keluar sebaliknya.
         router.push(ROUTES.pos);
       }
@@ -102,7 +102,7 @@ export function KadPos({
                 </Badge>
               ) : null}
             </p>
-            <p className="text-xs text-muted-foreground">{tarikhSingkat(post.created_at)}</p>
+            <p className="text-xs text-muted-foreground">{formatShortDate(post.created_at)}</p>
           </div>
         </div>
       </header>
@@ -116,7 +116,7 @@ export function KadPos({
             disabled={pending}
           />
           <div className="flex gap-2">
-            <Button type="button" size="sm" onClick={simpanEdit} disabled={pending || !kandungan.trim()}>
+            <Button type="button" size="sm" onClick={saveEdit} disabled={pending || !kandungan.trim()}>
               Simpan
             </Button>
             <Button
@@ -155,7 +155,7 @@ export function KadPos({
       ) : null}
 
       <footer className="flex items-center gap-2">
-        <ButangSuka
+          <LikeButton
           id={post.id}
           kiraanAwal={post.like_count}
           disukaAwal={post.liked_by_me}
@@ -176,7 +176,7 @@ export function KadPos({
         ) : null}
         {bolehPadam ? (
           sahkanPadam ? (
-            <Button type="button" size="sm" variant="destructive" onClick={padam} disabled={pending}>
+          <Button type="button" size="sm" variant="destructive" onClick={deletePost} disabled={pending}>
               Padam? Sahkan
             </Button>
           ) : (
@@ -196,9 +196,9 @@ export function KadPos({
   );
 }
 
-function tarikhSingkat(iso: string): string {
+function formatShortDate(iso: string): string {
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
+  if (Number.isNaN(d.getTime())) return "-";
   return new Intl.DateTimeFormat("ms-MY", {
     dateStyle: "medium",
     timeStyle: "short",

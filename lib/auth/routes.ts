@@ -1,6 +1,6 @@
 /**
  * Laluan aplikasi, dinamakan sekali di sini. `proxy.ts`, tindakan
- * pelayan dan komponen semuanya merujuk pemalar ini — laluan dalam
+ * pelayan dan komponen semuanya merujuk pemalar ini - laluan dalam
  * Bahasa Melayu mudah tersalah eja, dan salah eja dalam senarai
  * pemadanan proxy gagal secara SENYAP (halaman jadi terdedah, bukan
  * pecah).

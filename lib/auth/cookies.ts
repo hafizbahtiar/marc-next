@@ -6,7 +6,7 @@ import type { TokenPair } from "@/lib/api/types";
 /**
  * Kedua-dua token duduk dalam kuki `httpOnly`. JavaScript pelayar tak
  * boleh membacanya, jadi XSS pada mana-mana halaman tak boleh mengambil
- * sesi — perbezaan sebenar berbanding menyimpan token dalam
+ * sesi - perbezaan sebenar berbanding menyimpan token dalam
  * `localStorage`, yang mana-mana skrip yang disuntik boleh baca.
  */
 export const COOKIE_AKSES = "marc_at";
@@ -37,7 +37,7 @@ export type StoreKuki = {
 };
 
 /**
- * Tulis pasangan token ke mana-mana store kuki — `cookies()` daripada
+ * Tulis pasangan token ke mana-mana store kuki - `cookies()` daripada
  * `next/headers` dalam tindakan pelayan, atau `response.cookies` dalam
  * `proxy.ts`. Kedua-dua bentuk mendedahkan `set`/`delete` yang serasi,
  * jadi satu fungsi ini melayan kedua-dua laluan dan pilihan kuki tak

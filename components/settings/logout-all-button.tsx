@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { logKeluarSemuaAction } from "@/lib/auth/actions";
 
 /**
- * Dua-langkah dalam-baris (bukan modal) — padanan corak padam post
- * (KadPos, modul feed): klik pertama sedia, klik kedua sahkan.
+ * Dua-langkah dalam-baris (bukan modal) - padanan corak padam post
+ * (PostCard, modul feed): klik pertama sedia, klik kedua sahkan.
  */
-export function ButangLogKeluarSemua() {
+export function LogoutAllButton() {
   const [sahkan, setSahkan] = useState(false);
 
   if (!sahkan) {
@@ -36,13 +36,13 @@ export function ButangLogKeluarSemua() {
         <Button type="button" size="sm" variant="ghost" onClick={() => setSahkan(false)}>
           Batal
         </Button>
-        <ButangSahkan />
+        <ConfirmButton />
       </div>
     </form>
   );
 }
 
-function ButangSahkan() {
+function ConfirmButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" size="sm" variant="destructive" disabled={pending}>

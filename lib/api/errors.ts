@@ -1,7 +1,7 @@
 /**
  * Ralat daripada backend Go. Setiap handler Go menjawab kegagalan dengan
  * `{"error": "mesej dalam Bahasa Melayu"}`, jadi mesej itu boleh dipapar
- * terus kepada ahli — tak perlu jadual terjemahan di sini.
+ * terus kepada ahli - tak perlu jadual terjemahan di sini.
  */
 export class ApiError extends Error {
   constructor(
@@ -12,13 +12,13 @@ export class ApiError extends Error {
     this.name = "ApiError";
   }
 
-  /** 401 — token tiada/luput/tak sah. Isyarat untuk buang sesi. */
+  /** 401 - token tiada/luput/tak sah. Isyarat untuk buang sesi. */
   get isUnauthorized() {
     return this.status === 401;
   }
 
   /**
-   * 403 — token SAH tetapi akaun belum lulus gate. Backend guna kod ini
+   * 403 - token SAH tetapi akaun belum lulus gate. Backend guna kod ini
    * untuk dua keadaan berbeza (RequireApprovedStatus dan
    * RequireVerifiedEmail), jadi ia BUKAN isyarat untuk log keluar; ia
    * isyarat untuk papar skrin status yang betul.

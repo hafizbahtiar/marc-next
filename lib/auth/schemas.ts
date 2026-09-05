@@ -5,7 +5,7 @@ import { normalkanTelefonMY } from "./phone";
 /**
  * Peraturan pengesahan di sini MENCERMINKAN tag `binding` pada struct
  * permintaan Go (internal/http/handlers/auth.go). Ia bukan sumber
- * kebenaran — backend tetap mengesahkan segalanya sekali lagi — tetapi
+ * kebenaran - backend tetap mengesahkan segalanya sekali lagi - tetapi
  * ia yang memberi ahli maklum balas per-medan sebelum satu pun
  * permintaan rangkaian dihantar.
  */
@@ -36,7 +36,7 @@ export const skemaLogMasuk = z.object({
   email: emel,
   // Tiada had panjang minimum di sini selain "ada isi". Kata laluan
   // sedia ada yang tak memenuhi peraturan hari ini masih mesti boleh log
-  // masuk — peraturan panjang tertakluk kepada penetapan kata laluan,
+  // masuk - peraturan panjang tertakluk kepada penetapan kata laluan,
   // bukan penggunaannya.
   password: z.string().min(1, "Kata laluan diperlukan.").max(72),
 });

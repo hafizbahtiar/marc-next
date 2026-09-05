@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 
 /**
  * Sempadan ralat terakhir. Kegagalan yang boleh dijangka sudah dikendalikan
- * lebih awal — 401 mengubah hala ke log masuk, backend yang tak dapat
- * dihubungi mengubah hala ke /pelayan-luar-talian — jadi apa yang sampai
+ * lebih awal - 401 mengubah hala ke log masuk, backend yang tak dapat
+ * dihubungi mengubah hala ke /pelayan-luar-talian - jadi apa yang sampai
  * ke sini ialah sesuatu yang tak dijangka.
  *
  * `error.message` SENGAJA tak dipaparkan: dalam binaan produksi Next
@@ -38,7 +38,7 @@ export default function ErrorBoundary({
         Ada sesuatu yang tak kena
       </h1>
       <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground text-pretty">
-        Ralat tak dijangka berlaku. Cuba sekali lagi — kalau ia berulang,
+        Ralat tak dijangka berlaku. Cuba sekali lagi - kalau ia berulang,
         laporkan kepada pihak pengurusan MARC.
       </p>
 

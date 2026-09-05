@@ -1,4 +1,4 @@
-# Railway — marc_next
+# Railway - marc_next
 
 `marc_next` ialah perkhidmatan **kedua** dalam projek Railway `marc`,
 di sebelah `marc_go`. Tiada Docker (Railpack), sama seperti backend.
@@ -20,7 +20,7 @@ dalam projek berasingan mesti bercakap melalui internet awam.
 |---|---|
 | `MARC_API_URL` | `http://${{marc_go.RAILWAY_PRIVATE_DOMAIN}}:8080` |
 | `MARC_API_PUBLIC_URL` | `https://${{marc_go.RAILWAY_PUBLIC_DOMAIN}}` |
-| `MARC_REFRESH_TTL_DAYS` | `30` — padankan dengan `REFRESH_TTL` marc_go |
+| `MARC_REFRESH_TTL_DAYS` | `30` - padankan dengan `REFRESH_TTL` marc_go |
 
 Gantikan `marc_go` dengan nama perkhidmatan sebenar kalau ia berbeza;
 rujukan `${{...}}` diselesaikan mengikut **nama perkhidmatan**, bukan
@@ -32,7 +32,7 @@ Penjelasan penuh setiap satu ada dalam
 ### `PORT`
 
 Jangan tetapkan. Railway menyuntiknya, dan `next start` membacanya
-sendiri. Ia juga **tak boleh** diletak dalam `.env` — pelayan HTTP
+sendiri. Ia juga **tak boleh** diletak dalam `.env` - pelayan HTTP
 dinaikkan sebelum Next memuatkan fail env, jadi nilai di situ diabaikan
 secara senyap.
 
@@ -54,12 +54,12 @@ Railpack mengesan `bun.lock` dan `packageManager: bun@1.4.0` dalam
 | Start | `bun run start` |
 
 Binaan ialah keluaran Next standard (bukan `standalone`), jadi
-`node_modules` mesti kekal selepas build — itu tingkah laku lalai
+`node_modules` mesti kekal selepas build - itu tingkah laku lalai
 Railpack, jangan tambah langkah pemangkasan.
 
 ## Config as code
 
-Tidak wajib — tetapan papan pemuka sudah memadai. Kalau mahu ia
+Tidak wajib - tetapan papan pemuka sudah memadai. Kalau mahu ia
 dijejaki git, letak `railway.json` di akar repo:
 
 ```json
@@ -87,7 +87,7 @@ fail ini, papan pemuka berhenti menjadi tempat perubahan dibuat.
 `GET /api/sihat` → `200 {"status":"ok"}`.
 
 Ia menyemak SATU perkara: proses Next hidup. Ia **tidak** menghubungi
-backend Go dengan sengaja — Railway menggunakan pemeriksaan ini sebagai
+backend Go dengan sengaja - Railway menggunakan pemeriksaan ini sebagai
 pintu pagar penggunaan, jadi kalau ia turut menguji backend, gangguan
 pada `marc_go` akan menyekat setiap penggunaan web, termasuk penggunaan
 yang membaiki gangguan itu.
@@ -109,7 +109,7 @@ Tanpa `PASSWORD_RESET_URL`, `POST /auth/password-reset/request` menjawab
 **503** dan borang "lupa kata laluan" mati.
 
 `CORS_ALLOWED_ORIGINS` **tidak** perlu domain web ini. Pelayar tak pernah
-memanggil backend Go secara terus — semua panggilan melalui pelayan
+memanggil backend Go secara terus - semua panggilan melalui pelayan
 Next. Menambahnya di situ tak merosakkan apa-apa, tetapi ia menandakan
 salah faham tentang seni bina; lihat [`docs/auth.md`](./auth.md).
 
@@ -119,7 +119,7 @@ salah faham tentang seni bina; lihat [`docs/auth.md`](./auth.md).
 `/lupa-kata-laluan` dipra-render pada masa build, dan ia mengimport
 `lib/env.ts`, yang melempar bila kedua-dua URL kosong. Kalau build gagal
 dengan *"Tetapkan MARC_API_URL…"*, pemboleh ubah itu tiada pada
-perkhidmatan — bukan pepijat kod.
+perkhidmatan - bukan pepijat kod.
 
 **DNS peribadi ialah runtime sahaja.** `*.railway.internal` tak
 menyelesaikan semasa fasa build. Membaca URL itu sebagai rentetan
@@ -145,7 +145,7 @@ Environment yang lebih baharu dwi-tindanan, jadi ia tak diperlukan.
 
 **IP klien merentas rangkaian peribadi.** Railway menghantar permintaan
 melalui julat CGNAT `100.64.0.0/10`, yang `marc_go` percayai secara
-eksplisit (`trustedProxyRanges`, `internal/http/router.go`) — julat yang
+eksplisit (`trustedProxyRanges`, `internal/http/router.go`) - julat yang
 sama yang perkhidmatan Next berhubung daripadanya.
 
 Itu yang membuat penyiaran semula `X-Forwarded-For` berfungsi tanpa
@@ -155,7 +155,7 @@ guna-semula refresh token menjadi lemah untuk trafik web. Butiran penuh
 dalam [`docs/auth.md`](./auth.md).
 
 Kalau `trustedProxyRanges` pernah diubah, `TestClientIPMerentasProksi`
-dalam `marc_go` akan gagal — itu sengaja.
+dalam `marc_go` akan gagal - itu sengaja.
 
 ## Perintah
 

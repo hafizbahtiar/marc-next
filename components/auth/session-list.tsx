@@ -1,6 +1,6 @@
 import { MonitorIcon } from "lucide-react";
 
-import { ButangBatalSesi } from "@/components/auth/butang-batal-sesi";
+import { RevokeSessionButton } from "@/components/auth/revoke-session-button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { senaraiSesi } from "@/lib/auth/api";
@@ -8,11 +8,11 @@ import type { SessionRecord } from "@/lib/api/types";
 
 /**
  * Peranti yang sedang log masuk. Satu baris = satu family refresh token,
- * bukan satu token — backend sudah mengumpulkannya (lihat
+ * bukan satu token - backend sudah mengumpulkannya (lihat
  * groupSessionsByFamily, internal/http/handlers/sessions.go), jadi
  * putaran token tak menampakkan satu peranti sebagai banyak.
  */
-export async function SenaraiSesi({ accessToken }: { accessToken: string }) {
+export async function SessionList({ accessToken }: { accessToken: string }) {
   const sesi = await senaraiSesi(accessToken);
 
   return (
@@ -25,14 +25,14 @@ export async function SenaraiSesi({ accessToken }: { accessToken: string }) {
       </CardHeader>
       <CardContent className="grid gap-1">
         {sesi.map((s) => (
-          <BarisSesi key={s.id} sesi={s} />
+          <SessionRow key={s.id} sesi={s} />
         ))}
       </CardContent>
     </Card>
   );
 }
 
-function BarisSesi({ sesi }: { sesi: SessionRecord }) {
+function SessionRow({ sesi }: { sesi: SessionRecord }) {
   return (
     <div className="flex items-center gap-3 border-b border-border/70 py-3 last:border-0 last:pb-0 first:pt-0">
       <span
@@ -52,7 +52,7 @@ function BarisSesi({ sesi }: { sesi: SessionRecord }) {
           ) : null}
         </p>
         <p className="mt-0.5 truncate text-xs text-muted-foreground">
-          Log masuk {tarikhSingkat(sesi.created_at)}
+          Log masuk {formatShortDate(sesi.created_at)}
           {sesi.created_ip ? ` · ${sesi.created_ip}` : ""}
         </p>
       </div>
@@ -60,17 +60,17 @@ function BarisSesi({ sesi }: { sesi: SessionRecord }) {
       {/*
         Peranti semasa tak boleh dilog keluar dari sini. Membatalkan
         familynya sendiri akan menendang ahli keluar melalui laluan yang
-        kelihatan seperti pepijat — butang "Log keluar" di bar atas ialah
+        kelihatan seperti pepijat - butang "Log keluar" di bar atas ialah
         cara yang jelas untuk berbuat demikian.
       */}
-      {sesi.is_current ? null : <ButangBatalSesi id={sesi.id} />}
+      {sesi.is_current ? null : <RevokeSessionButton id={sesi.id} />}
     </div>
   );
 }
 
-function tarikhSingkat(iso: string): string {
+function formatShortDate(iso: string): string {
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
+  if (Number.isNaN(d.getTime())) return "-";
   return new Intl.DateTimeFormat("ms-MY", {
     dateStyle: "medium",
     timeStyle: "short",

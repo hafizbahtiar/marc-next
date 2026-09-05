@@ -1,0 +1,56 @@
+import Link from "next/link";
+
+import { Logo } from "@/components/marc/logo";
+import { ProfileMenu } from "@/components/marc/profile-menu";
+import { ThemeSwitch } from "@/components/marc/theme-switch";
+import type { Profile } from "@/lib/api/types";
+import { ROUTES } from "@/lib/auth/routes";
+
+/**
+ * Rangka bersama untuk setiap skrin selepas log masuk - termasuk skrin
+ * gate (menunggu kelulusan, emel belum disahkan). Ahli yang tersekat
+ * tetap ahli yang log masuk: menunjukkan kepadanya susun atur yang
+ * berbeza sama sekali membuatnya kelihatan seperti dia berada di tempat
+ * yang salah.
+ */
+export function AppShell({
+  profile,
+  children,
+}: {
+  profile: Profile;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex min-h-svh flex-col bg-muted/25">
+      <header className="sticky top-0 z-10 border-b bg-background/90 backdrop-blur-md">
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+          {/*
+            Jata sahaja, bukan logo penuh: pada 32px wordmark terbina
+            dalam varian penuh menjadi comotan. Label teks di sebelahnya
+            yang membawa nama itu.
+          */}
+          <Link href={ROUTES.utama} className="flex items-center gap-2.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Logo varian="jata" className="h-8" />
+            <span className="text-sm font-semibold tracking-[0.18em]">MARC</span>
+          </Link>
+
+          <nav className="hidden items-center gap-1 rounded-lg bg-muted/60 p-1 text-sm font-medium sm:flex">
+            <Link href={ROUTES.utama} className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:bg-background hover:text-foreground">
+              Utama
+            </Link>
+            <Link href={ROUTES.pos} className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:bg-background hover:text-foreground">
+              Feed
+            </Link>
+          </nav>
+
+          <div className="flex items-center gap-2">
+            <ThemeSwitch />
+            <ProfileMenu profile={profile} />
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">{children}</main>
+    </div>
+  );
+}

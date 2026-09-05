@@ -5,7 +5,7 @@
  * balik kepada User-Agent HTTP bila tiada (lihat deviceLabelFromRequest,
  * internal/http/handlers/auth.go). Sandaran itu tak menolong di sini:
  * dalam seni bina BFF, permintaan yang backend nampak datang daripada
- * pelayan Next, jadi User-Agentnya ialah runtime Node — SETIAP sesi web
+ * pelayan Next, jadi User-Agentnya ialah runtime Node - SETIAP sesi web
  * akan kelihatan serupa. Label eksplisit ini yang membuat senarai sesi
  * bermakna untuk pengguna web.
  */

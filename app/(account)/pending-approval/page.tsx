@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
-import { LangkahStatus, type KeadaanLangkah } from "@/components/marc/langkah-status";
+import { StatusStep, type KeadaanLangkah } from "@/components/marc/status-step";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ROUTES } from "@/lib/auth/routes";
@@ -46,13 +46,13 @@ export default async function PendingApprovalPage() {
         </CardHeader>
         <CardContent>
           <ol className="mt-1">
-            <LangkahStatus
+            <StatusStep
               keadaan="selesai"
               tajuk="Akaun dicipta"
               perihal={p.email}
             />
 
-            <LangkahStatus
+            <StatusStep
               keadaan={p.email_verified ? "selesai" : "menunggu"}
               tajuk="Emel disahkan"
               perihal={
@@ -67,7 +67,7 @@ export default async function PendingApprovalPage() {
               }
             />
 
-            <LangkahStatus
+            <StatusStep
               keadaan={p.staff_id_verified_at ? "selesai" : "menunggu"}
               tajuk="Nombor staf disahkan"
               perihal={
@@ -77,13 +77,13 @@ export default async function PendingApprovalPage() {
               }
             />
 
-            <LangkahStatus
+            <StatusStep
               keadaan={keadaanBayaran}
               tajuk="Yuran pendaftaran"
               perihal={paymentDescription(bayaran, p.registration_fee_cents)}
             />
 
-            <LangkahStatus
+            <StatusStep
               keadaan="menunggu"
               tajuk="Kelulusan keahlian"
               perihal="Langkah terakhir. Pihak pengurusan akan meluluskan akaun anda setelah semua di atas lengkap."
@@ -126,7 +126,7 @@ function paymentDescription(status: string | null, feeCents: number | null): str
   }
 }
 
-/** Backend menyimpan jumlah dalam SEN — bahagi 100 sebelum dipapar. */
+/** Backend menyimpan jumlah dalam SEN - bahagi 100 sebelum dipapar. */
 function formatCurrency(cents: number): string {
   return new Intl.NumberFormat("ms-MY", {
     style: "currency",

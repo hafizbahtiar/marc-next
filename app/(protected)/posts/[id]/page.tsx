@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
-import { KadPos } from "@/components/posts/kad-pos";
-import { SenaraiKomen } from "@/components/posts/senarai-komen";
+import { PostCard } from "@/components/posts/post-card";
+import { CommentList } from "@/components/posts/comment-list";
 import { ApiError } from "@/lib/api/errors";
 import type { Comment, Post } from "@/lib/api/types";
 import { dapatkanPos, senaraiKomen } from "@/lib/posts/api";
@@ -25,12 +25,12 @@ export default async function PostDetailPage({ params }: PageProps<"/posts/[id]"
 
   return (
     <div className="grid gap-6">
-      <KadPos post={pos} profileSemasa={profile} pautanKeDetail={false} />
+      <PostCard post={pos} profileSemasa={profile} pautanKeDetail={false} />
 
       <div>
         <h2 className="font-heading text-lg font-semibold">Komen</h2>
         <div className="mt-4">
-          <SenaraiKomen postId={pos.id} komenAwal={komen} profileSemasa={profile} />
+          <CommentList postId={pos.id} komenAwal={komen} profileSemasa={profile} />
         </div>
       </div>
     </div>

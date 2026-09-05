@@ -43,7 +43,7 @@
   /*
    * Token jenama dan semantik yang TIADA slot dalam set shadcn standard.
    * Padanan `AppTheme` (marc_flutter/lib/app/theme.dart): `brandNavy` dan
-   * `brandRoyal` ialah warna sebenar, bukan permukaan — ia diperlukan
+   * `brandRoyal` ialah warna sebenar, bukan permukaan - ia diperlukan
    * secara terus (panel jenama, lencana), bukan melalui `--secondary`
    * yang bermaksud "permukaan kedua" dalam shadcn.
    */
@@ -66,13 +66,13 @@
 }
 
 /*
- * Palet MARC — dipetakan daripada `AppTheme.lightScheme`
+ * Palet MARC - dipetakan daripada `AppTheme.lightScheme`
  * (marc_flutter/lib/app/theme.dart), yang pula diterbitkan daripada
  * `assets/splash/full_logo_android12.png`: merah perisai #E21E28,
  * navy ikon/wordmark #223145, biru diraja huruf "MARC" #2D3089.
  *
  * Aplikasi Flutter ialah SUMBER KEBENARAN untuk warna. Templat emel
- * dalam marc_go masih menggunakan palet hijau lama (#2F6B4F) — itu
+ * dalam marc_go masih menggunakan palet hijau lama (#2F6B4F) - itu
  * kerja susulan, bukan pilihan reka bentuk.
  *
  * Nota pemetaan: `secondary` Material ≠ `--secondary` shadcn. Dalam
@@ -82,7 +82,7 @@
  * `--brand-navy`.
  */
 :root {
-  /* Jejari 12px — padanan `BorderRadius.circular(12)` pada input dan
+  /* Jejari 12px - padanan `BorderRadius.circular(12)` pada input dan
      butang dalam AppTheme._build. */
   --radius: 0.75rem;
 
@@ -124,7 +124,7 @@
 
   --warning: #8a5a00;
   --warning-bg: #fbefd3;
-  /* #146B41 atas #DBF1E4 = 5.5:1 — selamat untuk label chip 12px.
+  /* #146B41 atas #DBF1E4 = 5.5:1 - selamat untuk label chip 12px.
      SENGAJA hijau dan bukan warna jenama: status positif mengikut
      konvensyen, bukan palet. Padanan komen AppSemanticColors. */
   --success: #146b41;
@@ -149,7 +149,7 @@
 /*
  * Padanan `AppTheme.darkScheme`. Merah #E21E28 jatuh di bawah 4.5:1 atas
  * #171718, jadi mod gelap menaikkannya kepada #FF8A85 dan bukan
- * menggunakan warna jenama yang sama — sama keputusan seperti Flutter.
+ * menggunakan warna jenama yang sama - sama keputusan seperti Flutter.
  */
 .dark {
   --background: #171718; /* surface */
@@ -178,7 +178,7 @@
   --input: #4c4747; /* outline */
   --ring: #ff8a85;
 
-  /* Navy kekal sebagai navy dalam mod gelap — ia sudah pun gelap, dan
+  /* Navy kekal sebagai navy dalam mod gelap - ia sudah pun gelap, dan
      wordmark putih di atasnya ialah pasangan yang sama seperti mod
      cerah. Hanya merah yang perlu dicerahkan. */
   --brand-red: #ff8a85;
@@ -220,7 +220,7 @@
 }
 
 /*
- * Peralihan tema — lihat `SuisTema`.
+ * Peralihan tema - lihat `SuisTema`.
  *
  * Peralihan silang-pudar lalai dimatikan supaya `clip-path` yang
  * dianimasikan itu SAHAJA yang kelihatan; tanpa ini, kedua-dua kesan

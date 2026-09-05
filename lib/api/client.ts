@@ -8,7 +8,7 @@ import { ApiError, ApiUnreachableError } from "./errors";
  * ADANYA kepada backend.
  *
  * Nilai ini TIDAK dihuraikan di sini dengan sengaja. Gin sudah melakukan
- * kerja itu — `validateHeader` (gin.go) melelar rantaian dari KANAN ke
+ * kerja itu - `validateHeader` (gin.go) melelar rantaian dari KANAN ke
  * KIRI dan memulangkan IP pertama yang bukan proksi dipercayai, jadi
  * entri palsu yang disuntik klien di sebelah kiri diabaikan. Memilih
  * satu entri di sini bermakna menulis semula algoritma itu dalam
@@ -16,14 +16,14 @@ import { ApiError, ApiUnreachableError } from "./errors";
  * akan membenarkan sesiapa memintas had kadar dengan menghantar
  * `X-Forwarded-For: <rawak>` pada setiap percubaan.
  *
- * `null` bila tiada — cth pembangunan tempatan, di mana backend jatuh
+ * `null` bila tiada - cth pembangunan tempatan, di mana backend jatuh
  * balik kepada alamat jauh sebenar.
  */
 async function rantaianIP(): Promise<string | null> {
   try {
     // Import dinamik: modul ini turut dimuatkan oleh `proxy.ts`, di mana
     // `next/headers` tiada. Di sana rantaian diserahkan secara eksplisit,
-    // jadi laluan ini tak pernah dicapai — tetapi import statik akan
+    // jadi laluan ini tak pernah dicapai - tetapi import statik akan
     // memecahkan bungkusan proxy walaupun begitu.
     const { headers } = await import("next/headers");
     return (await headers()).get("x-forwarded-for");
@@ -56,7 +56,7 @@ type ApiRequest = {
  * di sini ialah data per-ahli yang dikawal oleh Bearer token; respons yang
  * di-cache oleh Next akan dikongsi merentas pengguna. Titik akhir awam
  * (cth pengesahan sijil) boleh melonggarkan ini secara eksplisit kemudian
- * — lebih selamat lalai ketat dan longgarkan satu per satu.
+ * - lebih selamat lalai ketat dan longgarkan satu per satu.
  */
 export async function apiFetch<T>(
   path: string,
@@ -64,7 +64,7 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const finalHeaders: Record<string, string> = { ...headers };
 
-  // TANPA ini, backend melihat setiap pengguna web sebagai SATU klien —
+  // TANPA ini, backend melihat setiap pengguna web sebagai SATU klien -
   // alamat pelayan Next. Kesannya bukan kosmetik: baldi had kadar
   // `auth` (12s/5) menjadi kuota yang dikongsi seluruh portal, dan
   // `consumedIPMatches` (internal/http/handlers/auth.go) melayan setiap
@@ -108,7 +108,7 @@ export async function apiFetch<T>(
       parsed = JSON.parse(raw);
     } catch {
       // Backend menjawab bukan-JSON. Ini berlaku pada ralat infrastruktur
-      // (halaman ralat proksi, 502 gateway) — bukan sesuatu yang handler
+      // (halaman ralat proksi, 502 gateway) - bukan sesuatu yang handler
       // Go hasilkan sendiri.
       if (!response.ok) {
         throw new ApiError(response.status, "Pelayan MARC memberi respons yang tidak dijangka.");
@@ -127,7 +127,7 @@ export async function apiFetch<T>(
 /**
  * Handler Go menjawab `{"error": "..."}` dalam Bahasa Melayu. Sandaran
  * per-status di bawah hanya digunakan bila badan itu hilang atau
- * berbentuk lain — jangan tambah kes untuk mesej yang backend memang
+ * berbentuk lain - jangan tambah kes untuk mesej yang backend memang
  * hantar, itu akan jadi salinan kedua yang hanyut.
  */
 function errorMessage(parsed: unknown, status: number): string {

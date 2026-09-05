@@ -3,14 +3,14 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { ButangSuka } from "@/components/posts/butang-suka";
+import { LikeButton } from "@/components/posts/like-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Comment, Profile } from "@/lib/api/types";
 import { ciptaKomenAction, sukaKomenAction, nyahSukaKomenAction } from "@/lib/posts/actions";
 
-export function SenaraiKomen({
+export function CommentList({
   postId,
   komenAwal,
   profileSemasa,
@@ -21,8 +21,8 @@ export function SenaraiKomen({
 }) {
   const [komen, setKomen] = useState(komenAwal);
 
-  function tambahKomen(baharu: Comment) {
-    setKomen((k) => [...k, baharu]);
+  function addComment(newComment: Comment) {
+    setKomen((k) => [...k, newComment]);
   }
 
   const utama = komen.filter((k) => !k.parent_comment_id);
@@ -30,7 +30,7 @@ export function SenaraiKomen({
 
   return (
     <div className="grid gap-4">
-      <BorangKomen postId={postId} onHantar={tambahKomen} />
+      <CommentForm postId={postId} onHantar={addComment} />
 
       {utama.length === 0 ? (
         <p className="py-6 text-center text-sm text-muted-foreground">Belum ada komen.</p>
@@ -38,16 +38,16 @@ export function SenaraiKomen({
         <div className="grid gap-4">
           {utama.map((k) => (
             <div key={k.id} className="grid gap-3">
-              <BarisKomen komen={k} />
+              <CommentRow komen={k} />
               {balasanBagiInduk(k.id).length > 0 ? (
                 <div className="ml-8 grid gap-3 border-l border-border/70 pl-3">
                   {balasanBagiInduk(k.id).map((balasan) => (
-                    <BarisKomen key={balasan.id} komen={balasan} />
+                    <CommentRow key={balasan.id} komen={balasan} />
                   ))}
                 </div>
               ) : null}
               <div className="ml-8">
-                <BorangBalas postId={postId} parentCommentId={k.id} onHantar={tambahKomen} />
+                <ReplyForm postId={postId} parentCommentId={k.id} onHantar={addComment} />
               </div>
             </div>
           ))}
@@ -57,7 +57,7 @@ export function SenaraiKomen({
   );
 }
 
-function BarisKomen({ komen }: { komen: Comment }) {
+function CommentRow({ komen }: { komen: Comment }) {
   const nama = komen.author.display_name?.trim() || komen.author.member_id;
   return (
     <div className="flex items-start gap-2.5">
@@ -70,7 +70,7 @@ function BarisKomen({ komen }: { komen: Comment }) {
           <span className="font-medium">{nama}</span>{" "}
           <span className="whitespace-pre-wrap">{komen.content}</span>
         </p>
-        <ButangSuka
+              <LikeButton
           id={komen.id}
           kiraanAwal={komen.like_count}
           disukaAwal={komen.liked_by_me}
@@ -82,7 +82,7 @@ function BarisKomen({ komen }: { komen: Comment }) {
   );
 }
 
-function BorangKomen({
+function CommentForm({
   postId,
   onHantar,
 }: {
@@ -92,7 +92,7 @@ function BorangKomen({
   const [isi, setIsi] = useState("");
   const [pending, setPending] = useState(false);
 
-  async function hantar() {
+  async function submit() {
     if (!isi.trim()) return;
     setPending(true);
     try {
@@ -118,14 +118,14 @@ function BorangKomen({
         disabled={pending}
         className="min-h-14"
       />
-      <Button type="button" size="sm" className="justify-self-end" onClick={hantar} disabled={pending || !isi.trim()}>
+      <Button type="button" size="sm" className="justify-self-end" onClick={submit} disabled={pending || !isi.trim()}>
         {pending ? "Menghantar…" : "Hantar komen"}
       </Button>
     </div>
   );
 }
 
-function BorangBalas({
+function ReplyForm({
   postId,
   parentCommentId,
   onHantar,
@@ -138,7 +138,7 @@ function BorangBalas({
   const [isi, setIsi] = useState("");
   const [pending, setPending] = useState(false);
 
-  async function hantar() {
+  async function submit() {
     if (!isi.trim()) return;
     setPending(true);
     try {
@@ -177,7 +177,7 @@ function BorangBalas({
         <Button type="button" size="sm" variant="ghost" onClick={() => setTerbuka(false)} disabled={pending}>
           Batal
         </Button>
-        <Button type="button" size="sm" onClick={hantar} disabled={pending || !isi.trim()}>
+        <Button type="button" size="sm" onClick={submit} disabled={pending || !isi.trim()}>
           {pending ? "Menghantar…" : "Hantar"}
         </Button>
       </div>

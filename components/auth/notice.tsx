@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
  * mengganggu. Kejayaan yang mengganggu bacaan semasa pengguna adalah
  * bising; kegagalan yang menunggu giliran boleh terlepas sepenuhnya.
  */
-export function Notis({
+export function Notice({
   ralat,
   berjaya,
 }: {

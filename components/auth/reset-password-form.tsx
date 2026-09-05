@@ -2,22 +2,22 @@
 
 import { useActionState } from "react";
 
-import { ButangHantar } from "@/components/auth/butang-hantar";
-import { Medan } from "@/components/auth/medan";
-import { Notis } from "@/components/auth/notis";
+import { SubmitButton } from "@/components/auth/submit-button";
+import { FormField } from "@/components/auth/form-field";
+import { Notice } from "@/components/auth/notice";
 import { KEADAAN_AWAL } from "@/lib/auth/borang";
 import { tetapKataLaluanAction } from "@/lib/auth/actions";
 
-export function BorangTetapKataLaluan({ token }: { token: string }) {
+export function ResetPasswordForm({ token }: { token: string }) {
   const [keadaan, action] = useActionState(tetapKataLaluanAction, KEADAAN_AWAL);
 
   return (
     <form action={action} className="grid gap-4" noValidate>
-      <Notis ralat={keadaan.ralat} />
+      <Notice ralat={keadaan.ralat} />
 
       <input type="hidden" name="token" value={token} />
 
-      <Medan
+      <FormField
         name="password"
         label="Kata laluan baharu"
         type="password"
@@ -28,7 +28,7 @@ export function BorangTetapKataLaluan({ token }: { token: string }) {
         autoFocus
       />
 
-      <Medan
+      <FormField
         name="sahkan_password"
         label="Sahkan kata laluan baharu"
         type="password"
@@ -37,7 +37,7 @@ export function BorangTetapKataLaluan({ token }: { token: string }) {
         required
       />
 
-      <ButangHantar>Tetapkan kata laluan</ButangHantar>
+      <SubmitButton>Tetapkan kata laluan</SubmitButton>
 
       <p className="text-xs leading-relaxed text-muted-foreground">
         Menukar kata laluan akan melog keluar akaun anda daripada semua

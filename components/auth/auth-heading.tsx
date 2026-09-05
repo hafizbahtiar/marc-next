@@ -1,4 +1,4 @@
-export function TajukAuth({
+export function AuthHeading({
   tajuk,
   perihal,
 }: {

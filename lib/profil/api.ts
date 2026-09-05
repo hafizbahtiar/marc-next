@@ -4,7 +4,7 @@ import { apiFetch } from "@/lib/api/client";
 import type { Profile } from "@/lib/api/types";
 
 /**
- * Pembalut nipis atas `PATCH /me` — padanan `lib/auth/api.ts`/`lib/posts/api.ts`
+ * Pembalut nipis atas `PATCH /me` - padanan `lib/auth/api.ts`/`lib/posts/api.ts`
  * untuk domain profil. `GET /me` sudah wujud sebagai `lib/auth/api.ts`'s
  * `me()`; fail ni cuma tambah bahagian TULIS.
  */

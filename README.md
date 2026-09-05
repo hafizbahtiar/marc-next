@@ -12,7 +12,7 @@ bun run dev
 ```
 
 Backend Go mesti berjalan (lalai `http://localhost:8080`). Pelayar tak
-pernah memanggilnya terus — lihat [`docs/auth.md`](docs/auth.md).
+pernah memanggilnya terus - lihat [`docs/auth.md`](docs/auth.md).
 
 ## Skrip
 
@@ -37,6 +37,6 @@ lib/auth/            Sesi, kuki, tindakan pelayan, skema, laluan
 
 ## Dokumentasi
 
-- [`docs/auth.md`](docs/auth.md) — seni bina auth, lapisan gate, perangkap
-- [`docs/tema.md`](docs/tema.md) — palet, aset logo, tipografi, suis tema
-- [`docs/railway.md`](docs/railway.md) — penempatan, env, healthcheck, perangkap
+- [`docs/auth.md`](docs/auth.md) - seni bina auth, lapisan gate, perangkap
+- [`docs/tema.md`](docs/tema.md) - palet, aset logo, tipografi, suis tema
+- [`docs/railway.md`](docs/railway.md) - penempatan, env, healthcheck, perangkap

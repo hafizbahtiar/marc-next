@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BorangTetapKataLaluan } from "@/components/auth/borang-tetap-kata-laluan";
-import { Notis } from "@/components/auth/notis";
-import { TajukAuth } from "@/components/auth/tajuk";
+import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+import { Notice } from "@/components/auth/notice";
+import { AuthHeading } from "@/components/auth/auth-heading";
 import { ROUTES } from "@/lib/auth/routes";
 import { paramPertama } from "@/lib/search-params";
 
@@ -17,17 +17,17 @@ export default async function ResetPasswordPage({
   // Token TIDAK ditebus semasa memuatkan halaman. `ConsumePasswordResetToken`
   // di backend memadam baris itu pada percubaan pertama, jadi pengesahan
   // awal di sini akan menghanguskan pautan sebelum ahli sempat menaip
-  // apa-apa — dan pra-lawatan pautan oleh klien emel akan
+  // apa-apa - dan pra-lawatan pautan oleh klien emel akan
   // melakukannya untuknya.
   if (!token) {
     return (
       <>
-        <TajukAuth
+        <AuthHeading
           tajuk="Pautan tidak lengkap"
           perihal="Pautan reset yang anda buka tiada token."
         />
         <div className="grid gap-4">
-          <Notis ralat="Buka semula pautan penuh daripada emel, atau minta pautan baharu." />
+          <Notice ralat="Buka semula pautan penuh daripada emel, atau minta pautan baharu." />
           <Link
             href={ROUTES.lupaKataLaluan}
             className="text-sm font-medium text-primary underline-offset-4 hover:underline"
@@ -41,11 +41,11 @@ export default async function ResetPasswordPage({
 
   return (
     <>
-      <TajukAuth
+      <AuthHeading
         tajuk="Tetapkan kata laluan baharu"
         perihal="Pilih kata laluan baharu untuk akaun MARC anda."
       />
-      <BorangTetapKataLaluan token={token} />
+      <ResetPasswordForm token={token} />
     </>
   );
 }

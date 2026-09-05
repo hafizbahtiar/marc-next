@@ -1,12 +1,12 @@
 /**
- * Konfigurasi persekitaran — SERVER SAHAJA.
+ * Konfigurasi persekitaran - SERVER SAHAJA.
  *
  * Tiada satu pun pemboleh ubah di sini berawalan `NEXT_PUBLIC_`, dan itu
  * disengajakan: URL backend tak sepatutnya bocor ke bundle pelayar
  * kerana browser TAK PERNAH memanggil backend Go secara terus. Router
  * `/auth/login`, `/auth/register`, `/auth/refresh` dan `/auth/logout`
  * di backend TIADA middleware CORS (lihat internal/http/middleware/cors.go
- * — CORS dipasang per-route pada laluan awam terpilih sahaja), jadi
+ * - CORS dipasang per-route pada laluan awam terpilih sahaja), jadi
  * fetch() silang-origin dari pelayar akan gagal. Next.js bertindak
  * sebagai BFF: setiap panggilan berlaku di server, dan token duduk dalam
  * kuki httpOnly yang JavaScript pelayar tak boleh baca.
@@ -32,20 +32,20 @@ if (!peribadi && !awam) {
  *
  * `MARC_API_PUBLIC_URL` ialah sandaran yang BERFUNGSI, bukan hiasan: di
  * Railway, laluan pantas ialah rangkaian peribadi, tetapi persekitaran
- * tanpa rangkaian itu — mesin tempatan, atau preview dalam projek lain —
+ * tanpa rangkaian itu - mesin tempatan, atau preview dalam projek lain -
  * mesti tetap boleh berjalan tanpa menukar kod. Menetapkan satu pemboleh
  * ubah sudah memadai.
  */
 export const API_URL = kemas(peribadi || awam!);
 
 /**
- * Origin AWAM backend — untuk apa-apa yang mesti dicapai dari LUAR
+ * Origin AWAM backend - untuk apa-apa yang mesti dicapai dari LUAR
  * rangkaian peribadi: pautan yang dibuka pelayar, dan nilai yang
  * diserahkan kepada gateway pembayaran.
  *
  * BELUM ADA pemanggil hari ini; setiap laluan semasa berjalan melalui
  * `API_URL` di sisi pelayan. Ia didedahkan supaya keutamaan sandaran
- * ditakrifkan di SATU tempat bila laluan begitu ditambah — bukan
+ * ditakrifkan di SATU tempat bila laluan begitu ditambah - bukan
  * diterbitkan semula, mungkin secara terbalik, di tempat panggilan.
  *
  * Ia jatuh balik kepada `API_URL` supaya penyediaan tempatan (satu
@@ -54,7 +54,7 @@ export const API_URL = kemas(peribadi || awam!);
 export const API_PUBLIC_URL = kemas(awam || peribadi!);
 
 /**
- * Nama `.railway.internal` TIADA sijil TLS — rangkaian peribadi Railway
+ * Nama `.railway.internal` TIADA sijil TLS - rangkaian peribadi Railway
  * sudah disulitkan melalui Wireguard, dan dokumentasinya secara
  * eksplisit menyuruh gunakan `http://`. `https://` ke sana gagal dengan
  * ralat handshake yang tak menyebut TLS langsung, jadi ia ditangkap di
@@ -63,7 +63,7 @@ export const API_PUBLIC_URL = kemas(awam || peribadi!);
 if (API_URL.startsWith("https://") && API_URL.includes(".railway.internal")) {
   throw new Error(
     "MARC_API_URL menggunakan https:// pada hos .railway.internal. " +
-      "Rangkaian peribadi Railway tiada TLS — guna http:// dan sertakan port, " +
+      "Rangkaian peribadi Railway tiada TLS - guna http:// dan sertakan port, " +
       "cth http://marc-go.railway.internal:8080",
   );
 }
@@ -82,7 +82,7 @@ if (API_URL.includes(".railway.internal") && !/:\d+$/.test(API_URL)) {
 
 /**
  * Hayat kuki refresh token, dalam hari. MESTI sepadan (atau lebih pendek
- * daripada) REFRESH_TTL backend — kuki yang hidup lebih lama daripada
+ * daripada) REFRESH_TTL backend - kuki yang hidup lebih lama daripada
  * baris `refresh_tokens` dalam DB cuma menghasilkan 401 yang mengelirukan
  * pada refresh, bukan sesi yang lebih panjang.
  */

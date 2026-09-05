@@ -4,12 +4,12 @@ import { normalkanTelefonMY } from "../auth/phone";
 
 /**
  * Peraturan di sini MENCERMINKAN had backend PATCH /me
- * (updateMeRequest, internal/http/handlers/profile.go) — bukan sumber
+ * (updateMeRequest, internal/http/handlers/profile.go) - bukan sumber
  * kebenaran, tetapi maklum balas per-medan sebelum permintaan rangkaian.
  *
  * Borang ini SENTIASA menghantar SETIAP medan (bukan patch separa):
  * medan kosong bermaksud ahli sengaja buang nilai itu, bukan "tak
- * diubah" — borang sentiasa disemai dgn nilai semasa dahulu.
+ * diubah" - borang sentiasa disemai dgn nilai semasa dahulu.
  */
 
 const namaPilihan = z

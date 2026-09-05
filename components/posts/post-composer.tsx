@@ -16,7 +16,7 @@ const MAKS_GAMBAR = 4;
 
 type FailGambar = { file: File; preview: string; ralat?: string };
 
-export function KomposerPos({
+export function PostComposer({
   profile,
   onPosBaharu,
 }: {
@@ -30,7 +30,7 @@ export function KomposerPos({
   const [pending, startTransition] = useTransition();
   const inputFailRef = useRef<HTMLInputElement>(null);
 
-  function tambahFail(fail: FileList | null) {
+  function addFiles(fail: FileList | null) {
     if (!fail) return;
     const baharu: FailGambar[] = [];
     for (const f of Array.from(fail)) {
@@ -45,14 +45,14 @@ export function KomposerPos({
     if (inputFailRef.current) inputFailRef.current.value = "";
   }
 
-  function buangFail(index: number) {
+  function removeFile(index: number) {
     setGambar((g) => {
       URL.revokeObjectURL(g[index].preview);
       return g.filter((_, i) => i !== index);
     });
   }
 
-  function hantar() {
+  function submitPost() {
     if (!kandungan.trim()) {
       setRalat("Tulis sesuatu dahulu.");
       return;
@@ -122,7 +122,7 @@ export function KomposerPos({
               <img src={g.preview} alt="" className="size-full object-cover" />
               <button
                 type="button"
-                onClick={() => buangFail(i)}
+                onClick={() => removeFile(i)}
                 className="absolute top-1 right-1 grid size-5 place-items-center rounded-full bg-background/80"
                 aria-label="Buang gambar"
               >
@@ -158,7 +158,7 @@ export function KomposerPos({
             accept="image/jpeg,image/png,image/webp"
             multiple
             className="hidden"
-            onChange={(e) => tambahFail(e.target.files)}
+            onChange={(e) => addFiles(e.target.files)}
           />
 
           {isManagement(profile) ? (
@@ -173,7 +173,7 @@ export function KomposerPos({
           ) : null}
         </div>
 
-        <Button type="button" onClick={hantar} disabled={pending}>
+        <Button type="button" onClick={submitPost} disabled={pending}>
           {pending ? "Menghantar…" : "Hantar"}
         </Button>
       </div>
