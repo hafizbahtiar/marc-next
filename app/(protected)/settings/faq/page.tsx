@@ -1,4 +1,5 @@
 import { ChevronDownIcon } from "lucide-react";
+import { BackLink } from "@/components/ui/back-link";
 
 const faqs = [
   ["Bagaimana cara mendaftar sebagai ahli MARC?", "Daftar menggunakan emel anda dalam skrin pendaftaran. Pendaftaran perlu diluluskan oleh pihak pengurusan MARC sebelum anda boleh mengakses ciri penuh aplikasi."],
@@ -13,6 +14,7 @@ const faqs = [
 export default function FaqPage() {
   return (
     <div className="mx-auto grid max-w-3xl gap-6">
+      <BackLink href="/settings">Kembali ke Tetapan</BackLink>
       <header className="grid gap-2">
         <p className="text-sm font-medium text-primary">Bantuan</p>
         <h1 className="font-heading text-3xl font-semibold tracking-tight">Soalan lazim</h1>
