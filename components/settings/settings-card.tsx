@@ -5,15 +5,23 @@ import { Card, CardContent } from "@/components/ui/card";
  * Flutter (shared/ui/widgets/settings_section.dart), digabung jadi SATU
  * komponen supaya jarak antara label dan kad tak boleh terlepas.
  */
-export function SettingsCard({ label, children }: { label: string; children: React.ReactNode }) {
+export function SettingsCard({
+  label,
+  children,
+  id,
+}: {
+  label: string;
+  children: React.ReactNode;
+  id?: string;
+}) {
   return (
-    <div className="grid gap-2">
+    <section id={id} className="scroll-mt-24 grid gap-3">
       <h2 className="px-1 text-sm font-semibold text-muted-foreground">
         {label}
       </h2>
       <Card>
         <CardContent className="grid divide-y divide-border/70 p-0">{children}</CardContent>
       </Card>
-    </div>
+    </section>
   );
 }

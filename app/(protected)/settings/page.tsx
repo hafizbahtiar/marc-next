@@ -20,9 +20,9 @@ export default async function SettingsPage() {
   const { accessToken, profile } = await wajibSesi();
 
   return (
-    <div className="mx-auto grid max-w-5xl gap-6">
+    <div className="mx-auto grid max-w-6xl gap-8">
       <header className="grid gap-2">
-        <p className="text-sm font-medium text-primary">Aplikasi</p>
+        <p className="text-sm font-medium text-primary">Account workspace</p>
         <h1 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
           Tetapan
         </h1>
@@ -31,54 +31,77 @@ export default async function SettingsPage() {
         </p>
       </header>
 
-      <SettingsCard label="Paparan">
-        <div className="flex items-center justify-between gap-4 px-4 py-4">
-          <div className="flex items-center gap-3">
-            <span className="grid size-9 place-items-center rounded-lg bg-secondary text-secondary-foreground">
-              <MoonIcon className="size-4" />
-            </span>
-            <div>
-              <p className="text-sm font-medium">Mod gelap</p>
-              <p className="text-xs text-muted-foreground">Laraskan penampilan aplikasi.</p>
+      <div className="grid gap-8 lg:grid-cols-[190px_minmax(0,1fr)] lg:items-start">
+        <nav className="flex gap-2 overflow-x-auto pb-1 lg:sticky lg:top-24 lg:grid lg:overflow-visible" aria-label="Bahagian tetapan">
+          {[
+            ["#appearance", "Paparan"],
+            ["#connections", "Sambungan"],
+            ["#account", "Akaun"],
+            ["#help", "Bantuan"],
+            ["#danger", "Zon bahaya"],
+          ].map(([href, label]) => (
+            <a
+              key={href}
+              href={href}
+              className="whitespace-nowrap rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
+
+        <div className="grid min-w-0 gap-8">
+          <SettingsCard id="appearance" label="Paparan">
+            <div className="flex items-center justify-between gap-4 px-4 py-4">
+              <div className="flex items-center gap-3">
+                <span className="grid size-9 place-items-center rounded-lg bg-secondary text-secondary-foreground">
+                  <MoonIcon className="size-4" />
+                </span>
+                <div>
+                  <p className="text-sm font-medium">Mod gelap</p>
+                  <p className="text-xs text-muted-foreground">Laraskan penampilan aplikasi.</p>
+                </div>
+              </div>
+              <ThemeSwitch />
             </div>
+          </SettingsCard>
+
+          <SettingsCard id="connections" label="Sambungan">
+            <SettingNavItem
+              icon={SendIcon}
+              label="Telegram"
+              description={profile.telegram_linked ? "Akaun Telegram disambungkan" : "Sambungkan akaun Telegram"}
+              href="/settings/telegram"
+            />
+          </SettingsCard>
+
+          <div id="account" className="scroll-mt-24 grid gap-3">
+            <h2 className="px-1 text-sm font-semibold text-muted-foreground">Akaun</h2>
+            <SettingsCard label="Sesi & keselamatan">
+              <SettingNavItem
+                icon={BookOpenIcon}
+                label="Sesi aktif"
+                description="Urus peranti yang sedang log masuk"
+                href="/settings/sessions"
+              />
+              <LogoutAllButton />
+            </SettingsCard>
           </div>
-          <ThemeSwitch />
+
+          <Suspense fallback={<Skeleton className="h-48 w-full" />}>
+            <SessionList accessToken={accessToken} />
+          </Suspense>
+
+          <SettingsCard id="help" label="Bantuan">
+            <SettingNavItem icon={CircleHelpIcon} label="Soalan lazim" href="/settings/faq" />
+            <SettingNavItem icon={InfoIcon} label="Tentang" href="/settings/about" />
+          </SettingsCard>
+
+          <SettingsCard id="danger" label="Zon bahaya">
+            <DeleteAccountButton />
+          </SettingsCard>
         </div>
-      </SettingsCard>
-
-      <SettingsCard label="Sambungan">
-        <SettingNavItem
-          icon={SendIcon}
-          label="Telegram"
-          description={profile.telegram_linked ? "Akaun Telegram disambungkan" : "Sambungkan akaun Telegram"}
-          href="/settings/telegram"
-        />
-      </SettingsCard>
-
-      <Suspense fallback={<Skeleton className="h-24 w-full" />}>
-        <SettingsCard label="Akaun">
-          <SettingNavItem
-            icon={BookOpenIcon}
-            label="Sesi aktif"
-            description="Urus peranti yang sedang log masuk"
-            href="/settings/sessions"
-          />
-          <LogoutAllButton />
-        </SettingsCard>
-      </Suspense>
-
-      <Suspense fallback={<Skeleton className="h-24 w-full" />}>
-        <SessionList accessToken={accessToken} />
-      </Suspense>
-
-      <SettingsCard label="Bantuan">
-        <SettingNavItem icon={CircleHelpIcon} label="Soalan lazim" href="/settings/faq" />
-        <SettingNavItem icon={InfoIcon} label="Tentang" href="/settings/about" />
-      </SettingsCard>
-
-      <SettingsCard label="Zon bahaya">
-        <DeleteAccountButton />
-      </SettingsCard>
+      </div>
     </div>
   );
 }

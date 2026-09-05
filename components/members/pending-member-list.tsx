@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
+import type { ColumnDef } from "@tanstack/react-table";
 import { CheckCircle2Icon, MoreHorizontalIcon, ShieldCheckIcon, XCircleIcon } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,8 +15,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DataTable,
+  DataTableColumnHeader,
+} from "@/components/marc/data-table";
 import type { MemberRow } from "@/lib/api/types";
 import {
   approveMemberAction,
@@ -24,6 +29,8 @@ import {
   rejectMemberAction,
   verifyStaffAction,
 } from "@/lib/members/actions";
+
+type MemberAction = (id: string) => Promise<{ ok: boolean; mesej: string }>;
 
 export function PendingMemberList({
   members,
@@ -36,101 +43,111 @@ export function PendingMemberList({
 }) {
   const router = useRouter();
   const [message, setMessage] = useState<string>();
-  const [confirmation, setConfirmation] = useState<{
-    name: string;
-    question: string;
-    action: (id: string) => Promise<{ ok: boolean; mesej: string }>;
-    id: string;
-  } | null>(null);
   const [pending, startTransition] = useTransition();
+  const [confirmation, setConfirmation] = useState<{ question: string; action: MemberAction; id: string } | null>(null);
 
-  function run(action: (id: string) => Promise<{ ok: boolean; mesej: string }>, id: string) {
+  const run = useCallback((action: MemberAction, id: string) => {
     startTransition(async () => {
       const result = await action(id);
       setMessage(result.mesej);
       if (result.ok) router.refresh();
     });
-  }
+  }, [router]);
 
-  if (members.length === 0) {
-    return <p className="rounded-xl border bg-card px-6 py-16 text-center text-sm text-muted-foreground">Tiada ahli menunggu kelulusan.</p>;
-  }
+  const columns = useMemo<ColumnDef<MemberRow>[]>(() => [
+    {
+      accessorKey: "display_name",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Ahli" />,
+      cell: ({ row }) => {
+        const member = row.original;
+        const name = member.display_name?.trim() || member.member_id || "Belum disahkan";
+        return (
+          <div className="flex min-w-52 items-center gap-3">
+            <Avatar className="size-9">
+              {member.avatar_url ? <AvatarImage src={member.avatar_url} alt="" /> : null}
+              <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="truncate font-medium">{name}</p>
+              <p className="truncate text-xs text-muted-foreground">{member.email ?? "—"}</p>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "staff_id",
+      header: "No. staff",
+      cell: ({ row }) => (
+        <div>
+          <p>{row.original.staff_id ?? "—"}</p>
+          {row.original.staff_id_verified_at ? <Badge variant="outline" className="mt-1">Disahkan</Badge> : null}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "registration_payment_status",
+      header: "Bayaran",
+      cell: ({ row }) => {
+        const status = row.original.registration_payment_status;
+        return <Badge variant={status === "pending" ? "outline" : "secondary"}>{status === "pending" ? "Bil aktif" : status === "succeeded" ? "Dibayar" : "Belum bayar"}</Badge>;
+      },
+    },
+    {
+      id: "actions",
+      header: "Tindakan",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const member = row.original;
+        const name = member.display_name?.trim() || member.member_id || "ahli ini";
+        const verified = Boolean(member.staff_id_verified_at);
+        const billPending = member.registration_payment_status === "pending";
+        return (
+          <div className="flex min-w-64 flex-wrap gap-2">
+            {!verified && canVerifyStaff ? (
+              <Button size="sm" variant="outline" disabled={pending} onClick={() => run(verifyStaffAction, member.user_id)}>
+                <ShieldCheckIcon /> Sahkan
+              </Button>
+            ) : null}
+            <Button
+              size="sm"
+              disabled={pending || !verified}
+              onClick={() => setConfirmation({ question: `Luluskan pendaftaran ${name}?`, action: approveMemberAction, id: member.user_id })}
+            >
+              <CheckCircle2Icon /> Lulus
+            </Button>
+            {canCancelBill && billPending ? (
+              <Button size="sm" variant="outline" disabled={pending} onClick={() => run(cancelRegistrationBillAction, member.user_id)}>
+                <MoreHorizontalIcon /> Batal bil
+              </Button>
+            ) : null}
+            <Button
+              size="sm"
+              variant="destructive"
+              disabled={pending}
+              onClick={() => setConfirmation({ question: `Tolak pendaftaran ${name}?`, action: rejectMemberAction, id: member.user_id })}
+            >
+              <XCircleIcon /> Tolak
+            </Button>
+          </div>
+        );
+      },
+    },
+  ], [canCancelBill, canVerifyStaff, pending, run]);
 
   return (
     <div className="grid gap-3">
       {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
-      <div className="overflow-hidden rounded-xl border bg-card">
-        <div className="divide-y">
-          {members.map((member) => {
-            const name = member.display_name?.trim() || member.member_id || "Belum disahkan";
-            const verified = Boolean(member.staff_id_verified_at);
-            const billPending = member.registration_payment_status === "pending";
-            return (
-              <div key={member.user_id} className="grid gap-3 px-4 py-4 sm:flex sm:items-center">
-                <Avatar className="size-10">
-                  {member.avatar_url ? <AvatarImage src={member.avatar_url} alt="" /> : null}
-                  <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{name}</p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {member.member_id ?? "Belum disahkan"} · Staff: {member.staff_id ?? "-"}
-                  </p>
-                  {member.email ? <p className="truncate text-xs text-muted-foreground">{member.email}</p> : null}
-                </div>
-                <Badge variant={billPending ? "outline" : "secondary"}>
-                  {billPending ? "Bil aktif" : member.registration_payment_status === "succeeded" ? "Dibayar" : "Belum bayar"}
-                </Badge>
-                <div className="flex flex-wrap gap-2 sm:justify-end">
-                  {!verified && canVerifyStaff ? (
-                      <Button size="sm" variant="outline" disabled={pending} onClick={() => run(verifyStaffAction, member.user_id)}>
-                      <ShieldCheckIcon />
-                      Sahkan staff
-                    </Button>
-                  ) : null}
-                  <Button
-                    size="sm"
-                    disabled={pending || !verified}
-                    onClick={() => {
-                      setConfirmation({
-                        name,
-                        question: `Luluskan pendaftaran ${name}?`,
-                        action: approveMemberAction,
-                        id: member.user_id,
-                      });
-                    }}
-                  >
-                    <CheckCircle2Icon />
-                    Lulus
-                  </Button>
-                  {canCancelBill && billPending ? (
-                    <Button size="sm" variant="outline" disabled={pending} onClick={() => run(cancelRegistrationBillAction, member.user_id)}>
-                      <MoreHorizontalIcon />
-                      Batal bil
-                    </Button>
-                  ) : null}
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    disabled={pending}
-                    onClick={() => {
-                      setConfirmation({
-                        name,
-                        question: `Tolak pendaftaran ${name}?`,
-                        action: rejectMemberAction,
-                        id: member.user_id,
-                      });
-                    }}
-                  >
-                    <XCircleIcon />
-                    Tolak
-                  </Button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <DataTable
+        columns={columns}
+        data={members}
+        searchKey="display_name"
+        searchPlaceholder="Cari ahli pending…"
+        emptyMessage="Tiada ahli menunggu kelulusan."
+        getRowId={(member) => member.user_id}
+        pageSizeOptions={[10, 20, 50]}
+        initialPageSize={20}
+      />
       <AlertDialog open={Boolean(confirmation)} onOpenChange={(open) => !open && setConfirmation(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

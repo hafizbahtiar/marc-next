@@ -1,21 +1,9 @@
 import { CreditCardIcon } from "lucide-react";
 
+import { PaymentHistoryTable } from "@/components/payments/payment-history-table";
 import { BackLink } from "@/components/ui/back-link";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { wajibSesi } from "@/lib/auth/session";
 import { getPaymentHistory } from "@/lib/payments/api";
-
-function amount(cents: number, currency: string) {
-  return `${currency.toUpperCase()} ${(cents / 100).toFixed(2)}`;
-}
-
-function statusLabel(status: string) {
-  if (status === "succeeded" || status === "paid") return "Berjaya";
-  if (status === "failed") return "Gagal";
-  if (status === "refunded") return "Dikembalikan";
-  return "Menunggu";
-}
 
 export default async function PaymentHistoryPage() {
   const { accessToken } = await wajibSesi();
@@ -47,76 +35,9 @@ export default async function PaymentHistoryPage() {
               Yuran pendaftaran belum dibayar.
             </div>
           ) : null}
-          <PaymentGroup title="Yuran Pendaftaran">
-            {history.registration_fee.map((item) => (
-              <PaymentRow
-                key={item.id}
-                title="Yuran pendaftaran"
-                amount={amount(item.amount_cents, item.currency)}
-                status={item.status}
-                date={item.created_at}
-              />
-            ))}
-          </PaymentGroup>
-          <PaymentGroup title="Yuran Aktiviti">
-            {history.activity_fees.map((item) => (
-              <PaymentRow
-                key={item.registration_id}
-                title={item.title}
-                amount={amount(item.fee_cents, item.currency)}
-                status={item.payment_status}
-                date={item.starts_at}
-              />
-            ))}
-          </PaymentGroup>
-          <PaymentGroup title="Sokongan">
-            {history.donations.map((item) => (
-              <PaymentRow
-                key={item.id}
-                title="Sokongan MARC"
-                amount={amount(item.amount_cents, item.currency)}
-                status={item.status}
-                date={item.created_at}
-              />
-            ))}
-          </PaymentGroup>
+          <PaymentHistoryTable history={history} />
         </div>
       )}
-    </div>
-  );
-}
-
-function PaymentGroup({ title, children }: { title: string; children: React.ReactNode }) {
-  if (!children) return null;
-  return (
-    <section className="grid gap-2">
-      <h2 className="px-1 text-sm font-semibold text-muted-foreground">{title}</h2>
-      <Card>
-        <CardContent className="grid divide-y divide-border/70 p-0">{children}</CardContent>
-      </Card>
-    </section>
-  );
-}
-
-function PaymentRow({
-  title,
-  amount: value,
-  status,
-  date,
-}: {
-  title: string;
-  amount: string;
-  status: string;
-  date: string;
-}) {
-  return (
-    <div className="flex items-center gap-3 px-4 py-3">
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{title}</p>
-        <p className="text-xs text-muted-foreground">{new Date(date).toLocaleDateString("ms-MY")}</p>
-      </div>
-      <span className="text-sm font-semibold">{value}</span>
-      <Badge variant={status === "failed" ? "destructive" : "secondary"}>{statusLabel(status)}</Badge>
     </div>
   );
 }
