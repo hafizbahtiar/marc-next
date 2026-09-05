@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { HasilTindakan } from "@/lib/posts/hasil";
+import type { HasilTindakan } from "@/lib/posts/result";
 
 /**
  * Butang suka generik - dikongsi antara post dan comment. Ia tak tahu

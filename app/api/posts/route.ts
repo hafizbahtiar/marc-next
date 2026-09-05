@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { ApiError, ApiUnreachableError } from "@/lib/api/errors";
 import { accessToken } from "@/lib/auth/session";
-import { senaraiPos } from "@/lib/posts/api";
+import { listPosts } from "@/lib/posts/api";
 
 /**
  * Proksi halaman KEDUA dan seterusnya feed (GET /posts?cursor=).
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   const cursor = request.nextUrl.searchParams.get("cursor") ?? undefined;
 
   try {
-    const hasil = await senaraiPos(token, cursor);
+    const hasil = await listPosts(token, cursor);
     return NextResponse.json(hasil, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (error instanceof ApiError) {

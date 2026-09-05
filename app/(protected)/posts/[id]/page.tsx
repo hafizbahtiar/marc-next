@@ -4,7 +4,7 @@ import { PostCard } from "@/components/posts/post-card";
 import { CommentList } from "@/components/posts/comment-list";
 import { ApiError } from "@/lib/api/errors";
 import type { Comment, Post } from "@/lib/api/types";
-import { dapatkanPos, senaraiKomen } from "@/lib/posts/api";
+import { getPost, listComments } from "@/lib/posts/api";
 import { wajibSesi } from "@/lib/auth/session";
 
 export default async function PostDetailPage({ params }: PageProps<"/posts/[id]">) {
@@ -15,8 +15,8 @@ export default async function PostDetailPage({ params }: PageProps<"/posts/[id]"
   let komen: Comment[];
   try {
     [pos, { comments: komen }] = await Promise.all([
-      dapatkanPos(accessToken, id),
-      senaraiKomen(accessToken, id),
+      getPost(accessToken, id),
+      listComments(accessToken, id),
     ]);
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) notFound();
@@ -24,7 +24,7 @@ export default async function PostDetailPage({ params }: PageProps<"/posts/[id]"
   }
 
   return (
-    <div className="mx-auto grid max-w-2xl gap-5">
+    <div className="mx-auto grid max-w-6xl gap-5">
       <PostCard post={pos} profileSemasa={profile} pautanKeDetail={false} />
 
       <section className="rounded-2xl border bg-card p-4 shadow-sm sm:p-5" aria-labelledby="comments-heading">

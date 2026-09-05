@@ -48,3 +48,22 @@ export function markNotificationRead(token: string, id: string): Promise<void> {
 export function markAllNotificationsRead(token: string): Promise<void> {
   return apiFetch<void>("/notifications/read-all", { method: "POST", accessToken: token });
 }
+
+export function deleteNotification(token: string, id: string): Promise<void> {
+  return apiFetch<void>(`/notifications/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    accessToken: token,
+  });
+}
+
+export function deleteReadNotifications(token: string): Promise<void> {
+  return apiFetch<void>("/notifications/read", { method: "DELETE", accessToken: token });
+}
+
+export function deleteSelectedNotifications(token: string, ids: string[]): Promise<void> {
+  return apiFetch<void>("/notifications/selected", {
+    method: "DELETE",
+    body: { ids },
+    accessToken: token,
+  });
+}

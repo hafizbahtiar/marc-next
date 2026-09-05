@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { isManagement } from "@/lib/api/types";
 import type { Post, Profile } from "@/lib/api/types";
-import { ciptaPosAction, mintaUploadURLAction } from "@/lib/posts/actions";
+import { createPostAction, requestUploadUrlAction } from "@/lib/posts/actions";
 
 const JENIS_DIBENARKAN = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAKS_GAMBAR = 4;
@@ -67,7 +67,7 @@ export function PostComposer({
     startTransition(async () => {
       const r2Keys: string[] = [];
       for (const g of gambar) {
-        const hasilPresign = await mintaUploadURLAction(g.file.type);
+        const hasilPresign = await requestUploadUrlAction(g.file.type);
         if (!hasilPresign.ok) {
           setRalat(hasilPresign.ralat);
           return;
@@ -86,7 +86,7 @@ export function PostComposer({
         r2Keys.push(hasilPresign.data.r2_key);
       }
 
-      const hasil = await ciptaPosAction({
+      const hasil = await createPostAction({
         type: pengumuman ? "announcement" : "normal",
         content: kandungan.trim(),
         r2_keys: r2Keys,

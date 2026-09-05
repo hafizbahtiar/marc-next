@@ -6,7 +6,7 @@ import { ApiError, ApiUnreachableError } from "@/lib/api/errors";
 import type { Comment, Post, PostType } from "@/lib/api/types";
 import { accessToken as bacaAccessToken } from "@/lib/auth/session";
 import * as postsApi from "./api";
-import type { HasilTindakan } from "./hasil";
+import type { HasilTindakan } from "./result";
 
 async function token(): Promise<string> {
   const t = await bacaAccessToken();
@@ -26,13 +26,13 @@ function ralatDaripada(error: unknown): string {
   throw error;
 }
 
-export async function ciptaPosAction(body: {
+export async function createPostAction(body: {
   type?: PostType;
   content: string;
   r2_keys?: string[];
 }): Promise<HasilTindakan<Post>> {
   try {
-    const post = await postsApi.ciptaPos(await token(), body);
+    const post = await postsApi.createPost(await token(), body);
     revalidatePath("/posts");
     return { ok: true, data: post };
   } catch (error) {
@@ -40,9 +40,9 @@ export async function ciptaPosAction(body: {
   }
 }
 
-export async function kemaskiniPosAction(id: string, content: string): Promise<HasilTindakan<Post>> {
+export async function updatePostAction(id: string, content: string): Promise<HasilTindakan<Post>> {
   try {
-    const post = await postsApi.kemaskiniPos(await token(), id, content);
+    const post = await postsApi.updatePost(await token(), id, content);
     revalidatePath("/posts");
     revalidatePath(`/posts/${id}`);
     return { ok: true, data: post };
@@ -51,9 +51,9 @@ export async function kemaskiniPosAction(id: string, content: string): Promise<H
   }
 }
 
-export async function padamPosAction(id: string): Promise<HasilTindakan> {
+export async function deletePostAction(id: string): Promise<HasilTindakan> {
   try {
-    await postsApi.padamPos(await token(), id);
+    await postsApi.deletePost(await token(), id);
     revalidatePath("/posts");
     revalidatePath(`/posts/${id}`);
     return { ok: true, data: undefined };
@@ -62,31 +62,31 @@ export async function padamPosAction(id: string): Promise<HasilTindakan> {
   }
 }
 
-export async function sukaPosAction(id: string): Promise<HasilTindakan> {
+export async function likePostAction(id: string): Promise<HasilTindakan> {
   try {
-    await postsApi.sukaPos(await token(), id);
+    await postsApi.likePost(await token(), id);
     return { ok: true, data: undefined };
   } catch (error) {
     return { ok: false, ralat: ralatDaripada(error) };
   }
 }
 
-export async function nyahSukaPosAction(id: string): Promise<HasilTindakan> {
+export async function unlikePostAction(id: string): Promise<HasilTindakan> {
   try {
-    await postsApi.nyahSukaPos(await token(), id);
+    await postsApi.unlikePost(await token(), id);
     return { ok: true, data: undefined };
   } catch (error) {
     return { ok: false, ralat: ralatDaripada(error) };
   }
 }
 
-export async function ciptaKomenAction(
+export async function createCommentAction(
   postId: string,
   content: string,
   parentCommentId?: string,
 ): Promise<HasilTindakan<Comment>> {
   try {
-    const comment = await postsApi.ciptaKomen(await token(), postId, content, parentCommentId);
+    const comment = await postsApi.createComment(await token(), postId, content, parentCommentId);
     revalidatePath(`/posts/${postId}`);
     return { ok: true, data: comment };
   } catch (error) {
@@ -94,29 +94,29 @@ export async function ciptaKomenAction(
   }
 }
 
-export async function sukaKomenAction(id: string): Promise<HasilTindakan> {
+export async function likeCommentAction(id: string): Promise<HasilTindakan> {
   try {
-    await postsApi.sukaKomen(await token(), id);
+    await postsApi.likeComment(await token(), id);
     return { ok: true, data: undefined };
   } catch (error) {
     return { ok: false, ralat: ralatDaripada(error) };
   }
 }
 
-export async function nyahSukaKomenAction(id: string): Promise<HasilTindakan> {
+export async function unlikeCommentAction(id: string): Promise<HasilTindakan> {
   try {
-    await postsApi.nyahSukaKomen(await token(), id);
+    await postsApi.unlikeComment(await token(), id);
     return { ok: true, data: undefined };
   } catch (error) {
     return { ok: false, ralat: ralatDaripada(error) };
   }
 }
 
-export async function mintaUploadURLAction(
+export async function requestUploadUrlAction(
   contentType: string,
 ): Promise<HasilTindakan<{ upload_url: string; r2_key: string }>> {
   try {
-    const hasil = await postsApi.mintaUploadURL(await token(), contentType);
+    const hasil = await postsApi.requestUploadUrl(await token(), contentType);
     return { ok: true, data: hasil };
   } catch (error) {
     return { ok: false, ralat: ralatDaripada(error) };

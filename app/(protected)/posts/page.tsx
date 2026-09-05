@@ -1,13 +1,13 @@
 import { PostBoard } from "@/components/posts/post-board";
-import { senaraiPos } from "@/lib/posts/api";
+import { listPosts } from "@/lib/posts/api";
 import { wajibSesi } from "@/lib/auth/session";
 
 export default async function PostsPage() {
   const { accessToken, profile } = await wajibSesi();
-  const { posts, next_cursor } = await senaraiPos(accessToken);
+  const { posts, next_cursor } = await listPosts(accessToken);
 
   return (
-    <div className="mx-auto grid max-w-2xl gap-5">
+    <div className="mx-auto grid max-w-6xl gap-6">
       <header className="grid gap-3">
         <div className="flex items-end justify-between gap-4">
           <div className="grid gap-1">

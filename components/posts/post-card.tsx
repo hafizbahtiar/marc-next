@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ROUTES } from "@/lib/auth/routes";
 import { isManagement } from "@/lib/api/types";
 import type { Post, Profile } from "@/lib/api/types";
-import { kemaskiniPosAction, padamPosAction, sukaPosAction, nyahSukaPosAction } from "@/lib/posts/actions";
+import { updatePostAction, deletePostAction, likePostAction, unlikePostAction } from "@/lib/posts/actions";
 
 export function PostCard({
   post,
@@ -48,7 +48,7 @@ export function PostCard({
   async function saveEdit() {
     setPending(true);
     try {
-      const hasil = await kemaskiniPosAction(post.id, kandungan.trim());
+      const hasil = await updatePostAction(post.id, kandungan.trim());
       if (!hasil.ok) {
         toast.error(hasil.ralat);
         return;
@@ -63,7 +63,7 @@ export function PostCard({
   async function deletePost(): Promise<boolean> {
     setPending(true);
     try {
-      const hasil = await padamPosAction(post.id);
+      const hasil = await deletePostAction(post.id);
       if (!hasil.ok) {
         toast.error(hasil.ralat);
         return false;
@@ -90,13 +90,24 @@ export function PostCard({
     <article className="grid gap-3 rounded-2xl border bg-card p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
       <header className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <Avatar>
-            {post.author.avatar_url ? <AvatarImage src={post.author.avatar_url} alt="" /> : null}
-            <AvatarFallback>{nama.slice(0, 2).toUpperCase()}</AvatarFallback>
-          </Avatar>
+          <Link
+            href={`/members/${encodeURIComponent(post.author.user_id)}`}
+            className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={`Lihat profil ${nama}`}
+          >
+            <Avatar>
+              {post.author.avatar_url ? <AvatarImage src={post.author.avatar_url} alt="" /> : null}
+              <AvatarFallback>{nama.slice(0, 2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+          </Link>
           <div className="min-w-0">
             <p className="flex flex-wrap items-center gap-2 text-sm font-semibold">
-              {nama}
+              <Link
+                href={`/members/${encodeURIComponent(post.author.user_id)}`}
+                className="rounded-sm outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {nama}
+              </Link>
               {post.type === "announcement" ? (
                 <Badge variant="secondary" className="gap-1 text-primary">
                   <span className="size-1.5 rounded-full bg-primary" aria-hidden />
@@ -160,7 +171,7 @@ export function PostCard({
         </div>
       ) : null}
 
-      {post.comment_count > 0 && post.comment_previews?.length ? (
+      {pautanKeDetail && post.comment_count > 0 && post.comment_previews?.length ? (
         <div className="grid gap-2 border-t border-border/60 pt-3">
           {post.comment_previews.map((comment) => <CommentPreview key={comment.id} comment={comment} />)}
           {post.comment_count > post.comment_previews.length ? (
@@ -176,8 +187,8 @@ export function PostCard({
           id={post.id}
           kiraanAwal={post.like_count}
           disukaAwal={post.liked_by_me}
-          suka={sukaPosAction}
-          nyahSuka={nyahSukaPosAction}
+          suka={likePostAction}
+          nyahSuka={unlikePostAction}
         />
         <Link
           href={`/posts/${post.id}`}
@@ -228,7 +239,12 @@ function CommentPreview({ comment }: { comment: NonNullable<Post["comment_previe
         <AvatarFallback>{nama.slice(0, 2).toUpperCase()}</AvatarFallback>
       </Avatar>
       <div className="min-w-0 flex-1 rounded-2xl bg-muted/70 px-3 py-2">
-        <p className="text-xs font-semibold">{nama}</p>
+        <Link
+          href={`/members/${encodeURIComponent(comment.author.user_id)}`}
+          className="text-xs font-semibold outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {nama}
+        </Link>
         <p className={expanded ? "mt-0.5 text-sm whitespace-pre-wrap" : "mt-0.5 line-clamp-3 text-sm whitespace-pre-wrap"}>
           {comment.content}
         </p>

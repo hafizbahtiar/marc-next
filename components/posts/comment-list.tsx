@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -8,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Comment, Profile } from "@/lib/api/types";
-import { ciptaKomenAction, sukaKomenAction, nyahSukaKomenAction } from "@/lib/posts/actions";
+import { createCommentAction, likeCommentAction, unlikeCommentAction } from "@/lib/posts/actions";
 
 export function CommentList({
   postId,
@@ -61,21 +62,32 @@ function CommentRow({ komen }: { komen: Comment }) {
   const nama = komen.author.display_name?.trim() || komen.author.member_id;
   return (
     <div className="flex items-start gap-2.5">
-      <Avatar size="sm">
-        {komen.author.avatar_url ? <AvatarImage src={komen.author.avatar_url} alt="" /> : null}
-        <AvatarFallback>{nama.slice(0, 2).toUpperCase()}</AvatarFallback>
-      </Avatar>
+      <Link
+        href={`/members/${encodeURIComponent(komen.author.user_id)}`}
+        className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label={`Lihat profil ${nama}`}
+      >
+        <Avatar size="sm">
+          {komen.author.avatar_url ? <AvatarImage src={komen.author.avatar_url} alt="" /> : null}
+          <AvatarFallback>{nama.slice(0, 2).toUpperCase()}</AvatarFallback>
+        </Avatar>
+      </Link>
       <div className="min-w-0 flex-1">
         <p className="text-sm">
-          <span className="font-medium">{nama}</span>{" "}
+          <Link
+            href={`/members/${encodeURIComponent(komen.author.user_id)}`}
+            className="rounded-sm font-medium outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {nama}
+          </Link>{" "}
           <span className="whitespace-pre-wrap">{komen.content}</span>
         </p>
               <LikeButton
           id={komen.id}
           kiraanAwal={komen.like_count}
           disukaAwal={komen.liked_by_me}
-          suka={sukaKomenAction}
-          nyahSuka={nyahSukaKomenAction}
+          suka={likeCommentAction}
+          nyahSuka={unlikeCommentAction}
         />
       </div>
     </div>
@@ -96,7 +108,7 @@ function CommentForm({
     if (!isi.trim()) return;
     setPending(true);
     try {
-      const hasil = await ciptaKomenAction(postId, isi.trim());
+      const hasil = await createCommentAction(postId, isi.trim());
       if (!hasil.ok) {
         toast.error(hasil.ralat);
         return;
@@ -142,7 +154,7 @@ function ReplyForm({
     if (!isi.trim()) return;
     setPending(true);
     try {
-      const hasil = await ciptaKomenAction(postId, isi.trim(), parentCommentId);
+      const hasil = await createCommentAction(postId, isi.trim(), parentCommentId);
       if (!hasil.ok) {
         toast.error(hasil.ralat);
         return;

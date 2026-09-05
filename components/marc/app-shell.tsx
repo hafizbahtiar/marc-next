@@ -2,11 +2,12 @@ import Link from "next/link";
 
 import { Logo } from "@/components/marc/logo";
 import { MobileNav } from "@/components/marc/mobile-nav";
+import { NotificationPreview } from "@/components/notifications/notification-preview";
 import { ProfileMenu } from "@/components/marc/profile-menu";
 import { ThemeSwitch } from "@/components/marc/theme-switch";
-import { BellIcon } from "lucide-react";
 import type { Profile } from "@/lib/api/types";
 import { ROUTES } from "@/lib/auth/routes";
+import type { AppNotification } from "@/lib/notifications/api";
 
 /**
  * Rangka bersama untuk setiap skrin selepas log masuk - termasuk skrin
@@ -18,10 +19,12 @@ import { ROUTES } from "@/lib/auth/routes";
 export function AppShell({
   profile,
   unreadNotificationCount,
+  notificationPreview,
   children,
 }: {
   profile: Profile;
   unreadNotificationCount?: number;
+  notificationPreview?: AppNotification[];
   children: React.ReactNode;
 }) {
   const unreadCount = unreadNotificationCount ?? 0;
@@ -49,18 +52,7 @@ export function AppShell({
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link
-              href={ROUTES.notifikasi}
-              className="relative rounded-full p-2 text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label={unreadCount > 0 ? `${unreadCount} notifikasi belum dibaca` : "Notifikasi"}
-            >
-              <BellIcon className="size-5" />
-              {unreadCount > 0 ? (
-                <span className="absolute right-1 top-1 grid min-w-3.5 place-items-center rounded-full bg-destructive px-1 text-[9px] font-bold leading-3 text-destructive-foreground">
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              ) : null}
-            </Link>
+            <NotificationPreview items={notificationPreview} unreadCount={unreadCount} />
             <div className="hidden sm:block">
               <ThemeSwitch />
             </div>

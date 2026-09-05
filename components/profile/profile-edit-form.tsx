@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Profile } from "@/lib/api/types";
 import { KEADAAN_AWAL } from "@/lib/auth/borang";
-import { mintaUploadURLAction } from "@/lib/posts/actions";
+import { requestUploadUrlAction } from "@/lib/posts/actions";
 import { kemaskiniProfilAction } from "@/lib/profil/actions";
 
 const JENIS_DIBENARKAN = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -33,7 +33,7 @@ export function ProfileEditForm({ profile }: { profile: Profile }) {
     setRalatAvatar(null);
     setMemuatNaik(true);
     try {
-      const hasilPresign = await mintaUploadURLAction(file.type);
+      const hasilPresign = await requestUploadUrlAction(file.type);
       if (!hasilPresign.ok) {
         setRalatAvatar(hasilPresign.ralat);
         return;

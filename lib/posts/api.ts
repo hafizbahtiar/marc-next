@@ -14,7 +14,7 @@ import type {
  * backend Go - padanan `lib/auth/api.ts` untuk domain post/feed.
  */
 
-export function senaraiPos(
+export function listPosts(
   accessToken: string,
   cursor?: string,
   limit = 20,
@@ -24,38 +24,38 @@ export function senaraiPos(
   return apiFetch<SenaraiPosRespons>(`/posts?${params.toString()}`, { accessToken });
 }
 
-export function dapatkanPos(accessToken: string, id: string): Promise<Post> {
+export function getPost(accessToken: string, id: string): Promise<Post> {
   return apiFetch<Post>(`/posts/${id}`, { accessToken });
 }
 
-export function ciptaPos(
+export function createPost(
   accessToken: string,
   body: { type?: PostType; content: string; r2_keys?: string[] },
 ): Promise<Post> {
   return apiFetch<Post>("/posts", { method: "POST", body, accessToken });
 }
 
-export function kemaskiniPos(accessToken: string, id: string, content: string): Promise<Post> {
+export function updatePost(accessToken: string, id: string, content: string): Promise<Post> {
   return apiFetch<Post>(`/posts/${id}`, { method: "PATCH", body: { content }, accessToken });
 }
 
-export function padamPos(accessToken: string, id: string): Promise<void> {
+export function deletePost(accessToken: string, id: string): Promise<void> {
   return apiFetch<void>(`/posts/${id}`, { method: "DELETE", accessToken });
 }
 
-export function sukaPos(accessToken: string, id: string): Promise<void> {
+export function likePost(accessToken: string, id: string): Promise<void> {
   return apiFetch<void>(`/posts/${id}/like`, { method: "POST", accessToken });
 }
 
-export function nyahSukaPos(accessToken: string, id: string): Promise<void> {
+export function unlikePost(accessToken: string, id: string): Promise<void> {
   return apiFetch<void>(`/posts/${id}/like`, { method: "DELETE", accessToken });
 }
 
-export function senaraiKomen(accessToken: string, postId: string): Promise<SenaraiKomenRespons> {
+export function listComments(accessToken: string, postId: string): Promise<SenaraiKomenRespons> {
   return apiFetch<SenaraiKomenRespons>(`/posts/${postId}/comments`, { accessToken });
 }
 
-export function ciptaKomen(
+export function createComment(
   accessToken: string,
   postId: string,
   content: string,
@@ -68,15 +68,15 @@ export function ciptaKomen(
   });
 }
 
-export function sukaKomen(accessToken: string, id: string): Promise<void> {
+export function likeComment(accessToken: string, id: string): Promise<void> {
   return apiFetch<void>(`/comments/${id}/like`, { method: "POST", accessToken });
 }
 
-export function nyahSukaKomen(accessToken: string, id: string): Promise<void> {
+export function unlikeComment(accessToken: string, id: string): Promise<void> {
   return apiFetch<void>(`/comments/${id}/like`, { method: "DELETE", accessToken });
 }
 
-export function mintaUploadURL(
+export function requestUploadUrl(
   accessToken: string,
   contentType: string,
 ): Promise<{ upload_url: string; r2_key: string }> {
