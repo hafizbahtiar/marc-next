@@ -15,6 +15,7 @@ export const ROUTES = {
   pos: "/posts",
   profil: "/profil",
   tetapan: "/tetapan",
+  profilEdit: "/profil/edit",
   menungguKelulusan: "/menunggu-kelulusan",
   akaunDitolak: "/akaun-ditolak",
   sahkanEmelAnda: "/sahkan-emel-anda",
