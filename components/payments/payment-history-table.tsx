@@ -179,16 +179,18 @@ function ReceiptButton({ type, id }: { type: "registration" | "activity" | "dona
             Preview
           </Button>
         </DialogTrigger>
-        <DialogContent className="h-[90vh] w-[calc(100%-1rem)] max-w-4xl p-2 sm:p-4">
-          <DialogHeader className="px-2 pt-2 sm:px-0 sm:pt-0">
+        <DialogContent className="flex h-[90dvh] max-h-[calc(100dvh-2rem)] w-[calc(100%-1rem)] max-w-4xl flex-col overflow-hidden p-2 sm:p-4">
+          <DialogHeader className="shrink-0 px-2 pt-2 sm:px-0 sm:pt-0">
             <DialogTitle>Preview resit</DialogTitle>
             <DialogDescription>Semak resit sebelum memuat turunnya.</DialogDescription>
           </DialogHeader>
-          {previewUrl ? (
-            <iframe title="Preview resit bayaran" src={previewUrl} className="min-h-0 w-full flex-1 rounded-lg border" />
-          ) : (
-            <div className="grid min-h-64 place-items-center text-sm text-muted-foreground">Memuat preview…</div>
-          )}
+          <div className="min-h-0 flex-1">
+            {previewUrl ? (
+              <iframe title="Preview resit bayaran" src={previewUrl} className="size-full rounded-lg border" />
+            ) : (
+              <div className="grid size-full min-h-64 place-items-center text-sm text-muted-foreground">Memuat preview…</div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
       <Button type="button" size="sm" variant="outline" disabled={pending} onClick={() => void download()}>

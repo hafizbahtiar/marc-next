@@ -36,6 +36,8 @@ export function NotificationPreview({
   unreadCount: number;
 }) {
   const [previewItems, setPreviewItems] = useState(items ?? []);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -62,6 +64,8 @@ export function NotificationPreview({
         setPreviewItems((current) => current.map((entry) => entry.id === item.id ? { ...entry, read: true } : entry));
       }
       const destination = notificationDestination(item);
+      setPopoverOpen(false);
+      setDrawerOpen(false);
       if (destination) router.push(destination);
     });
   }
@@ -89,13 +93,17 @@ export function NotificationPreview({
       pending={pending}
       onOpen={open}
       onMarkAllRead={markAllRead}
+      onClose={() => {
+        setPopoverOpen(false);
+        setDrawerOpen(false);
+      }}
     />
   );
 
   return (
     <>
       <div className="hidden md:block">
-        <Popover>
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>{trigger}</PopoverTrigger>
           <PopoverContent align="end" className="w-[min(24rem,calc(100vw-2rem))] p-0">
             <PopoverHeader className="border-b px-4 py-3">
@@ -107,7 +115,7 @@ export function NotificationPreview({
         </Popover>
       </div>
       <div className="md:hidden">
-        <Drawer>
+        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
           <DrawerTrigger asChild>{trigger}</DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>
@@ -127,11 +135,13 @@ function NotificationPreviewContent({
   pending,
   onOpen,
   onMarkAllRead,
+  onClose,
 }: {
   items: AppNotification[];
   pending: boolean;
   onOpen: (item: AppNotification) => void;
   onMarkAllRead: () => void;
+  onClose: () => void;
 }) {
   const preview = items.slice(0, 7);
   return (
@@ -157,7 +167,7 @@ function NotificationPreviewContent({
           <CheckIcon /> Dibaca semua
         </Button>
         <Button asChild type="button" variant="ghost" size="sm">
-          <Link href="/notifications">
+          <Link href="/notifications" onClick={onClose}>
             Lihat semua <ChevronRightIcon />
           </Link>
         </Button>

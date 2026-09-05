@@ -20,13 +20,14 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { AlertCircleIcon, ChevronDownIcon, ChevronsUpDownIcon, EyeIcon, SearchIcon } from "lucide-react";
+import { AlertCircleIcon, ChevronDownIcon, ChevronsUpDownIcon, EyeIcon, InboxIcon, SearchIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -217,8 +218,15 @@ export function DataTable<TData, TValue>({
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={columns.length} className="h-32 text-center text-muted-foreground">
-                      {emptyMessage}
+                    <TableCell colSpan={columns.length} className="p-2">
+                      <Empty className="min-h-32 border-0">
+                        <EmptyHeader>
+                          <EmptyMedia variant="icon">
+                            <InboxIcon />
+                          </EmptyMedia>
+                          <EmptyTitle>{emptyMessage}</EmptyTitle>
+                        </EmptyHeader>
+                      </Empty>
                     </TableCell>
                   </TableRow>
                 )}

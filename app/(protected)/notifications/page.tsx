@@ -7,7 +7,7 @@ export default async function NotificationsPage() {
   const initial = await listNotifications(accessToken);
 
   return (
-    <div className="mx-auto grid max-w-3xl gap-6">
+    <div className="mx-auto grid max-w-6xl gap-6">
       <header className="flex items-end justify-between gap-4">
         <div className="grid gap-1">
           <p className="text-sm font-medium text-primary">Pusat makluman</p>
