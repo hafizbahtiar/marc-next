@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { UserRoundXIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { mintaPadamAkaunAction } from "@/lib/profil/settings-actions";
+import { requestAccountDeletionAction } from "@/lib/profil/settings-actions";
 
 export function DeleteAccountButton() {
   const [confirming, setConfirming] = useState(false);
@@ -13,9 +13,9 @@ export function DeleteAccountButton() {
 
   function requestDeletion() {
     startTransition(async () => {
-      const result = await mintaPadamAkaunAction();
-      setMessage(result.berjaya ?? result.error);
-      if (result.berjaya) setConfirming(false);
+      const result = await requestAccountDeletionAction();
+      setMessage(result.success ?? result.error);
+      if (result.success) setConfirming(false);
     });
   }
 

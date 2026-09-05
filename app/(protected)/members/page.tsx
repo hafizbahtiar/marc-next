@@ -3,11 +3,11 @@ import { UsersIcon } from "lucide-react";
 import { MemberDirectory } from "@/components/members/member-directory";
 import { BackLink } from "@/components/ui/back-link";
 import { wajibSesi } from "@/lib/auth/session";
-import { senaraiAhli } from "@/lib/members/api";
+import { listMembers } from "@/lib/members/api";
 
 export default async function MembersPage() {
   const { accessToken } = await wajibSesi();
-  const members = await senaraiAhli(accessToken);
+  const members = await listMembers(accessToken);
 
   return (
     <div className="mx-auto grid max-w-5xl gap-6">

@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { CheckIcon, Link2Icon, SendIcon, UnlinkIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { janaPautanTelegramAction, nyahikatTelegramAction } from "@/lib/profil/settings-actions";
+import { generateTelegramLinkAction, unlinkTelegramAction } from "@/lib/profil/settings-actions";
 
 export function TelegramPanel({
   linked,
@@ -19,7 +19,7 @@ export function TelegramPanel({
   function connect() {
     setError(undefined);
     startTransition(async () => {
-      const result = await janaPautanTelegramAction();
+      const result = await generateTelegramLinkAction();
       if ("error" in result) {
         setError(result.error);
       } else {
@@ -31,7 +31,7 @@ export function TelegramPanel({
   function disconnect() {
     setError(undefined);
     startTransition(async () => {
-      const result = await nyahikatTelegramAction();
+      const result = await unlinkTelegramAction();
       if (result.error) {
         setError(result.error);
       } else {

@@ -5,14 +5,24 @@ import { useState, useTransition } from "react";
 import { CheckCircle2Icon, MoreHorizontalIcon, ShieldCheckIcon, XCircleIcon } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { MemberRow } from "@/lib/api/types";
 import {
-  batalkanBilAction,
-  lulusAhliAction,
-  sahkanStaffAction,
-  tolakAhliAction,
+  approveMemberAction,
+  cancelRegistrationBillAction,
+  rejectMemberAction,
+  verifyStaffAction,
 } from "@/lib/members/actions";
 
 export function PendingMemberList({
@@ -26,6 +36,12 @@ export function PendingMemberList({
 }) {
   const router = useRouter();
   const [message, setMessage] = useState<string>();
+  const [confirmation, setConfirmation] = useState<{
+    name: string;
+    question: string;
+    action: (id: string) => Promise<{ ok: boolean; mesej: string }>;
+    id: string;
+  } | null>(null);
   const [pending, startTransition] = useTransition();
 
   function run(action: (id: string) => Promise<{ ok: boolean; mesej: string }>, id: string) {
@@ -67,7 +83,7 @@ export function PendingMemberList({
                 </Badge>
                 <div className="flex flex-wrap gap-2 sm:justify-end">
                   {!verified && canVerifyStaff ? (
-                    <Button size="sm" variant="outline" disabled={pending} onClick={() => run(sahkanStaffAction, member.user_id)}>
+                      <Button size="sm" variant="outline" disabled={pending} onClick={() => run(verifyStaffAction, member.user_id)}>
                       <ShieldCheckIcon />
                       Sahkan staff
                     </Button>
@@ -76,14 +92,19 @@ export function PendingMemberList({
                     size="sm"
                     disabled={pending || !verified}
                     onClick={() => {
-                      if (window.confirm(`Luluskan pendaftaran ${name}?`)) run(lulusAhliAction, member.user_id);
+                      setConfirmation({
+                        name,
+                        question: `Luluskan pendaftaran ${name}?`,
+                        action: approveMemberAction,
+                        id: member.user_id,
+                      });
                     }}
                   >
                     <CheckCircle2Icon />
                     Lulus
                   </Button>
                   {canCancelBill && billPending ? (
-                    <Button size="sm" variant="outline" disabled={pending} onClick={() => run(batalkanBilAction, member.user_id)}>
+                    <Button size="sm" variant="outline" disabled={pending} onClick={() => run(cancelRegistrationBillAction, member.user_id)}>
                       <MoreHorizontalIcon />
                       Batal bil
                     </Button>
@@ -93,7 +114,12 @@ export function PendingMemberList({
                     variant="destructive"
                     disabled={pending}
                     onClick={() => {
-                      if (window.confirm(`Tolak pendaftaran ${name}?`)) run(tolakAhliAction, member.user_id);
+                      setConfirmation({
+                        name,
+                        question: `Tolak pendaftaran ${name}?`,
+                        action: rejectMemberAction,
+                        id: member.user_id,
+                      });
                     }}
                   >
                     <XCircleIcon />
@@ -105,6 +131,27 @@ export function PendingMemberList({
           })}
         </div>
       </div>
+      <AlertDialog open={Boolean(confirmation)} onOpenChange={(open) => !open && setConfirmation(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sahkan tindakan</AlertDialogTitle>
+            <AlertDialogDescription>{confirmation?.question}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={pending}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={pending}
+              onClick={() => {
+                if (!confirmation) return;
+                run(confirmation.action, confirmation.id);
+                setConfirmation(null);
+              }}
+            >
+              Teruskan
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

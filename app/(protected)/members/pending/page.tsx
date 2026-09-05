@@ -4,14 +4,14 @@ import { PendingMemberList } from "@/components/members/pending-member-list";
 import { BackLink } from "@/components/ui/back-link";
 import { isManagement } from "@/lib/api/types";
 import { wajibSesi } from "@/lib/auth/session";
-import { senaraiAhliPending } from "@/lib/members/api";
+import { listPendingMembers } from "@/lib/members/api";
 
 export default async function PendingMembersPage() {
   const { accessToken, profile } = await wajibSesi();
 
   if (!isManagement(profile)) {
     return (
-      <div className="mx-auto grid max-w-3xl gap-4">
+      <div className="mx-auto grid max-w-5xl gap-4">
         <BackLink href="/profile">Kembali ke Profil</BackLink>
         <h1 className="font-heading text-3xl font-semibold tracking-tight">Ahli Pending</h1>
         <p className="rounded-xl border bg-card px-6 py-12 text-center text-sm text-muted-foreground">
@@ -21,7 +21,7 @@ export default async function PendingMembersPage() {
     );
   }
 
-  const members = await senaraiAhliPending(accessToken);
+  const members = await listPendingMembers(accessToken);
   const canVerifyStaff = ["manager", "admin", "superadmin"].includes(profile.role_key);
   const canCancelBill = ["admin", "superadmin"].includes(profile.role_key);
 

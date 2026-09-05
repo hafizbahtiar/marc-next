@@ -29,6 +29,6 @@ export type PaymentHistory = {
   outstanding_registration_fee?: boolean;
 };
 
-export function sejarahBayaran(accessToken: string): Promise<PaymentHistory> {
+export function getPaymentHistory(accessToken: string): Promise<PaymentHistory> {
   return apiFetch<PaymentHistory>("/me/payments", { accessToken });
 }

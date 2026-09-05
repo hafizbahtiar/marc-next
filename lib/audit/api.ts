@@ -16,6 +16,6 @@ export type AuditLog = {
   created_at: string;
 };
 
-export function senaraiAudit(accessToken: string): Promise<{ logs: AuditLog[] }> {
+export function listAuditLogs(accessToken: string): Promise<{ logs: AuditLog[] }> {
   return apiFetch<{ logs: AuditLog[] }>("/audit-logs?limit=50", { accessToken });
 }

@@ -17,6 +17,24 @@ export type Address = {
   state: string;
 };
 
-export function senaraiAlamat(accessToken: string): Promise<Address[]> {
+export function listAddresses(accessToken: string): Promise<Address[]> {
   return apiFetch<Address[]>("/me/addresses", { accessToken });
+}
+
+export function createAddress(
+  accessToken: string,
+  body: {
+    address_type: "landed" | "highrise";
+    unit_number: string;
+    floor?: string;
+    block?: string;
+    street: string;
+    township: string;
+    city: string;
+    postcode: string;
+    state: string;
+    is_default: boolean;
+  },
+): Promise<Address> {
+  return apiFetch<Address>("/me/addresses", { method: "POST", body, accessToken });
 }

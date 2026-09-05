@@ -3,6 +3,7 @@ import { Fraunces, Geist_Mono, Inter } from "next/font/google";
 
 import { InitialThemeScript } from "@/components/marc/initial-theme-script";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 /**
@@ -46,7 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <InitialThemeScript />
       </head>
       <body className="flex min-h-full flex-col">
-        {children}
+        <TooltipProvider>{children}</TooltipProvider>
         <Toaster />
       </body>
     </html>

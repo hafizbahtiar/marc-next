@@ -3,15 +3,17 @@ import { MapPinIcon } from "lucide-react";
 import { BackLink } from "@/components/ui/back-link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { wajibSesi } from "@/lib/auth/session";
-import { senaraiAlamat } from "@/lib/profile/addresses-api";
+import { listAddresses } from "@/lib/profile/addresses-api";
 
 export default async function AddressesPage() {
   const { accessToken } = await wajibSesi();
-  const addresses = await senaraiAlamat(accessToken);
+  const addresses = await listAddresses(accessToken);
 
   return (
-    <div className="mx-auto grid max-w-3xl gap-6">
+    <div className="mx-auto grid max-w-5xl gap-6">
       <BackLink href="/profile">Kembali ke Profil</BackLink>
       <header className="grid gap-2">
         <p className="flex items-center gap-2 text-sm font-medium text-primary">
@@ -21,6 +23,13 @@ export default async function AddressesPage() {
         <h1 className="font-heading text-3xl font-semibold tracking-tight">Alamat Saya</h1>
         <p className="text-sm text-muted-foreground">{addresses.length}/3 alamat digunakan.</p>
       </header>
+      {addresses.length < 3 ? (
+        <Button asChild className="w-fit">
+          <Link href="/profile/addresses/new">Tambah alamat</Link>
+        </Button>
+      ) : (
+        <Button className="w-fit" disabled>Had maksimum alamat dicapai</Button>
+      )}
       {addresses.length === 0 ? (
         <p className="rounded-xl border bg-card px-6 py-16 text-center text-sm text-muted-foreground">
           Tiada alamat disimpan.

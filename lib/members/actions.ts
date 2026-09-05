@@ -7,7 +7,7 @@ import { accessToken } from "@/lib/auth/session";
 
 type Hasil = { ok: true; mesej: string } | { ok: false; mesej: string };
 
-async function jalankan(
+async function runMemberAction(
   operation: (token: string) => Promise<void>,
   successMessage: string,
 ): Promise<Hasil> {
@@ -24,24 +24,24 @@ async function jalankan(
   }
 }
 
-export async function sahkanStaffAction(userId: string) {
-  return jalankan(
-    (token) => membersApi.sahkanStaff(token, userId),
+export async function verifyStaffAction(userId: string) {
+  return runMemberAction(
+    (token) => membersApi.verifyStaff(token, userId),
     "Nombor staff disahkan.",
   );
 }
 
-export async function lulusAhliAction(userId: string) {
-  return jalankan((token) => membersApi.lulusAhli(token, userId), "Ahli diluluskan.");
+export async function approveMemberAction(userId: string) {
+  return runMemberAction((token) => membersApi.approveMember(token, userId), "Ahli diluluskan.");
 }
 
-export async function tolakAhliAction(userId: string) {
-  return jalankan((token) => membersApi.tolakAhli(token, userId), "Pendaftaran ditolak.");
+export async function rejectMemberAction(userId: string) {
+  return runMemberAction((token) => membersApi.rejectMember(token, userId), "Pendaftaran ditolak.");
 }
 
-export async function batalkanBilAction(userId: string) {
-  return jalankan(
-    (token) => membersApi.batalkanBil(token, userId),
+export async function cancelRegistrationBillAction(userId: string) {
+  return runMemberAction(
+    (token) => membersApi.cancelRegistrationBill(token, userId),
     "Bil pendaftaran dibatalkan.",
   );
 }

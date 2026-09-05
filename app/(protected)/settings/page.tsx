@@ -20,7 +20,7 @@ export default async function SettingsPage() {
   const { accessToken, profile } = await wajibSesi();
 
   return (
-    <div className="mx-auto grid max-w-4xl gap-6">
+    <div className="mx-auto grid max-w-5xl gap-6">
       <header className="grid gap-2">
         <p className="text-sm font-medium text-primary">Aplikasi</p>
         <h1 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">

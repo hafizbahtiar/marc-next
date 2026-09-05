@@ -3,7 +3,7 @@
 import * as authApi from "@/lib/auth/api";
 import { accessToken } from "@/lib/auth/session";
 
-export async function janaPautanTelegramAction(): Promise<
+export async function generateTelegramLinkAction(): Promise<
   { deepLink: string; error?: never } | { deepLink?: never; error: string }
 > {
   const token = await accessToken();
@@ -17,7 +17,7 @@ export async function janaPautanTelegramAction(): Promise<
   }
 }
 
-export async function nyahikatTelegramAction(): Promise<{ error?: string }> {
+export async function unlinkTelegramAction(): Promise<{ error?: string }> {
   const token = await accessToken();
   if (!token) return { error: "Sesi anda sudah tamat." };
 
@@ -29,13 +29,13 @@ export async function nyahikatTelegramAction(): Promise<{ error?: string }> {
   }
 }
 
-export async function mintaPadamAkaunAction(): Promise<{ berjaya?: string; error?: string }> {
+export async function requestAccountDeletionAction(): Promise<{ success?: string; error?: string }> {
   const token = await accessToken();
   if (!token) return { error: "Sesi anda sudah tamat." };
 
   try {
     await authApi.mintaPadamAkaun(token);
-    return { berjaya: "Permintaan pemadaman akaun direkod. Kami akan hubungi anda." };
+    return { success: "Permintaan pemadaman akaun direkod. Kami akan hubungi anda." };
   } catch {
     return { error: "Gagal hantar permintaan. Cuba lagi." };
   }
