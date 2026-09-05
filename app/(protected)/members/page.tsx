@@ -1,6 +1,7 @@
 import { UsersIcon } from "lucide-react";
 
 import { MemberDirectory } from "@/components/members/member-directory";
+import { BackLink } from "@/components/ui/back-link";
 import { wajibSesi } from "@/lib/auth/session";
 import { senaraiAhli } from "@/lib/members/api";
 
@@ -10,6 +11,7 @@ export default async function MembersPage() {
 
   return (
     <div className="mx-auto grid max-w-5xl gap-6">
+      <BackLink href="/profile">Kembali ke Profil</BackLink>
       <header className="grid gap-2">
         <p className="flex items-center gap-2 text-sm font-medium text-primary">
           <UsersIcon className="size-4" />

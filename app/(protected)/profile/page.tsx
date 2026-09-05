@@ -1,4 +1,4 @@
-import { Clock3Icon, UsersIcon } from "lucide-react";
+import { Clock3Icon, CreditCardIcon, FileSearchIcon, MapPinIcon, UsersIcon } from "lucide-react";
 
 import { SettingNavItem } from "@/components/settings/setting-nav-item";
 import { SettingsCard } from "@/components/settings/settings-card";
@@ -30,6 +30,20 @@ export default async function ProfilePage() {
           description="Lihat direktori ahli MARC"
           href="/members"
         />
+        <SettingNavItem
+          icon={MapPinIcon}
+          label="Alamat saya"
+          description="Urus alamat yang disimpan"
+          href="/profile/addresses"
+        />
+      </SettingsCard>
+      <SettingsCard label="Kewangan">
+        <SettingNavItem
+          icon={CreditCardIcon}
+          label="Sejarah bayaran saya"
+          description="Lihat yuran dan sokongan MARC"
+          href="/payments/history"
+        />
       </SettingsCard>
       {isManagement(profile) ? (
         <SettingsCard label="Pengurusan">
@@ -38,6 +52,12 @@ export default async function ProfilePage() {
             label="Ahli pending"
             description="Semak dan luluskan pendaftaran baharu"
             href="/members/pending"
+          />
+          <SettingNavItem
+            icon={FileSearchIcon}
+            label="Jejak audit"
+            description="Lihat perubahan yang direkodkan"
+            href="/audit-logs"
           />
         </SettingsCard>
       ) : null}
