@@ -32,3 +32,24 @@ export function cancelRegistrationBill(accessToken: string, userId: string): Pro
     accessToken,
   });
 }
+
+export type MemberDetail = MemberRow & {
+  phone: string | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
+  health_notes: string | null;
+  telegram_linked: boolean | null;
+  telegram_username: string | null;
+  addresses: Array<{
+    id: string;
+    label: string | null;
+    city: string;
+    state: string;
+    postcode: string;
+    street: string | null;
+  }> | null;
+};
+
+export function getMemberDetail(accessToken: string, userId: string): Promise<MemberDetail> {
+  return apiFetch<MemberDetail>(`/members/${encodeURIComponent(userId)}`, { accessToken });
+}

@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
+import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -91,4 +92,14 @@ const memberColumns: ColumnDef<MemberRow>[] = [
     header: "Status",
     cell: ({ row }) => row.original.is_active ? <Badge variant="outline">Aktif</Badge> : <Badge variant="destructive">Tidak aktif</Badge>,
   },
+  {
+    id: "actions",
+    header: "Tindakan",
+    enableHiding: false,
+    cell: ({ row }) => <ButtonLink href={`/members/${row.original.user_id}`}>Lihat detail</ButtonLink>,
+  },
 ];
+
+function ButtonLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return <Link href={href} className="inline-flex h-8 items-center rounded-lg border px-3 text-xs font-medium transition-colors hover:bg-muted">{children}</Link>;
+}

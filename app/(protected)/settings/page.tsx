@@ -1,8 +1,11 @@
 import { Suspense } from "react";
 import {
   BookOpenIcon,
+  Building2Icon,
   CircleHelpIcon,
   InfoIcon,
+  Layers3Icon,
+  MailWarningIcon,
   MoonIcon,
   SendIcon,
 } from "lucide-react";
@@ -12,6 +15,7 @@ import { ThemeSwitch } from "@/components/marc/theme-switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SettingsCard } from "@/components/settings/settings-card";
 import { LogoutAllButton } from "@/components/settings/logout-all-button";
+import { LogoutButton } from "@/components/settings/logout-button";
 import { SettingNavItem } from "@/components/settings/setting-nav-item";
 import { DeleteAccountButton } from "@/components/settings/delete-account-button";
 import { wajibSesi } from "@/lib/auth/session";
@@ -37,6 +41,8 @@ export default async function SettingsPage() {
             ["#appearance", "Paparan"],
             ["#connections", "Sambungan"],
             ["#account", "Akaun"],
+            ...(profile.role_key === "admin" || profile.role_key === "superadmin" ? [["#activity", "Aktiviti"]] : []),
+            ...(profile.role_key === "superadmin" ? [["#system", "Sistem"]] : []),
             ["#help", "Bantuan"],
             ["#danger", "Zon bahaya"],
           ].map(([href, label]) => (
@@ -75,6 +81,34 @@ export default async function SettingsPage() {
             />
           </SettingsCard>
 
+          {["admin", "superadmin"].includes(profile.role_key) ? (
+            <SettingsCard id="activity" label="Aktiviti">
+              <SettingNavItem
+                icon={Layers3Icon}
+                label="Urus kategori"
+                description="Kategori yang digunakan untuk aktiviti"
+                href="/settings/activity-categories"
+              />
+            </SettingsCard>
+          ) : null}
+
+          {profile.role_key === "superadmin" ? (
+            <SettingsCard id="system" label="Sistem">
+              <SettingNavItem
+                icon={MailWarningIcon}
+                label="Domain emel disekat"
+                description="Urus domain yang tidak dibenarkan"
+                href="/settings/blocked-email-domains"
+              />
+              <SettingNavItem
+                icon={Building2Icon}
+                label="Bahagian/jabatan"
+                description="Urus struktur organisasi"
+                href="/settings/departments"
+              />
+            </SettingsCard>
+          ) : null}
+
           <div id="account" className="scroll-mt-24 grid gap-3">
             <h2 className="px-1 text-sm font-semibold text-muted-foreground">Akaun</h2>
             <SettingsCard label="Sesi & keselamatan">
@@ -85,6 +119,7 @@ export default async function SettingsPage() {
                 href="/settings/sessions"
               />
               <LogoutAllButton />
+              <LogoutButton />
             </SettingsCard>
           </div>
 
