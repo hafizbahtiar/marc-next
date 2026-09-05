@@ -69,14 +69,17 @@ export function PostFeed({
 
   if (pos.length === 0 && !cursor) {
     return (
-      <p className="py-12 text-center text-sm text-muted-foreground">
-        Belum ada post lagi.
-      </p>
+      <div className="grid place-items-center gap-2 rounded-2xl border border-dashed bg-card px-6 py-16 text-center">
+        <p className="font-medium">Belum ada perkongsian</p>
+        <p className="max-w-sm text-sm leading-6 text-muted-foreground">
+          Jadilah orang pertama yang berkongsi sesuatu dengan komuniti MARC.
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-3">
       {pos.map((p) => (
         <PostCard
           key={p.id}
@@ -89,17 +92,17 @@ export function PostFeed({
       ))}
 
       {cursor ? (
-        <div ref={sentinelRef} className="py-4 text-center text-sm text-muted-foreground">
+        <div ref={sentinelRef} className="min-h-10 py-4 text-center text-sm text-muted-foreground">
           {ralat ? (
-            <button type="button" onClick={loadNextPage} className="underline">
+            <button type="button" onClick={loadNextPage} className="rounded-lg px-3 py-2 underline underline-offset-4 outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">
               {ralat} - cuba lagi
             </button>
           ) : memuat ? (
-            "Memuat…"
+            <span role="status">Memuat perkongsian…</span>
           ) : null}
         </div>
       ) : (
-        <p className="py-4 text-center text-xs text-muted-foreground">- hujung feed -</p>
+        <p className="py-5 text-center text-xs text-muted-foreground">Anda sudah sampai ke hujung feed.</p>
       )}
     </div>
   );

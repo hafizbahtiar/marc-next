@@ -44,7 +44,7 @@ export function PostBoard({
   }
 
   return (
-    <>
+    <div className="grid gap-4">
       <PostComposer profile={profileSemasa} onPosBaharu={addNewPost} />
 
       <PostFeed
@@ -55,6 +55,6 @@ export function PostBoard({
         onDipadam={removePost}
         onDikemaskini={updatePost}
       />
-    </>
+    </div>
   );
 }

@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { ImagePlusIcon, XIcon } from "lucide-react";
+import { ImagePlusIcon, MegaphoneIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
@@ -104,20 +105,32 @@ export function PostComposer({
     });
   }
 
+  const nama = profile.display_name?.trim() || profile.member_id || "Ahli MARC";
+
   return (
-    <div className="grid gap-3 rounded-xl bg-card p-4 ring-1 ring-foreground/10">
-      <Textarea
-        placeholder="Kongsi sesuatu…"
-        value={kandungan}
-        onChange={(e) => setKandungan(e.target.value)}
-        maxLength={10000}
-        disabled={pending}
-      />
+    <section className="overflow-hidden rounded-2xl border bg-card shadow-sm" aria-label="Cipta post baharu">
+      <div className="flex gap-3 p-4 pb-3 sm:p-5 sm:pb-4">
+        <Avatar className="mt-0.5" size="default">
+          {profile.avatar_url ? <AvatarImage src={profile.avatar_url} alt="" /> : null}
+          <AvatarFallback>{nama.slice(0, 2).toUpperCase()}</AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1">
+          <p className="mb-2 text-sm font-semibold">{nama}</p>
+          <Textarea
+            placeholder="Apa yang ingin anda kongsikan?"
+            value={kandungan}
+            onChange={(e) => setKandungan(e.target.value)}
+            maxLength={10000}
+            disabled={pending}
+            className="min-h-20 resize-none border-0 bg-transparent px-0 py-0 text-base shadow-none focus-visible:border-0 focus-visible:ring-0 md:text-base"
+          />
+        </div>
+      </div>
 
       {gambar.length > 0 ? (
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2 px-4 sm:px-5">
           {gambar.map((g, i) => (
-            <div key={g.preview} className="relative aspect-square overflow-hidden rounded-lg ring-1 ring-foreground/10">
+            <div key={g.preview} className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted ring-1 ring-foreground/10">
               {/* eslint-disable-next-line @next/next/no-img-element -- pratonton blob: tempatan, bukan aset dioptimumkan. */}
               <img src={g.preview} alt="" className="size-full object-cover" />
               <button
@@ -138,10 +151,10 @@ export function PostComposer({
         </div>
       ) : null}
 
-      {ralat ? <p className="text-sm text-destructive">{ralat}</p> : null}
+      {ralat ? <p className="px-4 text-sm text-destructive sm:px-5">{ralat}</p> : null}
 
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+      <div className="mt-4 flex items-center justify-between gap-3 border-t bg-muted/20 px-4 py-3 sm:px-5">
+        <div className="flex items-center gap-1">
           <Button
             type="button"
             variant="ghost"
@@ -149,9 +162,11 @@ export function PostComposer({
             disabled={pending || gambar.length >= MAKS_GAMBAR}
             onClick={() => inputFailRef.current?.click()}
             aria-label="Tambah gambar"
+            title="Tambah gambar"
           >
             <ImagePlusIcon />
           </Button>
+          <span className="hidden text-xs text-muted-foreground sm:inline">Tambah gambar</span>
           <input
             ref={inputFailRef}
             type="file"
@@ -162,21 +177,27 @@ export function PostComposer({
           />
 
           {isManagement(profile) ? (
-            <label className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <label className="ml-2 flex items-center gap-1.5 border-l pl-3 text-sm text-muted-foreground">
               <Checkbox
                 checked={pengumuman}
                 onCheckedChange={(v) => setPengumuman(v === true)}
                 disabled={pending}
               />
-              Pengumuman
+              <MegaphoneIcon className="size-4" />
+              <span>Pengumuman</span>
             </label>
           ) : null}
         </div>
 
-        <Button type="button" onClick={submitPost} disabled={pending}>
+        <div className="flex items-center gap-3">
+          <span className="hidden text-xs tabular-nums text-muted-foreground sm:inline">
+            {kandungan.length.toLocaleString("ms-MY")}/10,000
+          </span>
+          <Button type="button" onClick={submitPost} disabled={pending || !kandungan.trim()} className="rounded-full px-4">
           {pending ? "Menghantar…" : "Hantar"}
-        </Button>
+          </Button>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

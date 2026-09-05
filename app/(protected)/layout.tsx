@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/marc/app-shell";
 import { ROUTES } from "@/lib/auth/routes";
 import { dapatkanSesi, skrinGate } from "@/lib/auth/session";
+import { listNotifications } from "@/lib/notifications/api";
 
 /**
  * Gate sebenar untuk kawasan aplikasi.
@@ -24,5 +25,13 @@ export default async function ProtectedLayout({ children }: LayoutProps<"/">) {
   const gate = skrinGate(sesi.profile);
   if (gate) redirect(gate);
 
-  return <AppShell profile={sesi.profile}>{children}</AppShell>;
+  let unreadNotificationCount = 0;
+  try {
+    const notifications = await listNotifications(sesi.accessToken);
+    unreadNotificationCount = notifications.notifications.filter((item) => !item.read).length;
+  } catch {
+    // Kegagalan badge tidak patut menghalang halaman utama daripada dirender.
+  }
+
+  return <AppShell profile={sesi.profile} unreadNotificationCount={unreadNotificationCount}>{children}</AppShell>;
 }

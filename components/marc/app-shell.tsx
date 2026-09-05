@@ -4,6 +4,7 @@ import { Logo } from "@/components/marc/logo";
 import { MobileNav } from "@/components/marc/mobile-nav";
 import { ProfileMenu } from "@/components/marc/profile-menu";
 import { ThemeSwitch } from "@/components/marc/theme-switch";
+import { BellIcon } from "lucide-react";
 import type { Profile } from "@/lib/api/types";
 import { ROUTES } from "@/lib/auth/routes";
 
@@ -16,11 +17,14 @@ import { ROUTES } from "@/lib/auth/routes";
  */
 export function AppShell({
   profile,
+  unreadNotificationCount,
   children,
 }: {
   profile: Profile;
+  unreadNotificationCount?: number;
   children: React.ReactNode;
 }) {
+  const unreadCount = unreadNotificationCount ?? 0;
   return (
     <div className="flex min-h-svh flex-col bg-muted/25">
       <header className="sticky top-0 z-10 border-b bg-background/90 backdrop-blur-md">
@@ -45,6 +49,18 @@ export function AppShell({
           </nav>
 
           <div className="flex items-center gap-2">
+            <Link
+              href={ROUTES.notifikasi}
+              className="relative rounded-full p-2 text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={unreadCount > 0 ? `${unreadCount} notifikasi belum dibaca` : "Notifikasi"}
+            >
+              <BellIcon className="size-5" />
+              {unreadCount > 0 ? (
+                <span className="absolute right-1 top-1 grid min-w-3.5 place-items-center rounded-full bg-destructive px-1 text-[9px] font-bold leading-3 text-destructive-foreground">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              ) : null}
+            </Link>
             <div className="hidden sm:block">
               <ThemeSwitch />
             </div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Clock3Icon, MessageCircleIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { LikeButton } from "@/components/posts/like-button";
@@ -86,23 +87,28 @@ export function PostCard({
   const nama = post.author.display_name?.trim() || post.author.member_id;
 
   return (
-    <article className="grid gap-3 rounded-xl bg-card p-4 ring-1 ring-foreground/10">
+    <article className="grid gap-3 rounded-2xl border bg-card p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
       <header className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <Avatar size="sm">
+          <Avatar>
             {post.author.avatar_url ? <AvatarImage src={post.author.avatar_url} alt="" /> : null}
             <AvatarFallback>{nama.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
-          <div>
-            <p className="flex items-center gap-2 text-sm font-medium">
+          <div className="min-w-0">
+            <p className="flex flex-wrap items-center gap-2 text-sm font-semibold">
               {nama}
               {post.type === "announcement" ? (
-                <Badge variant="secondary" className="text-primary">
+                <Badge variant="secondary" className="gap-1 text-primary">
+                  <span className="size-1.5 rounded-full bg-primary" aria-hidden />
                   Pengumuman
                 </Badge>
               ) : null}
             </p>
-            <p className="text-xs text-muted-foreground">{formatShortDate(post.created_at)}</p>
+            <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock3Icon className="size-3" aria-hidden />
+              <time dateTime={post.created_at}>{relativeTime(post.created_at)}</time>
+              {post.edited_at ? <span>(diedit)</span> : null}
+            </p>
           </div>
         </div>
       </header>
@@ -134,7 +140,7 @@ export function PostCard({
           </div>
         </div>
       ) : (
-        <p className="text-sm whitespace-pre-wrap">
+        <p className="text-[0.95rem] leading-7 whitespace-pre-wrap">
           {pautanKeDetail ? (
             <Link href={`/posts/${post.id}`} className="hover:underline">
               {post.content}
@@ -146,10 +152,10 @@ export function PostCard({
       )}
 
       {post.images.length > 0 ? (
-        <div className="grid grid-cols-2 gap-2">
+        <div className={post.images.length === 1 ? "grid" : "grid grid-cols-2 gap-2"}>
           {post.images.map((url) => (
             // eslint-disable-next-line @next/next/no-img-element -- URL R2 bertandatangan, luput; next/image cache tak sesuai.
-            <img key={url} src={url} alt="" className="aspect-video w-full rounded-lg object-cover" />
+            <img key={url} src={url} alt="" className="aspect-video w-full rounded-xl object-cover ring-1 ring-foreground/10" />
           ))}
         </div>
       ) : null}
@@ -165,7 +171,7 @@ export function PostCard({
         </div>
       ) : null}
 
-      <footer className="flex items-center gap-2">
+      <footer className="flex items-center gap-1 border-t border-border/60 pt-2">
           <LikeButton
           id={post.id}
           kiraanAwal={post.like_count}
@@ -175,13 +181,14 @@ export function PostCard({
         />
         <Link
           href={`/posts/${post.id}`}
-          className="rounded-lg px-2.5 py-1 text-sm text-muted-foreground hover:bg-muted"
+          className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
+          <MessageCircleIcon className="size-4" />
           {post.comment_count} komen
         </Link>
 
         {!menyunting && bolehEdit ? (
-          <Button type="button" size="sm" variant="ghost" className="ml-auto" onClick={() => setMenyunting(true)}>
+          <Button type="button" size="sm" variant="ghost" className="ml-auto text-muted-foreground" onClick={() => setMenyunting(true)}>
             Edit
           </Button>
         ) : null}
@@ -235,12 +242,17 @@ function CommentPreview({ comment }: { comment: NonNullable<Post["comment_previe
   );
 }
 
-function formatShortDate(iso: string): string {
+function relativeTime(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "-";
-  return new Intl.DateTimeFormat("ms-MY", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "Asia/Kuala_Lumpur",
-  }).format(d);
+  const seconds = Math.round((d.getTime() - Date.now()) / 1000);
+  const formatter = new Intl.RelativeTimeFormat("ms-MY", { numeric: "auto" });
+  if (Math.abs(seconds) < 60) return formatter.format(seconds, "second");
+  const minutes = Math.round(seconds / 60);
+  if (Math.abs(minutes) < 60) return formatter.format(minutes, "minute");
+  const hours = Math.round(minutes / 60);
+  if (Math.abs(hours) < 24) return formatter.format(hours, "hour");
+  const days = Math.round(hours / 24);
+  if (Math.abs(days) < 7) return formatter.format(days, "day");
+  return new Intl.DateTimeFormat("ms-MY", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kuala_Lumpur" }).format(d);
 }

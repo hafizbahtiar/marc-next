@@ -13,6 +13,7 @@ export const ROUTES = {
   sahkanEmel: "/verify-email",
   utama: "/",
   pos: "/posts",
+  notifikasi: "/notifications",
   profil: "/profile",
   tetapan: "/settings",
   profilEdit: "/profile/edit",

@@ -60,11 +60,13 @@ export function LikeButton({
       type="button"
       variant="ghost"
       size="sm"
+      className={cn("gap-1.5 text-muted-foreground", disuka && "text-primary hover:text-primary")}
       disabled={pending}
       onClick={toggleLike}
       aria-pressed={disuka}
+      aria-label={disuka ? `Buang suka, ${kiraan} suka` : `Suka post, ${kiraan} suka`}
     >
-      <HeartIcon className={cn("size-4", disuka && "fill-primary text-primary")} />
+      <HeartIcon className={cn("size-4", disuka && "fill-current")} />
       {kiraan}
     </Button>
   );

@@ -24,15 +24,18 @@ export default async function PostDetailPage({ params }: PageProps<"/posts/[id]"
   }
 
   return (
-    <div className="mx-auto grid max-w-3xl gap-6">
+    <div className="mx-auto grid max-w-2xl gap-5">
       <PostCard post={pos} profileSemasa={profile} pautanKeDetail={false} />
 
-      <div>
-        <h2 className="font-heading text-lg font-semibold">Komen</h2>
-        <div className="mt-4">
+      <section className="rounded-2xl border bg-card p-4 shadow-sm sm:p-5" aria-labelledby="comments-heading">
+        <div className="flex items-center justify-between gap-3 border-b pb-3">
+          <h2 id="comments-heading" className="font-heading text-lg font-semibold">Komen</h2>
+          <span className="text-xs text-muted-foreground">Sertai perbualan</span>
+        </div>
+        <div className="pt-4">
           <CommentList postId={pos.id} komenAwal={komen} profileSemasa={profile} />
         </div>
-      </div>
+      </section>
     </div>
   );
 }
