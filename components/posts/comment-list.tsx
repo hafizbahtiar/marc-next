@@ -13,7 +13,7 @@ import { ciptaKomenAction, sukaKomenAction, nyahSukaKomenAction } from "@/lib/po
 export function CommentList({
   postId,
   komenAwal,
-  profileSemasa,
+  profileSemasa: _profileSemasa,
 }: {
   postId: string;
   komenAwal: Comment[];

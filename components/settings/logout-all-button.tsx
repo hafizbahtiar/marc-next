@@ -19,7 +19,7 @@ export function LogoutAllButton() {
       <button
         type="button"
         onClick={() => setSahkan(true)}
-        className="flex w-full items-center justify-between px-4 py-3 text-left text-sm text-destructive hover:bg-destructive/10"
+        className="flex min-h-16 w-full items-center justify-between px-4 py-0 text-left text-sm text-destructive hover:bg-destructive/10"
       >
         <span className="flex items-center gap-2">
           <LogOutIcon className="size-4" />
@@ -30,7 +30,7 @@ export function LogoutAllButton() {
   }
 
   return (
-    <form action={logKeluarSemuaAction} className="flex items-center justify-between px-4 py-3">
+    <form action={logKeluarSemuaAction} className="flex min-h-16 items-center justify-between px-4 py-0">
       <span className="text-sm text-muted-foreground">Log keluar SEMUA peranti?</span>
       <div className="flex gap-2">
         <Button type="button" size="sm" variant="ghost" onClick={() => setSahkan(false)}>

@@ -6,12 +6,12 @@ import {
   InfoIcon,
   Layers3Icon,
   MailWarningIcon,
-  MoonIcon,
   SendIcon,
 } from "lucide-react";
 
 import { SessionList } from "@/components/auth/session-list";
-import { ThemeSwitch } from "@/components/marc/theme-switch";
+import { TelegramPanel } from "@/components/settings/telegram-panel";
+import { ResponsiveSheetItem, SettingsAboutSheetContent, SettingsFaqSheetContent } from "@/components/marc/responsive-sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SettingsCard } from "@/components/settings/settings-card";
 import { LogoutAllButton } from "@/components/settings/logout-all-button";
@@ -38,7 +38,6 @@ export default async function SettingsPage() {
       <div className="grid gap-8 lg:grid-cols-[190px_minmax(0,1fr)] lg:items-start">
         <nav className="flex gap-1 overflow-x-auto rounded-xl border bg-card p-1 pb-1 lg:sticky lg:top-24 lg:grid lg:overflow-visible" aria-label="Bahagian tetapan">
           {[
-            ["#appearance", "Paparan"],
             ["#connections", "Sambungan"],
             ["#account", "Akaun"],
             ...(profile.role_key === "admin" || profile.role_key === "superadmin" ? [["#activity", "Aktiviti"]] : []),
@@ -57,28 +56,14 @@ export default async function SettingsPage() {
         </nav>
 
         <div className="grid min-w-0 gap-8">
-          <SettingsCard id="appearance" label="Paparan">
-            <div className="flex items-center justify-between gap-4 px-4 py-4">
-              <div className="flex items-center gap-3">
-                <span className="grid size-9 place-items-center rounded-lg bg-secondary text-secondary-foreground">
-                  <MoonIcon className="size-4" />
-                </span>
-                <div>
-                  <p className="text-sm font-medium">Mod gelap</p>
-                  <p className="text-xs text-muted-foreground">Laraskan penampilan aplikasi.</p>
-                </div>
-              </div>
-              <ThemeSwitch />
-            </div>
-          </SettingsCard>
-
           <SettingsCard id="connections" label="Sambungan">
-            <SettingNavItem
+            <ResponsiveSheetItem
               icon={SendIcon}
               label="Telegram"
               description={profile.telegram_linked ? "Akaun Telegram disambungkan" : "Sambungkan akaun Telegram"}
-              href="/settings/telegram"
-            />
+            >
+              <TelegramPanel linked={profile.telegram_linked} username={profile.telegram_username} />
+            </ResponsiveSheetItem>
           </SettingsCard>
 
           {["admin", "superadmin"].includes(profile.role_key) ? (
@@ -125,8 +110,12 @@ export default async function SettingsPage() {
           </Suspense>
 
           <SettingsCard id="help" label="Bantuan">
-            <SettingNavItem icon={CircleHelpIcon} label="Soalan lazim" href="/settings/faq" />
-            <SettingNavItem icon={InfoIcon} label="Tentang" href="/settings/about" />
+            <ResponsiveSheetItem icon={CircleHelpIcon} label="Soalan lazim" description="Jawapan untuk perkara biasa">
+              <SettingsFaqSheetContent />
+            </ResponsiveSheetItem>
+            <ResponsiveSheetItem icon={InfoIcon} label="Tentang" description="Maklumat ringkas tentang MARC">
+              <SettingsAboutSheetContent />
+            </ResponsiveSheetItem>
           </SettingsCard>
 
           <SettingsCard id="danger" label="Zon bahaya">
