@@ -31,5 +31,10 @@ export function labelPeranti(userAgent: string | null | undefined): string {
     /Linux/.test(userAgent) ? "Linux" :
     null;
 
-  return platform ? `${pelayar} · ${platform} (web)` : `${pelayar} (web)`;
+  // Guna "-" bukan "·": nilai ni pergi terus dalam header HTTP
+  // (X-MARC-Device-Label), yang dihantar sebagai bait Latin-1 - aksara
+  // bukan-ASCII macam "·" (U+00B7) sampai sebagai bait tunggal 0xB7 yang
+  // BUKAN UTF-8 sah, dan backend tolak dengan SQLSTATE 22021 bila cuba
+  // simpan terus ke lajur Postgres (lihat issueTokens, auth.go).
+  return platform ? `${pelayar} - ${platform} (web)` : `${pelayar} (web)`;
 }
