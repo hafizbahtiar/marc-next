@@ -37,6 +37,12 @@ export function RangkaAplikasi({
             <span className="text-base font-semibold tracking-[0.14em]">MARC</span>
           </Link>
 
+          <nav className="flex items-center gap-4 text-sm font-medium">
+            <Link href={ROUTES.pos} className="text-muted-foreground hover:text-foreground">
+              Feed
+            </Link>
+          </nav>
+
           <div className="flex items-center gap-3">
             <div className="hidden text-right leading-tight sm:block">
               <p className="text-[13px] font-medium">{nama}</p>

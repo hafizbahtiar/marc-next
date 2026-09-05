@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist_Mono, Inter } from "next/font/google";
 
 import { SkripTemaAwal } from "@/components/marc/skrip-tema-awal";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 /**
@@ -44,7 +45,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <SkripTemaAwal />
       </head>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }

@@ -12,6 +12,7 @@ export const ROUTES = {
   tetapKataLaluan: "/tetap-kata-laluan",
   sahkanEmel: "/sahkan-emel",
   utama: "/",
+  pos: "/posts",
   menungguKelulusan: "/menunggu-kelulusan",
   akaunDitolak: "/akaun-ditolak",
   sahkanEmelAnda: "/sahkan-emel-anda",

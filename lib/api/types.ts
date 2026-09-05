@@ -61,3 +61,51 @@ export const CATEGORY_MANAGEMENT = "management";
 export function isManagement(profile: Profile): boolean {
   return profile.category === CATEGORY_MANAGEMENT;
 }
+
+/** `type` pada post — `postResponse.Type`, internal/http/handlers/posts_common.go. */
+export type PostType = "normal" | "announcement";
+
+/** Blok `author` sepunya pada post & comment — `authorResponse`. */
+export type PostAuthor = {
+  user_id: string;
+  member_id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+};
+
+/** GET /posts, GET /posts/:id, POST /posts, PATCH /posts/:id — `postResponse`. */
+export type Post = {
+  id: string;
+  type: PostType;
+  content: string;
+  created_at: string;
+  edited_at: string | null;
+  author: PostAuthor;
+  images: string[];
+  like_count: number;
+  comment_count: number;
+  liked_by_me: boolean;
+};
+
+/** GET /posts/:id/comments, POST /posts/:id/comments, PATCH /comments/:id — `commentResponse`. */
+export type Comment = {
+  id: string;
+  parent_comment_id: string | null;
+  content: string;
+  created_at: string;
+  edited_at: string | null;
+  author: PostAuthor;
+  like_count: number;
+  liked_by_me: boolean;
+};
+
+/** GET /posts — keyset pagination, `next_cursor` null pada halaman terakhir. */
+export type SenaraiPosRespons = {
+  posts: Post[];
+  next_cursor: string | null;
+};
+
+/** GET /posts/:id/comments. */
+export type SenaraiKomenRespons = {
+  comments: Comment[];
+};
