@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { ArrowLeftIcon, RotateCcwIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { useUnsavedChangesGuard } from "@/components/marc/unsaved-changes-guard";
@@ -13,6 +14,19 @@ import {
   publishCertificateTemplateAction,
   updateCertificateTemplateAction,
 } from "@/lib/admin/certificate-templates-actions";
+
+const DEFAULT_TEMPLATE_VALUES: CertificateTemplateInput = {
+  name: "Template MARC Standard",
+  primary_color: "#E21E28",
+  secondary_color: "#223145",
+  logo_url: "/marc-logo-penuh.png",
+  title: "Sijil Penyertaan",
+  subtitle: "MARC",
+  body_text: "Diberikan kepada [Nama penerima] atas penyertaan dalam aktiviti MARC.",
+  issuer_name: "MARC",
+  signature_name: "Pengurusan MARC",
+  footer_text: "Sijil ini dijana secara rasmi oleh MARC.",
+};
 
 export function CertificateTemplateForm({ template }: { template: CertificateTemplate }) {
   const [values, setValues] = useState<CertificateTemplateInput>(toInput(template));
@@ -48,8 +62,14 @@ export function CertificateTemplateForm({ template }: { template: CertificateTem
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.85fr)]">
+    <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
       <div className="grid gap-6">
+        <div>
+          <Button type="button" variant="ghost" onClick={() => requestNavigation(() => window.history.back())}>
+            <ArrowLeftIcon />
+            Kembali
+          </Button>
+        </div>
         {error ? (
           <Alert variant="destructive">
             <AlertTitle>Template tidak dapat disimpan</AlertTitle>
@@ -83,6 +103,10 @@ export function CertificateTemplateForm({ template }: { template: CertificateTem
         </section>
 
         <div className="flex flex-wrap justify-end gap-2">
+          <Button type="button" variant="ghost" onClick={() => setValues(DEFAULT_TEMPLATE_VALUES)}>
+            <RotateCcwIcon />
+            Reset kepada default
+          </Button>
           <Button type="button" variant="outline" onClick={() => requestNavigation(() => window.history.back())}>Batal</Button>
           <Button type="button" variant="secondary" disabled={pending} onClick={() => save()}>{pending ? "Menyimpan…" : "Simpan draf"}</Button>
           <Button type="button" disabled={pending} onClick={() => save(true)}>{pending ? "Memproses…" : "Simpan dan terbitkan"}</Button>
@@ -99,8 +123,8 @@ function CertificatePreview({ values }: { values: CertificateTemplateInput }) {
     <aside className="lg:sticky lg:top-24 lg:self-start">
       <div className="grid gap-3">
         <p className="text-sm font-medium">Pratonton sijil</p>
-        <div className="aspect-[1.414/1] rounded-xl border-8 bg-background p-5 shadow-sm sm:p-8" style={{ borderColor: values.primary_color }}>
-          {values.logo_url ? <img src={values.logo_url} alt="" className="mx-auto mb-4 h-10 max-w-32 object-contain" /> : null}
+        <div className="aspect-[1.414/1] w-full max-w-full overflow-hidden rounded-xl border-8 bg-background p-5 shadow-sm sm:p-8" style={{ borderColor: values.primary_color }}>
+          {values.logo_url ? <img src={values.logo_url} alt="" className="mx-auto mb-4 h-10 max-w-full object-contain" /> : null}
           <div className="grid h-full content-center gap-3 text-center">
             <p className="text-xs font-medium uppercase tracking-[0.2em]" style={{ color: values.secondary_color }}>{values.subtitle || "MARC"}</p>
             <h2 className="font-heading text-xl font-bold sm:text-3xl" style={{ color: values.primary_color }}>{values.title || "Sijil Penyertaan"}</h2>
@@ -119,10 +143,11 @@ function CertificatePreview({ values }: { values: CertificateTemplateInput }) {
 
 function toInput(template: CertificateTemplate): CertificateTemplateInput {
   return {
+    ...DEFAULT_TEMPLATE_VALUES,
     name: template.name,
     primary_color: template.primary_color,
     secondary_color: template.secondary_color,
-    logo_url: template.logo_url,
+    logo_url: template.logo_url || DEFAULT_TEMPLATE_VALUES.logo_url,
     title: template.title,
     subtitle: template.subtitle,
     body_text: template.body_text,
@@ -141,5 +166,34 @@ function TextAreaField({ id, label, value, onChange }: { id: string; label: stri
 }
 
 function ColorField({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (value: string) => void }) {
-  return <div className="grid gap-2"><label htmlFor={id} className="text-sm font-medium">{label}</label><div className="flex gap-2"><Input id={id} type="color" value={value} onChange={(event) => onChange(event.target.value)} className="w-12 p-1" /><Input value={value} onChange={(event) => onChange(event.target.value)} /></div></div>;
+  const presets = [
+    { value: "#E21E28", label: "Merah MARC" },
+    { value: "#223145", label: "Navy MARC" },
+    { value: "#2D3089", label: "Royal blue MARC" },
+    { value: "#FAF8F7", label: "Surface MARC" },
+  ];
+  const colorValue = /^#[0-9A-Fa-f]{6}$/.test(value) ? value : presets[0].value;
+
+  return (
+    <div className="grid gap-2">
+      <label htmlFor={id} className="text-sm font-medium">{label}</label>
+      <div className="flex gap-2">
+        <Input id={id} type="color" value={colorValue} onChange={(event) => onChange(event.target.value.toUpperCase())} className="w-12 p-1" />
+        <Input aria-label={`${label} HEX`} value={value} onChange={(event) => onChange(event.target.value.toUpperCase())} placeholder="#E21E28" />
+      </div>
+      <div className="flex flex-wrap gap-1.5" aria-label={`Preset ${label}`}>
+        {presets.map((preset) => (
+          <button
+            key={preset.value}
+            type="button"
+            title={preset.label}
+            aria-label={`Pilih ${preset.label}`}
+            className="size-6 rounded-full border border-black/15 ring-offset-2 transition hover:scale-110 focus-visible:ring-2 focus-visible:ring-ring"
+            style={{ backgroundColor: preset.value }}
+            onClick={() => onChange(preset.value)}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
