@@ -13,6 +13,18 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // Tindakan `useActionState` menerima `(prevState, formData)` walaupun
+      // ia tak menggunakan salah satunya - tandatangan itu ditetapkan oleh
+      // React, bukan oleh kami. Awalan garis bawah ialah cara isyarat
+      // "sengaja tak digunakan" yang standard.
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrors: "none" },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;

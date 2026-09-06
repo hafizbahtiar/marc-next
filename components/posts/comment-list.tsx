@@ -1,0 +1,314 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
+
+import { LikeButton } from "@/components/posts/like-button";
+import { ConfirmationDialog } from "@/components/marc/confirmation-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Textarea } from "@/components/ui/textarea";
+import type { Comment, Profile } from "@/lib/api/types";
+import {
+  createCommentAction,
+  deleteCommentAction,
+  likeCommentAction,
+  unlikeCommentAction,
+  updateCommentAction,
+} from "@/lib/posts/actions";
+import { isManagement } from "@/lib/api/types";
+import { MoreHorizontalIcon, PencilIcon, Trash2Icon } from "lucide-react";
+
+export function CommentList({
+  postId,
+  komenAwal,
+  profileSemasa,
+}: {
+  postId: string;
+  komenAwal: Comment[];
+  profileSemasa: Profile;
+}) {
+  const [komen, setKomen] = useState(komenAwal);
+
+  function addComment(newComment: Comment) {
+    setKomen((k) => [...k, newComment]);
+  }
+
+  function replaceComment(updated: Comment) {
+    setKomen((current) => current.map((comment) => comment.id === updated.id ? updated : comment));
+  }
+
+  function removeComment(id: string) {
+    setKomen((current) => current.filter((comment) => comment.id !== id));
+  }
+
+  const utama = komen.filter((k) => !k.parent_comment_id);
+  const balasanBagiInduk = (indukId: string) => komen.filter((k) => k.parent_comment_id === indukId);
+
+  return (
+    <div className="grid gap-4">
+      <CommentForm postId={postId} onHantar={addComment} />
+
+      {utama.length === 0 ? (
+        <p className="py-6 text-center text-sm text-muted-foreground">Belum ada komen.</p>
+      ) : (
+        <div className="grid gap-4">
+          {utama.map((k) => (
+            <div key={k.id} className="grid gap-3">
+              <CommentRow
+                postId={postId}
+                komen={k}
+                profileSemasa={profileSemasa}
+                onUpdated={replaceComment}
+                onDeleted={removeComment}
+              />
+              {balasanBagiInduk(k.id).length > 0 ? (
+                <div className="ml-8 grid gap-3 border-l border-border/70 pl-3">
+                  {balasanBagiInduk(k.id).map((balasan) => (
+                    <CommentRow
+                      key={balasan.id}
+                      postId={postId}
+                      komen={balasan}
+                      profileSemasa={profileSemasa}
+                      onUpdated={replaceComment}
+                      onDeleted={removeComment}
+                    />
+                  ))}
+                </div>
+              ) : null}
+              <div className="ml-8">
+                <ReplyForm postId={postId} parentCommentId={k.id} onHantar={addComment} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CommentRow({
+  postId,
+  komen,
+  profileSemasa,
+  onUpdated,
+  onDeleted,
+}: {
+  postId: string;
+  komen: Comment;
+  profileSemasa: Profile;
+  onUpdated: (comment: Comment) => void;
+  onDeleted: (id: string) => void;
+}) {
+  const nama = komen.author.display_name?.trim() || komen.author.member_id;
+  const isOwner = profileSemasa.member_id !== null && profileSemasa.member_id === komen.author.member_id;
+  const canDelete = isOwner || isManagement(profileSemasa);
+  const [editing, setEditing] = useState(false);
+  const [content, setContent] = useState(komen.content);
+  const [pending, setPending] = useState(false);
+
+  async function saveEdit() {
+    if (!content.trim() || content.trim() === komen.content) {
+      setEditing(false);
+      return;
+    }
+    setPending(true);
+    try {
+      const result = await updateCommentAction(postId, komen.id, content.trim());
+      if (!result.ok) {
+        toast.error(result.ralat);
+        return;
+      }
+      onUpdated(result.data);
+      setEditing(false);
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function remove() {
+    const result = await deleteCommentAction(postId, komen.id);
+    if (!result.ok) {
+      toast.error(result.ralat);
+      return false;
+    }
+    onDeleted(komen.id);
+    toast.success("Komen dipadam.");
+    return true;
+  }
+
+  return (
+    <div className="flex items-start gap-2.5">
+      <Link
+        href={`/members/${encodeURIComponent(komen.author.user_id)}`}
+        className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label={`Lihat profil ${nama}`}
+      >
+        <Avatar size="sm">
+          {komen.author.avatar_url ? <AvatarImage src={komen.author.avatar_url} alt="" /> : null}
+          <AvatarFallback>{nama.slice(0, 2).toUpperCase()}</AvatarFallback>
+        </Avatar>
+      </Link>
+      <div className="min-w-0 flex-1">
+        {editing ? (
+          <div className="grid gap-2">
+            <Textarea value={content} onChange={(event) => setContent(event.target.value)} maxLength={2000} disabled={pending} />
+            <div className="flex justify-end gap-2">
+              <Button type="button" size="sm" variant="ghost" onClick={() => { setContent(komen.content); setEditing(false); }} disabled={pending}>Batal</Button>
+              <Button type="button" size="sm" onClick={() => void saveEdit()} disabled={pending || !content.trim()}>Simpan</Button>
+            </div>
+          </div>
+        ) : (
+        <p className="text-sm">
+          <Link
+            href={`/members/${encodeURIComponent(komen.author.user_id)}`}
+            className="rounded-sm font-medium outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {nama}
+          </Link>{" "}
+          <span className="whitespace-pre-wrap">{komen.content}</span>
+          {komen.edited_at ? <span className="ml-1 text-xs text-muted-foreground">(disunting)</span> : null}
+        </p>
+        )}
+        {isOwner || canDelete ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" variant="ghost" size="icon-sm" className="float-right -mt-7" aria-label="Tindakan komen" disabled={pending}>
+                <MoreHorizontalIcon />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {isOwner ? <DropdownMenuItem onClick={() => setEditing(true)}><PencilIcon /> Edit</DropdownMenuItem> : null}
+              {canDelete ? (
+                <ConfirmationDialog
+                  title="Padam komen?"
+                  description="Komen ini akan dipadam dan tindakan ini tidak boleh dibuat asal."
+                  confirmLabel="Padam"
+                  trigger={<DropdownMenuItem onSelect={(event) => event.preventDefault()} className="text-destructive"><Trash2Icon /> Padam</DropdownMenuItem>}
+                  onConfirm={remove}
+                />
+              ) : null}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
+              <LikeButton
+          id={komen.id}
+          kiraanAwal={komen.like_count}
+          disukaAwal={komen.liked_by_me}
+          suka={likeCommentAction}
+          nyahSuka={unlikeCommentAction}
+        />
+      </div>
+    </div>
+  );
+}
+
+function CommentForm({
+  postId,
+  onHantar,
+}: {
+  postId: string;
+  onHantar: (komen: Comment) => void;
+}) {
+  const [isi, setIsi] = useState("");
+  const [pending, setPending] = useState(false);
+
+  async function submit() {
+    if (!isi.trim()) return;
+    setPending(true);
+    try {
+      const hasil = await createCommentAction(postId, isi.trim());
+      if (!hasil.ok) {
+        toast.error(hasil.ralat);
+        return;
+      }
+      onHantar(hasil.data);
+      setIsi("");
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <div className="grid gap-2">
+      <Textarea
+        placeholder="Tulis komen…"
+        value={isi}
+        onChange={(e) => setIsi(e.target.value)}
+        maxLength={2000}
+        disabled={pending}
+        className="min-h-14"
+      />
+      <Button type="button" size="sm" className="justify-self-end" onClick={submit} disabled={pending || !isi.trim()}>
+        {pending ? "Menghantar…" : "Hantar komen"}
+      </Button>
+    </div>
+  );
+}
+
+function ReplyForm({
+  postId,
+  parentCommentId,
+  onHantar,
+}: {
+  postId: string;
+  parentCommentId: string;
+  onHantar: (komen: Comment) => void;
+}) {
+  const [terbuka, setTerbuka] = useState(false);
+  const [isi, setIsi] = useState("");
+  const [pending, setPending] = useState(false);
+
+  async function submit() {
+    if (!isi.trim()) return;
+    setPending(true);
+    try {
+      const hasil = await createCommentAction(postId, isi.trim(), parentCommentId);
+      if (!hasil.ok) {
+        toast.error(hasil.ralat);
+        return;
+      }
+      onHantar(hasil.data);
+      setIsi("");
+      setTerbuka(false);
+    } finally {
+      setPending(false);
+    }
+  }
+
+  if (!terbuka) {
+    return (
+      <button type="button" onClick={() => setTerbuka(true)} className="text-xs text-muted-foreground hover:underline">
+        Balas
+      </button>
+    );
+  }
+
+  return (
+    <div className="grid gap-2">
+      <Textarea
+        placeholder="Tulis balasan…"
+        value={isi}
+        onChange={(e) => setIsi(e.target.value)}
+        maxLength={2000}
+        disabled={pending}
+        className="min-h-14"
+      />
+      <div className="flex justify-end gap-2">
+        <Button type="button" size="sm" variant="ghost" onClick={() => setTerbuka(false)} disabled={pending}>
+          Batal
+        </Button>
+        <Button type="button" size="sm" onClick={submit} disabled={pending || !isi.trim()}>
+          {pending ? "Menghantar…" : "Hantar"}
+        </Button>
+      </div>
+    </div>
+  );
+}

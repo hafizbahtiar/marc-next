@@ -1,26 +1,243 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-fraunces);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /*
+   * Token jenama dan semantik yang TIADA slot dalam set shadcn standard.
+   * Padanan `AppTheme` (marc_flutter/lib/app/theme.dart): `brandNavy` dan
+   * `brandRoyal` ialah warna sebenar, bukan permukaan - ia diperlukan
+   * secara terus (panel jenama, lencana), bukan melalui `--secondary`
+   * yang bermaksud "permukaan kedua" dalam shadcn.
+   */
+  --color-brand-red: var(--brand-red);
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-navy-foreground: var(--brand-navy-foreground);
+  --color-brand-royal: var(--brand-royal);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/*
+ * Palet MARC - dipetakan daripada `AppTheme.lightScheme`
+ * (marc_flutter/lib/app/theme.dart), yang pula diterbitkan daripada
+ * `assets/splash/full_logo_android12.png`: merah perisai #E21E28,
+ * navy ikon/wordmark #223145, biru diraja huruf "MARC" #2D3089.
+ *
+ * Aplikasi Flutter ialah SUMBER KEBENARAN untuk warna. Templat emel
+ * dalam marc_go masih menggunakan palet hijau lama (#2F6B4F) - itu
+ * kerja susulan, bukan pilihan reka bentuk.
+ *
+ * Nota pemetaan: `secondary` Material ≠ `--secondary` shadcn. Dalam
+ * Material ia warna JENAMA kedua (navy pekat); dalam shadcn ia
+ * PERMUKAAN untuk butang sekunder. Jadi `--secondary` di sini mengambil
+ * `secondaryContainer` Flutter, dan navy sebenar hidup dalam
+ * `--brand-navy`.
+ */
+:root {
+  /* Jejari 12px - padanan `BorderRadius.circular(12)` pada input dan
+     butang dalam AppTheme._build. */
+  --radius: 0.75rem;
+
+  --background: #faf8f7; /* surface */
+  --foreground: #1b1a1a; /* onSurface */
+
+  /* Flutter tak memisahkan warna kad; putih tulen di atas surface
+     #FAF8F7 memberi kenaikan yang cukup tanpa sempadan tambahan. */
+  --card: #ffffff;
+  --card-foreground: #1b1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1b1a1a;
+
+  --primary: #e21e28; /* brandRed */
+  --primary-foreground: #ffffff;
+
+  --secondary: #d9e2f2; /* secondaryContainer */
+  --secondary-foreground: #16202f; /* onSecondaryContainer */
+
+  --muted: #f1ecec; /* surfaceContainerHighest */
+  --muted-foreground: #5f5a5a; /* onSurfaceVariant */
+
+  /* Neutral, bukan bertona merah: `--accent` ialah keadaan tuding untuk
+     butang hantu dan item menu. Merah di situ menjadikan setiap tudingan
+     kelihatan seperti tindakan merosakkan. */
+  --accent: #f1ecec;
+  --accent-foreground: #1b1a1a;
+
+  --destructive: #b3261e; /* error */
+
+  --border: #e6dede; /* outlineVariant */
+  --input: #e6dede;
+  --ring: #e21e28;
+
+  --brand-red: #e21e28;
+  --brand-navy: #223145;
+  --brand-navy-foreground: #f5f0ef;
+  --brand-royal: #2d3089;
+
+  --warning: #8a5a00;
+  --warning-bg: #fbefd3;
+  /* #146B41 atas #DBF1E4 = 5.5:1 - selamat untuk label chip 12px.
+     SENGAJA hijau dan bukan warna jenama: status positif mengikut
+     konvensyen, bukan palet. Padanan komen AppSemanticColors. */
+  --success: #146b41;
+  --success-bg: #dbf1e4;
+
+  --chart-1: #e21e28;
+  --chart-2: #223145;
+  --chart-3: #2d3089;
+  --chart-4: #8a5a00;
+  --chart-5: #146b41;
+
+  --sidebar: #f1ecec;
+  --sidebar-foreground: #1b1a1a;
+  --sidebar-primary: #e21e28;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #d9e2f2;
+  --sidebar-accent-foreground: #16202f;
+  --sidebar-border: #e6dede;
+  --sidebar-ring: #e21e28;
+}
+
+/*
+ * Padanan `AppTheme.darkScheme`. Merah #E21E28 jatuh di bawah 4.5:1 atas
+ * #171718, jadi mod gelap menaikkannya kepada #FF8A85 dan bukan
+ * menggunakan warna jenama yang sama - sama keputusan seperti Flutter.
+ */
+.dark {
+  --background: #171718; /* surface */
+  --foreground: #ebe8e7; /* onSurface */
+
+  --card: #1f1e20;
+  --card-foreground: #ebe8e7;
+  --popover: #1f1e20;
+  --popover-foreground: #ebe8e7;
+
+  --primary: #ff8a85;
+  --primary-foreground: #5e0f12;
+
+  --secondary: #33415a; /* secondaryContainer */
+  --secondary-foreground: #d9e2f2;
+
+  --muted: #262323; /* surfaceContainerHighest */
+  --muted-foreground: #a9a2a1; /* onSurfaceVariant */
+
+  --accent: #262323;
+  --accent-foreground: #ebe8e7;
+
+  --destructive: #ffb4a9;
+
+  --border: #332f2f; /* outlineVariant */
+  --input: #4c4747; /* outline */
+  --ring: #ff8a85;
+
+  /* Navy kekal sebagai navy dalam mod gelap - ia sudah pun gelap, dan
+     wordmark putih di atasnya ialah pasangan yang sama seperti mod
+     cerah. Hanya merah yang perlu dicerahkan. */
+  --brand-red: #ff8a85;
+  --brand-navy: #1a2534;
+  --brand-navy-foreground: #ebe8e7;
+  --brand-royal: #9aa0f0;
+
+  --warning: #e3b255;
+  --warning-bg: #3a2e12;
+  --success: #6fd79e;
+  --success-bg: #123424;
+
+  --chart-1: #ff8a85;
+  --chart-2: #a9b8d8;
+  --chart-3: #9aa0f0;
+  --chart-4: #e3b255;
+  --chart-5: #6fd79e;
+
+  --sidebar: #1f1e20;
+  --sidebar-foreground: #ebe8e7;
+  --sidebar-primary: #ff8a85;
+  --sidebar-primary-foreground: #5e0f12;
+  --sidebar-accent: #33415a;
+  --sidebar-accent-foreground: #d9e2f2;
+  --sidebar-border: #332f2f;
+  --sidebar-ring: #ff8a85;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/*
+ * Peralihan tema - lihat `SuisTema`.
+ *
+ * Peralihan silang-pudar lalai dimatikan supaya `clip-path` yang
+ * dianimasikan itu SAHAJA yang kelihatan; tanpa ini, kedua-dua kesan
+ * berjalan serentak dan bulatan itu kelihatan berkabur. Susunan z
+ * meletakkan tema baharu DI ATAS yang lama, kerana bulatan itu
+ * mendedahkannya dari tengah keluar.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
 }
