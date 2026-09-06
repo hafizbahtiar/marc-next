@@ -118,24 +118,134 @@ export function CertificateTemplateForm({ template }: { template: CertificateTem
   );
 }
 
+// Fallback SAMA seperti defaultTemplateStyle() dalam
+// marc_go/internal/certificate/certificate.go. Kalau yang sana berubah,
+// yang sini kena ikut - kalau tidak pratonton menipu.
+const FALLBACK = {
+  primary_color: "#105e4a",
+  secondary_color: "#093d30",
+  title: "SIJIL PENYERTAAN",
+  subtitle: "Dengan ini disahkan bahawa",
+  body_text: "telah menyertai",
+};
+
+// Bahagian per-sijil: bukan sebahagian template, jadi ia contoh sahaja.
+const CONTOH = {
+  serial: "MARC-2026-0001",
+  recipient: "Ahmad bin Abdullah",
+  activity: "Gotong-Royong Perdana MARC",
+  meta: "Kemasyarakatan  •  6 September 2026",
+};
+
+const MUTED = "#6e747a";
+
+// Saiz fon fpdf dalam pt; viewBox SVG dalam mm. 1pt = 25.4/72 mm.
+const pt = (size: number) => size * (25.4 / 72);
+
+// Cermin hexColor() dalam certificate.go: apa-apa yang bukan 6 digit hex
+// jatuh balik ke warna lalai, jadi warna tak sah dipratonton sebagaimana
+// ia akan dicetak - bukan sebagaimana ia ditaip.
+function hexColor(value: string, fallback: string) {
+  const hex = value.startsWith("#") ? value.slice(1) : value;
+  return /^[0-9a-fA-F]{6}$/.test(hex) ? `#${hex}` : fallback;
+}
+
+// templateStyle() menyemak `== ""` tanpa trim - ikut sama.
+function orFallback(value: string, fallback: string) {
+  return value === "" ? fallback : value;
+}
+
+// CertificatePreview melukis semula susun atur GeneratePDF dalam SVG,
+// dalam sistem koordinat yang sama (A4 landskap, 297x210mm). Setiap
+// kedudukan di bawah datang terus daripada drawBorder/drawHeading/
+// drawRecipient/drawFooter, termasuk cMargin 1mm fpdf pada teks rata
+// kiri/kanan dan pemusatan menegak dalam setiap sel.
+//
+// Teks yang terlalu panjang SENGAJA dibiar melimpah keluar viewBox:
+// GeneratePDF tidak memotong medan template, jadi pratonton yang
+// membalut teks akan menyembunyikan sijil yang rosak.
 function CertificatePreview({ values }: { values: CertificateTemplateInput }) {
+  const primary = hexColor(values.primary_color, FALLBACK.primary_color);
+  const secondary = hexColor(values.secondary_color, FALLBACK.secondary_color);
+  const title = orFallback(values.title, FALLBACK.title);
+  const subtitle = orFallback(values.subtitle, FALLBACK.subtitle);
+  const bodyText = orFallback(values.body_text, FALLBACK.body_text);
+
   return (
     <aside className="lg:sticky lg:top-24 lg:self-start">
       <div className="grid gap-3">
         <p className="text-sm font-medium">Pratonton sijil</p>
-        <div className="aspect-[1.414/1] w-full max-w-full overflow-hidden rounded-xl border-8 bg-background p-5 shadow-sm sm:p-8" style={{ borderColor: values.primary_color }}>
-          {values.logo_url ? <img src={values.logo_url} alt="" className="mx-auto mb-4 h-10 max-w-full object-contain" /> : null}
-          <div className="grid h-full content-center gap-3 text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.2em]" style={{ color: values.secondary_color }}>{values.subtitle || "MARC"}</p>
-            <h2 className="font-heading text-xl font-bold sm:text-3xl" style={{ color: values.primary_color }}>{values.title || "Sijil Penyertaan"}</h2>
-            <p className="text-xs leading-5 text-muted-foreground">{values.body_text || "Diberikan kepada [Nama penerima] atas penyertaan dalam aktiviti MARC."}</p>
-            <div className="mt-4 grid gap-1 text-xs">
-              <span className="font-semibold">{values.signature_name || "Nama penandatangan"}</span>
-              <span className="text-muted-foreground">{values.issuer_name || "Penerbit sijil"}</span>
-            </div>
-          </div>
-          <p className="mt-4 text-center text-[10px] text-muted-foreground">{values.footer_text || "Sijil ini dijana secara rasmi oleh MARC."}</p>
-        </div>
+        <svg
+          viewBox="0 0 297 210"
+          role="img"
+          aria-label={`Pratonton sijil ${title}`}
+          xmlSpace="preserve"
+          className="w-full rounded-xl border shadow-sm"
+          style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
+        >
+          <rect x="0" y="0" width="297" height="210" fill="#ffffff" />
+
+          {/* drawBorder */}
+          <rect x="0" y="0" width="297" height="14" fill={primary} />
+          <rect x="0" y="14" width="297" height="1.6" fill={secondary} />
+          <rect x="10" y="22" width="277" height="178" fill="none" stroke={primary} strokeWidth="0.6" />
+
+          {/* drawHeading - "MARC" dikodkan keras dalam PDF, bukan issuer_name */}
+          <text x="21" y="7" fill="#ffffff" fontSize={pt(15)} fontWeight="700" dominantBaseline="central">
+            MARC
+          </text>
+          <text x="148.5" y="49" fill={primary} fontSize={pt(30)} fontWeight="700" textAnchor="middle" dominantBaseline="central">
+            {title}
+          </text>
+          <text x="148.5" y="60" fill={MUTED} fontSize={pt(11)} textAnchor="middle" dominantBaseline="central">
+            {subtitle}
+          </text>
+
+          {/* drawRecipient */}
+          <text x="148.5" y="85" fill={secondary} fontSize={pt(26)} fontWeight="700" textAnchor="middle" dominantBaseline="central">
+            {CONTOH.recipient}
+          </text>
+          <text x="148.5" y="96" fill={MUTED} fontSize={pt(11)} textAnchor="middle" dominantBaseline="central">
+            {bodyText}
+          </text>
+          <text x="148.5" y="105" fill={primary} fontSize={pt(16)} fontWeight="700" textAnchor="middle" dominantBaseline="central">
+            {CONTOH.activity}
+          </text>
+          <text x="148.5" y="113.5" fill={MUTED} fontSize={pt(11)} textAnchor="middle" dominantBaseline="central">
+            {CONTOH.meta}
+          </text>
+
+          {/* drawFooter - kod QR sebenar dijana per-sijil daripada URL sahih */}
+          <rect x="249" y="152" width="28" height="28" fill="#f1f2f4" stroke="#d6d9dd" strokeWidth="0.4" />
+          <rect x="252" y="155" width="6" height="6" fill="#c3c7cc" />
+          <rect x="268" y="155" width="6" height="6" fill="#c3c7cc" />
+          <rect x="252" y="171" width="6" height="6" fill="#c3c7cc" />
+          <text x="263" y="167" fill="#9aa0a6" fontSize={pt(7)} textAnchor="middle" dominantBaseline="central">
+            QR
+          </text>
+          <text x="21" y="168.5" fill={MUTED} fontSize={pt(9)} dominantBaseline="central">
+            {`No. Sijil  ${CONTOH.serial}`}
+          </text>
+          <text x="21" y="173.5" fill={MUTED} fontSize={pt(9)} dominantBaseline="central">
+            {values.footer_text}
+          </text>
+          <text x="276" y="168.5" fill={MUTED} fontSize={pt(9)} textAnchor="end" dominantBaseline="central">
+            {values.signature_name}
+          </text>
+          <text x="276" y="173.5" fill={MUTED} fontSize={pt(9)} textAnchor="end" dominantBaseline="central">
+            {values.issuer_name}
+          </text>
+        </svg>
+
+        <p className="text-xs leading-5 text-muted-foreground">
+          Susun atur mengikut PDF sebenar. Nama penerima, nama aktiviti, nombor siri dan kod QR di atas
+          hanyalah contoh - setiap sijil mengisinya sendiri.
+        </p>
+        {values.logo_url ? (
+          <p className="text-xs leading-5 text-amber-700 dark:text-amber-300">
+            Logo belum digunakan pada PDF sijil, jadi ia tidak dipratonton di sini.
+          </p>
+        ) : null}
       </div>
     </aside>
   );

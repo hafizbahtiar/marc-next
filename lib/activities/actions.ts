@@ -10,7 +10,6 @@ import {
   cancelManagedActivity,
   checkoutActivity,
   createManagedActivity,
-  getCertificateFile,
   listActivityRegistrants,
   listActivities,
   markAttendance,
@@ -115,11 +114,8 @@ export async function getCertificateFileAction(
   id: string,
 ): Promise<ActivityActionResult<{ url: string }>> {
   try {
-    const data = await getCertificateFile(await getToken(), id);
-    if (!data.url.startsWith("https://")) {
-      return { ok: false, error: "Pautan sijil tidak sah." };
-    }
-    return { ok: true, data };
+    if (!id.trim()) return { ok: false, error: "Sijil tidak sah." };
+    return { ok: true, data: { url: `/api/certificates/${encodeURIComponent(id)}/file` } };
   } catch (error) {
     return { ok: false, ...actionError(error) };
   }

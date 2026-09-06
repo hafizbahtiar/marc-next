@@ -56,9 +56,9 @@ function CertificateCard({ certificate }: { certificate: MyCertificate }) {
           <dd className="font-medium">{certificate.serial || "-"}</dd>
         </div>
       </dl>
-      <Button type="button" variant="outline" onClick={download} disabled={pending || !certificate.file_ready}>
+      <Button type="button" variant="outline" onClick={download} disabled={pending}>
         <DownloadIcon />
-        {pending ? "Menyediakan…" : certificate.file_ready ? "Muat turun sijil" : "Sijil sedang disediakan"}
+        {pending ? "Menyediakan…" : "Muat turun sijil"}
       </Button>
     </article>
   );
