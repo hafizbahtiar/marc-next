@@ -7,9 +7,11 @@ import { toast } from "sonner";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useUnsavedChangesGuard } from "@/components/marc/unsaved-changes-guard";
 import type { Activity, ActivityCategory, ActivityInput, ActivitySessionInput } from "@/lib/activities/api";
 import {
   cancelManagedActivityAction,
@@ -53,6 +55,24 @@ export function ActivityForm({
   const [cancelReason, setCancelReason] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const formSnapshot = JSON.stringify({
+    title,
+    description,
+    categoryId,
+    locationName,
+    locationAddress,
+    opensAt,
+    closesAt,
+    capacity,
+    fee,
+    threshold,
+    sessions,
+    cancelReason,
+  });
+  const [initialSnapshot] = useState(formSnapshot);
+  const { markClean, requestNavigation, dialog } = useUnsavedChangesGuard(
+    initialSnapshot !== formSnapshot,
+  );
 
   function updateSession(key: string, patch: Partial<SessionDraft>) {
     setSessions((current) => current.map((session) => session.key === key ? { ...session, ...patch } : session));
@@ -83,6 +103,7 @@ export function ActivityForm({
           return;
         }
       }
+      markClean();
       toast.success(activity ? "Aktiviti dikemas kini." : "Aktiviti dicipta sebagai draf.");
       router.push(activity ? `/activities/${activity.id}` : "/activities");
       router.refresh();
@@ -97,6 +118,7 @@ export function ActivityForm({
         setFormError(result.error);
         return;
       }
+      markClean();
       toast.success("Aktiviti diterbitkan.");
       router.push(`/activities/${activity.id}`);
       router.refresh();
@@ -114,6 +136,7 @@ export function ActivityForm({
         setFormError(result.error);
         return;
       }
+      markClean();
       toast.success("Aktiviti dibatalkan.");
       router.push(`/activities/${activity.id}`);
       router.refresh();
@@ -147,8 +170,8 @@ export function ActivityForm({
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id="location-name" label="Nama lokasi" value={locationName} onChange={setLocationName} />
           <Field id="location-address" label="Alamat lokasi" value={locationAddress} onChange={setLocationAddress} />
-          <Field id="registration-opens" label="Pendaftaran dibuka" type="datetime-local" value={opensAt} onChange={setOpensAt} />
-          <Field id="registration-closes" label="Pendaftaran ditutup" type="datetime-local" value={closesAt} onChange={setClosesAt} required />
+          <DateTimeField id="registration-opens" label="Pendaftaran dibuka" value={opensAt} onChange={setOpensAt} />
+          <DateTimeField id="registration-closes" label="Pendaftaran ditutup" value={closesAt} onChange={setClosesAt} />
           <Field id="capacity" label="Kapasiti (kosong = tiada had)" type="number" min="1" value={capacity} onChange={setCapacity} />
           <Field id="fee" label="Yuran (RM)" type="number" min="0" step="0.01" value={fee} onChange={setFee} />
           <Field id="threshold" label="Ambang kehadiran (%)" type="number" min="1" max="100" value={threshold} onChange={setThreshold} />
@@ -163,15 +186,15 @@ export function ActivityForm({
         {sessions.map((session, index) => (
           <div key={session.key} className="grid gap-3 rounded-xl bg-muted/40 p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end">
             <Field id={`session-title-${session.key}`} label={`Sesi ${index + 1}`} value={session.title} onChange={(value) => updateSession(session.key, { title: value })} />
-            <Field id={`session-start-${session.key}`} label="Mula" type="datetime-local" value={session.starts_at} onChange={(value) => updateSession(session.key, { starts_at: value })} />
-            <Field id={`session-end-${session.key}`} label="Tamat" type="datetime-local" value={session.ends_at} onChange={(value) => updateSession(session.key, { ends_at: value })} />
+            <DateTimeField id={`session-start-${session.key}`} label="Mula" value={session.starts_at} onChange={(value) => updateSession(session.key, { starts_at: value })} />
+            <DateTimeField id={`session-end-${session.key}`} label="Tamat" value={session.ends_at} onChange={(value) => updateSession(session.key, { ends_at: value })} />
             <Button type="button" variant="ghost" size="icon-sm" aria-label="Buang sesi" disabled={sessions.length === 1} onClick={() => setSessions((current) => current.filter((item) => item.key !== session.key))}><Trash2Icon /></Button>
           </div>
         ))}
       </section>
 
       <div className="flex flex-wrap justify-end gap-2">
-        <Button type="button" variant="outline" onClick={() => router.back()}>Batal</Button>
+        <Button type="button" variant="outline" onClick={() => requestNavigation(() => router.back())}>Batal</Button>
         <Button type="button" onClick={submit} disabled={pending}>{pending ? "Menyimpan…" : "Simpan aktiviti"}</Button>
       </div>
 
@@ -187,12 +210,32 @@ export function ActivityForm({
           <Button type="button" variant="destructive" onClick={cancel} disabled={pending || !cancelReason.trim()}>Batalkan aktiviti</Button>
         </div>
       ) : null}
+      {dialog}
     </div>
   );
 }
 
 function Field({ id, label, value, onChange, type = "text", ...props }: { id: string; label: string; value: string; onChange: (value: string) => void; type?: string; [key: string]: unknown }) {
   return <div className="grid gap-2"><label htmlFor={id} className="text-sm font-medium">{label}</label><Input id={id} type={type} value={value} onChange={(event) => onChange(event.target.value)} {...props} /></div>;
+}
+
+function DateTimeField({
+  id,
+  label,
+  value,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="grid gap-2">
+      <label htmlFor={id} className="text-sm font-medium">{label}</label>
+      <DateTimePicker id={id} value={value} onChange={onChange} />
+    </div>
+  );
 }
 
 function newSession(): SessionDraft {

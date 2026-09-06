@@ -3,6 +3,7 @@ import {
   BookOpenIcon,
   Building2Icon,
   CreditCardIcon,
+  AwardIcon,
   Layers3Icon,
   MailWarningIcon,
 } from "lucide-react";
@@ -72,6 +73,12 @@ export default async function SettingsPage() {
                 label="Log bayaran"
                 description="Pantau bayaran dan reconcile gateway"
                 href="/admin/payments"
+              />
+              <SettingNavItem
+                icon={AwardIcon}
+                label="Template sijil"
+                description="Urus reka bentuk global sijil aktiviti"
+                href="/settings/certificate-templates"
               />
             </SettingsCard>
           ) : null}
