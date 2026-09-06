@@ -51,6 +51,7 @@ export async function kemaskiniProfilAction(
   const avatarR2Key = formData.has("avatar_r2_key")
     ? String(formData.get("avatar_r2_key"))
     : undefined;
+  const updatedAt = String(formData.get("updated_at") ?? "");
 
   const token = await accessToken();
   if (!token) {
@@ -58,7 +59,7 @@ export async function kemaskiniProfilAction(
   }
 
   try {
-    await kemaskiniProfil(token, { ...disahkan.data, avatar_r2_key: avatarR2Key });
+    await kemaskiniProfil(token, { ...disahkan.data, updated_at: updatedAt, avatar_r2_key: avatarR2Key });
   } catch (error) {
     return keadaanRalat(error, nilai);
   }

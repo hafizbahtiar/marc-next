@@ -16,6 +16,7 @@ export function kemaskiniProfil(
     emergency_contact_name: string;
     emergency_contact_phone: string;
     health_notes: string;
+    updated_at: string;
     avatar_r2_key?: string;
   },
 ): Promise<Profile> {

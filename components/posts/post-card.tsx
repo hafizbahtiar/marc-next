@@ -48,7 +48,7 @@ export function PostCard({
   async function saveEdit() {
     setPending(true);
     try {
-      const hasil = await updatePostAction(post.id, kandungan.trim());
+      const hasil = await updatePostAction(post.id, kandungan.trim(), post.updated_at);
       if (!hasil.ok) {
         toast.error(hasil.ralat);
         return;
@@ -63,7 +63,7 @@ export function PostCard({
   async function deletePost(): Promise<boolean> {
     setPending(true);
     try {
-      const hasil = await deletePostAction(post.id);
+      const hasil = await deletePostAction(post.id, post.updated_at);
       if (!hasil.ok) {
         toast.error(hasil.ralat);
         return false;

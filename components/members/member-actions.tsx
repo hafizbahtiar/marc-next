@@ -55,7 +55,7 @@ export function MemberActions({
   const canCorrectIds = ["admin", "superadmin"].includes(roleKey) && roleRank > member.role_rank;
 
   async function updateRole() {
-    const result = await updateMemberRoleAction(member.user_id, selectedRole);
+    const result = await updateMemberRoleAction(member.user_id, selectedRole, member.updated_at);
     toast[result.ok ? "success" : "error"](result.mesej);
     if (result.ok) router.refresh();
   }
@@ -65,6 +65,7 @@ export function MemberActions({
       member.user_id,
       departmentCode === "none" ? null : departmentCode,
       position.trim() || null,
+      member.updated_at,
     );
     toast[result.ok ? "success" : "error"](result.mesej);
     if (result.ok) router.refresh();
@@ -113,7 +114,7 @@ export function MemberActions({
               </Button>
             }
             onConfirm={async () => {
-              const result = await updateMemberActiveAction(member.user_id, !member.is_active);
+              const result = await updateMemberActiveAction(member.user_id, !member.is_active, member.updated_at);
               if (result.ok) router.refresh();
               else toast.error(result.mesej);
               return result.ok;

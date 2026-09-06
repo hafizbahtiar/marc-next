@@ -128,6 +128,72 @@ export function LegacyImportConsole({ batches }: { batches: LegacyImportBatch[] 
           )}
         </CardContent>
       </Card>
+
+      {batches.map((batch) => (
+        <Card key={`${batch.id}-rows`}>
+          <CardHeader>
+            <CardTitle className="text-base">
+              Senarai row: {batch.source_filename}
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Semua {batch.total_rows} row dipaparkan. Row merah mempunyai konflik dan tidak akan diimport.
+            </p>
+          </CardHeader>
+          <CardContent className="overflow-x-auto">
+            <table className="w-full min-w-[980px] text-sm">
+              <thead className="border-b text-left text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2 font-medium">Row</th>
+                  <th className="px-3 py-2 font-medium">Ahli</th>
+                  <th className="px-3 py-2 font-medium">Emel</th>
+                  <th className="px-3 py-2 font-medium">Bahagian</th>
+                  <th className="px-3 py-2 font-medium">Akaun</th>
+                  <th className="px-3 py-2 font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {batch.rows?.map((row) => {
+                  const hasConflict = row.conflicts.length > 0 || row.status === "conflict";
+                  return (
+                    <tr key={row.id} className={hasConflict ? "border-b bg-destructive/5 align-top" : "border-b align-top"}>
+                      <td className="px-3 py-3">{row.source_row}</td>
+                      <td className="px-3 py-3">
+                        <p className="font-medium">{row.display_name || "Tanpa nama"}</p>
+                        <p className="text-xs text-muted-foreground">{row.member_id || "No. ahli tiada"}</p>
+                      </td>
+                      <td className="px-3 py-3">{row.email}</td>
+                      <td className="px-3 py-3">{row.department_code || "—"}</td>
+                      <td className="px-3 py-3">
+                        {row.user_id ? (
+                          <span className="text-emerald-700 dark:text-emerald-400">Dipadankan</span>
+                        ) : (
+                          <span className="text-muted-foreground">Belum ada akaun</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-3">
+                        {hasConflict ? (
+                          <div className="grid gap-1 text-destructive">
+                            <span className="font-medium">Konflik</span>
+                            {row.conflicts.map((conflict) => (
+                              <span key={conflict.code} className="text-xs">
+                                {conflict.message}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-emerald-700 dark:text-emerald-400">
+                            {row.status === "imported" ? "Sudah diimport" : "Lulus"}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

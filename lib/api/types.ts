@@ -43,6 +43,7 @@ export type Profile = {
   position: string | null;
   staff_id: string;
   staff_id_verified_at: string | null;
+  updated_at: string;
 };
 
 /** GET /members - directory row returned according to caller visibility. */
@@ -63,6 +64,7 @@ export type MemberRow = {
   position: string | null;
   staff_id: string | null;
   staff_id_verified_at: string | null;
+  updated_at: string;
   registration_payment_status: string | null;
 };
 
@@ -100,6 +102,7 @@ export type Post = {
   type: PostType;
   content: string;
   created_at: string;
+  updated_at: string;
   edited_at: string | null;
   author: PostAuthor;
   images: string[];
@@ -115,6 +118,7 @@ export type Comment = {
   parent_comment_id: string | null;
   content: string;
   created_at: string;
+  updated_at: string;
   edited_at: string | null;
   author: PostAuthor;
   like_count: number;

@@ -8,6 +8,7 @@ export type ActivityCategory = {
   name: string;
   sort_order: number;
   is_active: boolean;
+  updated_at: string;
 };
 
 export type BlockedDomain = {
@@ -29,7 +30,7 @@ export function createActivityCategory(token: string, body: { key: string; name:
   return apiFetch<ActivityCategory>("/activity-categories", { method: "POST", body, accessToken: token });
 }
 
-export function updateActivityCategory(token: string, id: string, body: Partial<Pick<ActivityCategory, "name" | "sort_order" | "is_active">>) {
+export function updateActivityCategory(token: string, id: string, body: Partial<Pick<ActivityCategory, "name" | "sort_order" | "is_active">> & { updated_at: string }) {
   return apiFetch<ActivityCategory>(`/activity-categories/${id}`, { method: "PATCH", body, accessToken: token });
 }
 

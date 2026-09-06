@@ -7,6 +7,7 @@ import {
   FileUpIcon,
   Layers3Icon,
   MailWarningIcon,
+  UserRoundXIcon,
 } from "lucide-react";
 
 import { SessionList } from "@/components/auth/session-list";
@@ -105,6 +106,12 @@ export default async function SettingsPage() {
                 label="Bahagian/jabatan"
                 description="Urus struktur organisasi"
                 href="/settings/departments"
+              />
+              <SettingNavItem
+                icon={UserRoundXIcon}
+                label="Pemadaman akaun"
+                description="Semak dan proses permintaan pemadaman data"
+                href="/settings/account-deletions"
               />
             </SettingsCard>
           ) : null}

@@ -46,7 +46,7 @@ export function CategoryTable({ rows }: { rows: ActivityCategory[] }) {
               { name: "name", label: "Nama kategori", defaultValue: row.original.name },
               { name: "sort_order", label: "Susunan", defaultValue: String(row.original.sort_order), placeholder: "0" },
             ]}
-            onSubmit={(values) => execute(() => updateCategoryAction(row.original.id, values.name.trim(), Number(values.sort_order) || 0))}
+            onSubmit={(values) => execute(() => updateCategoryAction(row.original.id, values.name.trim(), Number(values.sort_order) || 0, row.original.updated_at))}
           />
           {row.original.is_active ? (
             <ConfirmationDialog
@@ -54,10 +54,10 @@ export function CategoryTable({ rows }: { rows: ActivityCategory[] }) {
               description={`Kategori ${row.original.name} akan dinyahaktifkan. Aktiviti sedia ada tidak akan terjejas.`}
               confirmLabel="Padam kategori"
               trigger={<Button size="sm" variant="destructive" disabled={pending}><Trash2Icon /> Padam</Button>}
-              onConfirm={async () => (await execute(() => toggleCategoryAction(row.original.id, false))).ok}
+              onConfirm={async () => (await execute(() => toggleCategoryAction(row.original.id, false, row.original.updated_at))).ok}
             />
           ) : (
-            <Button size="sm" variant="outline" disabled={pending} onClick={() => run(() => toggleCategoryAction(row.original.id, true))}>
+          <Button size="sm" variant="outline" disabled={pending} onClick={() => run(() => toggleCategoryAction(row.original.id, true, row.original.updated_at))}>
               <CheckIcon /> Pulihkan
             </Button>
           )}

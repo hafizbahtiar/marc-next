@@ -40,9 +40,9 @@ export async function createPostAction(body: {
   }
 }
 
-export async function updatePostAction(id: string, content: string): Promise<HasilTindakan<Post>> {
+export async function updatePostAction(id: string, content: string, updatedAt: string): Promise<HasilTindakan<Post>> {
   try {
-    const post = await postsApi.updatePost(await token(), id, content);
+    const post = await postsApi.updatePost(await token(), id, content, updatedAt);
     revalidatePath("/posts");
     revalidatePath(`/posts/${id}`);
     return { ok: true, data: post };
@@ -51,9 +51,9 @@ export async function updatePostAction(id: string, content: string): Promise<Has
   }
 }
 
-export async function deletePostAction(id: string): Promise<HasilTindakan> {
+export async function deletePostAction(id: string, updatedAt: string): Promise<HasilTindakan> {
   try {
-    await postsApi.deletePost(await token(), id);
+    await postsApi.deletePost(await token(), id, updatedAt);
     revalidatePath("/posts");
     revalidatePath(`/posts/${id}`);
     return { ok: true, data: undefined };
@@ -116,9 +116,10 @@ export async function updateCommentAction(
   postId: string,
   id: string,
   content: string,
+  updatedAt: string,
 ): Promise<HasilTindakan<Comment>> {
   try {
-    const comment = await postsApi.updateComment(await token(), id, content);
+    const comment = await postsApi.updateComment(await token(), id, content, updatedAt);
     revalidatePath(`/posts/${postId}`);
     return { ok: true, data: comment };
   } catch (error) {
@@ -126,9 +127,9 @@ export async function updateCommentAction(
   }
 }
 
-export async function deleteCommentAction(postId: string, id: string): Promise<HasilTindakan> {
+export async function deleteCommentAction(postId: string, id: string, updatedAt: string): Promise<HasilTindakan> {
   try {
-    await postsApi.deleteComment(await token(), id);
+    await postsApi.deleteComment(await token(), id, updatedAt);
     revalidatePath(`/posts/${postId}`);
     return { ok: true, data: undefined };
   } catch (error) {

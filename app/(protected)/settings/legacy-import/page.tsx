@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { LegacyImportConsole } from "@/components/admin/legacy-import-console";
 import { PageBreadcrumb } from "@/components/marc/page-breadcrumb";
-import { listLegacyImportBatches } from "@/lib/admin/legacy-import-api";
+import { getLegacyImportBatch, listLegacyImportBatches } from "@/lib/admin/legacy-import-api";
 import { isManagement } from "@/lib/api/types";
 import { wajibSesi } from "@/lib/auth/session";
 
@@ -11,6 +11,12 @@ export default async function LegacyImportPage() {
   const { accessToken, profile } = await wajibSesi();
   if (!isManagement(profile) || profile.role_key !== "superadmin") notFound();
   const { batches } = await listLegacyImportBatches(accessToken);
+  const batchesWithRows = await Promise.all(
+    batches.map(async (batch) => ({
+      ...batch,
+      rows: (await getLegacyImportBatch(accessToken, batch.id)).rows,
+    })),
+  );
 
   return (
     <div className="mx-auto grid max-w-6xl gap-6">
@@ -25,7 +31,7 @@ export default async function LegacyImportPage() {
           Semak data CSV MARC lama sebelum memadankan akaun. Konflik ID staff, emel atau nombor ahli mesti diselesaikan dahulu.
         </p>
       </header>
-      <LegacyImportConsole batches={batches} />
+      <LegacyImportConsole batches={batchesWithRows} />
     </div>
   );
 }

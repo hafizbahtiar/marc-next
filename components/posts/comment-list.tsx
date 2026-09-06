@@ -121,7 +121,7 @@ function CommentRow({
     }
     setPending(true);
     try {
-      const result = await updateCommentAction(postId, komen.id, content.trim());
+      const result = await updateCommentAction(postId, komen.id, content.trim(), komen.updated_at);
       if (!result.ok) {
         toast.error(result.ralat);
         return;
@@ -134,7 +134,7 @@ function CommentRow({
   }
 
   async function remove() {
-    const result = await deleteCommentAction(postId, komen.id);
+    const result = await deleteCommentAction(postId, komen.id, komen.updated_at);
     if (!result.ok) {
       toast.error(result.ralat);
       return false;

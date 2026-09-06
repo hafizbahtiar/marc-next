@@ -61,6 +61,7 @@ export function ProfileEditForm({ profile }: { profile: Profile }) {
 
   return (
     <form action={formAction} className="grid gap-6">
+      <input type="hidden" name="updated_at" value={profile.updated_at} />
       {keadaan.ralat ? <p className="text-sm text-destructive">{keadaan.ralat}</p> : null}
 
       <div className="flex items-center gap-4">

@@ -60,16 +60,16 @@ export async function cancelRegistrationBillAction(userId: string) {
   );
 }
 
-export async function updateMemberRoleAction(userId: string, roleKey: string) {
+export async function updateMemberRoleAction(userId: string, roleKey: string, updatedAt: string) {
   return runMemberAction(
-    (token) => membersApi.updateMemberRole(token, userId, roleKey),
+    (token) => membersApi.updateMemberRole(token, userId, roleKey, updatedAt),
     "Role ahli dikemas kini.",
   );
 }
 
-export async function updateMemberActiveAction(userId: string, isActive: boolean) {
+export async function updateMemberActiveAction(userId: string, isActive: boolean, updatedAt: string) {
   return runMemberAction(
-    (token) => membersApi.updateMemberActive(token, userId, isActive),
+    (token) => membersApi.updateMemberActive(token, userId, isActive, updatedAt),
     isActive ? "Ahli diaktifkan." : "Ahli dinyahaktifkan.",
   );
 }
@@ -78,9 +78,10 @@ export async function updateMemberDepartmentAction(
   userId: string,
   departmentCode: string | null,
   position: string | null,
+  updatedAt: string,
 ) {
   return runMemberAction(
-    (token) => membersApi.updateMemberDepartment(token, userId, { department_code: departmentCode, position }),
+    (token) => membersApi.updateMemberDepartment(token, userId, { department_code: departmentCode, position, updated_at: updatedAt }),
     "Bahagian dan jawatan ahli dikemas kini.",
   );
 }

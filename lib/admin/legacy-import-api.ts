@@ -11,6 +11,7 @@ export type LegacyImportBatch = {
   valid_rows: number;
   conflict_rows: number;
   created_at: string;
+  rows?: LegacyImportRow[];
 };
 
 export type LegacyImportRow = {
@@ -24,7 +25,9 @@ export type LegacyImportRow = {
   phone: string;
   department_code: string;
   position: string;
+  legacy_status: string;
   conflicts: { code: string; message: string }[];
+  warnings: { code: string; message: string }[];
   user_id: string | null;
 };
 
