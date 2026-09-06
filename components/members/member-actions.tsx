@@ -81,99 +81,109 @@ export function MemberActions({
   }
 
   return (
-    <div className="flex min-w-56 flex-wrap gap-2">
-      <Button asChild size="sm" variant="outline">
-        <Link href={`/members/${member.user_id}`}>
-          <UserRoundIcon />
-          Detail
-        </Link>
-      </Button>
+    <ResponsiveDetailsSheet
+      title={`Tindakan ahli: ${name}`}
+      description="Pilih tindakan yang ingin dilakukan untuk ahli ini."
+      trigger={
+        <Button size="sm" variant="outline">
+          <MoreHorizontalIcon />
+          Tindakan
+        </Button>
+      }
+    >
+      <div className="grid gap-2">
+        <Button asChild variant="outline" className="justify-start">
+          <Link href={`/members/${member.user_id}`}>
+            <UserRoundIcon />
+            Lihat profil ahli
+          </Link>
+        </Button>
 
-      {canEditRank ? (
-        <ConfirmationDialog
-          title={member.is_active ? "Nyahaktifkan ahli?" : "Aktifkan ahli?"}
-          description={`${member.is_active ? "Nyahaktifkan" : "Aktifkan"} ${name}. Status kelulusan pendaftaran tidak berubah.`}
-          confirmLabel={member.is_active ? "Nyahaktifkan" : "Aktifkan"}
-          trigger={
-            <Button size="sm" variant={member.is_active ? "destructive" : "outline"}>
-              <ShieldCheckIcon />
-              {member.is_active ? "Nyahaktif" : "Aktif"}
-            </Button>
-          }
-          onConfirm={async () => {
-            const result = await updateMemberActiveAction(member.user_id, !member.is_active);
-            if (result.ok) router.refresh();
-            else toast.error(result.mesej);
-            return result.ok;
-          }}
-        />
-      ) : null}
-
-      {roles.length > 0 && canEditRank ? (
-        <ResponsiveDetailsSheet
-          title="Tukar role"
-          description={`Kemas kini role untuk ${name}.`}
-          trigger={<Button size="sm" variant="ghost"><MoreHorizontalIcon /> Role</Button>}
-        >
-          <form
-            className="grid gap-4"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void updateRole();
+        {canEditRank ? (
+          <ConfirmationDialog
+            title={member.is_active ? "Nyahaktifkan ahli?" : "Aktifkan ahli?"}
+            description={`${member.is_active ? "Nyahaktifkan" : "Aktifkan"} ${name}. Status kelulusan pendaftaran tidak berubah.`}
+            confirmLabel={member.is_active ? "Nyahaktifkan" : "Aktifkan"}
+            trigger={
+              <Button className="justify-start" variant={member.is_active ? "destructive" : "outline"}>
+                <ShieldCheckIcon />
+                {member.is_active ? "Nyahaktifkan ahli" : "Aktifkan ahli"}
+              </Button>
+            }
+            onConfirm={async () => {
+              const result = await updateMemberActiveAction(member.user_id, !member.is_active);
+              if (result.ok) router.refresh();
+              else toast.error(result.mesej);
+              return result.ok;
             }}
-          >
-            <div className="grid gap-2">
-              <Label>Role</Label>
-              <Select value={selectedRole} onValueChange={setSelectedRole}>
-                <SelectTrigger><SelectValue placeholder="Pilih role" /></SelectTrigger>
-                <SelectContent>
-                  {roles.map((role) => <SelectItem key={role.key} value={role.key}>{role.name}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <Button type="submit"><PencilIcon /> Simpan role</Button>
-          </form>
-        </ResponsiveDetailsSheet>
-      ) : null}
+          />
+        ) : null}
 
-      {departments.length > 0 && canEditDepartment ? (
-        <ResponsiveDetailsSheet
-          title="Bahagian dan jawatan"
-          description={`Kemas kini maklumat organisasi untuk ${name}.`}
-          trigger={<Button size="sm" variant="ghost"><MoreHorizontalIcon /> Bahagian</Button>}
-        >
-          <form
-            className="grid gap-4"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void updateDepartment();
-            }}
+        {roles.length > 0 && canEditRank ? (
+          <ResponsiveDetailsSheet
+            title="Tukar role"
+            description={`Kemas kini role untuk ${name}.`}
+            trigger={<Button variant="outline" className="justify-start"><PencilIcon /> Tukar role</Button>}
           >
-            <div className="grid gap-2">
-              <Label>Bahagian</Label>
-              <Select value={departmentCode} onValueChange={setDepartmentCode}>
-                <SelectTrigger><SelectValue placeholder="Pilih bahagian" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Tiada bahagian</SelectItem>
-                  {departments.map((department) => <SelectItem key={department.code} value={department.code}>{department.code} — {department.name}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor={`position-${member.user_id}`}>Jawatan</Label>
-              <Input id={`position-${member.user_id}`} value={position} onChange={(event) => setPosition(event.target.value)} maxLength={150} placeholder="Contoh: Penolong Pegawai" />
-            </div>
-            <Button type="submit"><PencilIcon /> Simpan bahagian</Button>
-          </form>
-        </ResponsiveDetailsSheet>
-      ) : null}
+            <form
+              className="grid gap-4"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void updateRole();
+              }}
+            >
+              <div className="grid gap-2">
+                <Label>Role</Label>
+                <Select value={selectedRole} onValueChange={setSelectedRole}>
+                  <SelectTrigger><SelectValue placeholder="Pilih role" /></SelectTrigger>
+                  <SelectContent>
+                    {roles.map((role) => <SelectItem key={role.key} value={role.key}>{role.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button type="submit"><PencilIcon /> Simpan role</Button>
+            </form>
+          </ResponsiveDetailsSheet>
+        ) : null}
+
+        {departments.length > 0 && canEditDepartment ? (
+          <ResponsiveDetailsSheet
+            title="Bahagian dan jawatan"
+            description={`Kemas kini maklumat organisasi untuk ${name}.`}
+            trigger={<Button variant="outline" className="justify-start"><PencilIcon /> Bahagian dan jawatan</Button>}
+          >
+            <form
+              className="grid gap-4"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void updateDepartment();
+              }}
+            >
+              <div className="grid gap-2">
+                <Label>Bahagian</Label>
+                <Select value={departmentCode} onValueChange={setDepartmentCode}>
+                  <SelectTrigger><SelectValue placeholder="Pilih bahagian" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Tiada bahagian</SelectItem>
+                    {departments.map((department) => <SelectItem key={department.code} value={department.code}>{department.code} — {department.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor={`position-${member.user_id}`}>Jawatan</Label>
+                <Input id={`position-${member.user_id}`} value={position} onChange={(event) => setPosition(event.target.value)} maxLength={150} placeholder="Contoh: Penolong Pegawai" />
+              </div>
+              <Button type="submit"><PencilIcon /> Simpan bahagian</Button>
+            </form>
+          </ResponsiveDetailsSheet>
+        ) : null}
 
       {canCorrectIds ? (
         <>
           <ResponsiveDetailsSheet
             title="Betulkan nombor staff"
             description={`Nombor staff untuk ${name}.`}
-            trigger={<Button size="sm" variant="ghost"><PencilIcon /> ID staff</Button>}
+            trigger={<Button variant="outline" className="justify-start"><PencilIcon /> ID staff</Button>}
           >
             <form className="grid gap-4" onSubmit={(event) => { event.preventDefault(); void correctStaffId(); }}>
               <div className="grid gap-2">
@@ -188,7 +198,7 @@ export function MemberActions({
             <ResponsiveDetailsSheet
               title="Betulkan nombor ahli"
               description={`Nombor ahli untuk ${name}.`}
-              trigger={<Button size="sm" variant="ghost"><PencilIcon /> ID ahli</Button>}
+              trigger={<Button variant="outline" className="justify-start"><PencilIcon /> ID ahli</Button>}
             >
               <form className="grid gap-4" onSubmit={(event) => { event.preventDefault(); void correctMemberId(); }}>
                 <div className="grid gap-2">
@@ -201,6 +211,7 @@ export function MemberActions({
           ) : null}
         </>
       ) : null}
-    </div>
+      </div>
+    </ResponsiveDetailsSheet>
   );
 }

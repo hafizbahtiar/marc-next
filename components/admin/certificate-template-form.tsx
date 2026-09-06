@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { ArrowLeftIcon, RotateCcwIcon } from "lucide-react";
+import { RotateCcwIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { useUnsavedChangesGuard } from "@/components/marc/unsaved-changes-guard";
@@ -64,12 +64,6 @@ export function CertificateTemplateForm({ template }: { template: CertificateTem
   return (
     <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
       <div className="grid gap-6">
-        <div>
-          <Button type="button" variant="ghost" onClick={() => requestNavigation(() => window.history.back())}>
-            <ArrowLeftIcon />
-            Kembali
-          </Button>
-        </div>
         {error ? (
           <Alert variant="destructive">
             <AlertTitle>Template tidak dapat disimpan</AlertTitle>
@@ -175,15 +169,21 @@ function CertificatePreview({ values }: { values: CertificateTemplateInput }) {
     <aside className="lg:sticky lg:top-24 lg:self-start">
       <div className="grid gap-3">
         <p className="text-sm font-medium">Pratonton sijil</p>
+        {/*
+          width/height + viewBox semuanya 297x210 (A4 landskap, mm) supaya
+          <svg> ada saiz DAN nisbah intrinsik sebenar - ia kemudian mengecil
+          macam <img> dengan w-full + h-auto. Tanpa atribut itu, <svg>
+          default kepada 100%x100% dan tingginya terpulang kepada bapa, jadi
+          ia boleh terpampang jadi kotak. aspect-[297/210] jadi jaring
+          keselamatan kalau enjin abaikan nisbah intrinsik.
+        */}
         <svg
+          width="297"
+          height="210"
           viewBox="0 0 297 210"
           role="img"
           aria-label={`Pratonton sijil ${title}`}
           xmlSpace="preserve"
-          // aspect + h-auto WAJIB: <svg> tanpa atribut width/height default
-          // kepada 100%x100%, dan sebagai grid item ia diregangkan ikut tinggi
-          // baris grid, bukan ikut nisbah viewBox - itu sebab ia jadi kotak.
-          // 297/210 = A4 landskap, saiz sebenar sijil.
           className="block aspect-[297/210] h-auto w-full rounded-xl border shadow-sm"
           style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
         >
