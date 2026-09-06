@@ -10,11 +10,12 @@ import { wajibSesi } from "@/lib/auth/session";
 export default async function LegacyImportPage() {
   const { accessToken, profile } = await wajibSesi();
   if (!isManagement(profile) || profile.role_key !== "superadmin") notFound();
-  const { batches } = await listLegacyImportBatches(accessToken);
+  const { batches: responseBatches } = await listLegacyImportBatches(accessToken);
+  const batches = responseBatches ?? [];
   const batchesWithRows = await Promise.all(
     batches.map(async (batch) => ({
       ...batch,
-      rows: (await getLegacyImportBatch(accessToken, batch.id)).rows,
+      rows: (await getLegacyImportBatch(accessToken, batch.id)).rows ?? [],
     })),
   );
 

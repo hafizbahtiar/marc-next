@@ -26,3 +26,16 @@ export function executeAccountDeletion(token: string, userId: string) {
     { method: "POST", accessToken: token },
   );
 }
+
+export function listAccountDeletionTargets(token: string) {
+  return apiFetch<{ accounts: AccountDeletionRequest[] }>("/admin/account-deletion-targets", {
+    accessToken: token,
+  });
+}
+
+export function executeDirectAccountDeletion(token: string, userId: string, reason: string) {
+  return apiFetch<{ ok: boolean; user_id: string }>(
+    `/admin/account-deletion-targets/${encodeURIComponent(userId)}/execute`,
+    { method: "POST", body: { reason }, accessToken: token },
+  );
+}
