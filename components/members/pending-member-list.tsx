@@ -60,7 +60,7 @@ export function PendingMemberList({
             </Avatar>
             <div className="min-w-0">
               <p className="truncate font-medium">{name}</p>
-              <p className="truncate text-xs text-muted-foreground">{member.email ?? "—"}</p>
+              <p className="truncate text-xs text-muted-foreground">{member.email ?? "-"}</p>
             </div>
           </div>
         );
@@ -71,7 +71,7 @@ export function PendingMemberList({
       header: "No. staff",
       cell: ({ row }) => (
         <div>
-          <p>{row.original.staff_id ?? "—"}</p>
+          <p>{row.original.staff_id ?? "-"}</p>
           {row.original.staff_id_verified_at ? <StatusBadge label="Disahkan" tone="success" className="mt-1" /> : null}
         </div>
       ),

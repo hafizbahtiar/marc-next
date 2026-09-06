@@ -145,7 +145,7 @@ export function StripeDonationForm({ publishableKey }: { publishableKey: string 
         ) : null}
 
         <Button type="button" onClick={startCheckout} disabled={pending}>
-          {pending ? "Menyediakan pembayaran…" : `Teruskan — RM${(amountCents / 100).toFixed(2)}`}
+          {pending ? "Menyediakan pembayaran…" : `Teruskan - RM${(amountCents / 100).toFixed(2)}`}
         </Button>
       </CardContent>
     </Card>

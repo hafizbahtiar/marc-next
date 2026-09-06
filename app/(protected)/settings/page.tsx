@@ -7,6 +7,7 @@ import {
   FileUpIcon,
   Layers3Icon,
   MailWarningIcon,
+  ShieldBanIcon,
   UserRoundXIcon,
 } from "lucide-react";
 
@@ -112,6 +113,12 @@ export default async function SettingsPage() {
                 label="Pemadaman akaun"
                 description="Semak dan proses permintaan pemadaman data"
                 href="/settings/account-deletions"
+              />
+              <SettingNavItem
+                icon={ShieldBanIcon}
+                label="Akaun digantung"
+                description="Urus ban sementara dan permanent"
+                href="/settings/banned-members"
               />
             </SettingsCard>
           ) : null}

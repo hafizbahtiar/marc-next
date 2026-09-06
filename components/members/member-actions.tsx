@@ -3,11 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MoreHorizontalIcon, PencilIcon, ShieldCheckIcon, UserRoundIcon } from "lucide-react";
+import { MoreHorizontalIcon, PencilIcon, ShieldBanIcon, ShieldCheckIcon, UserRoundIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { ConfirmationDialog } from "@/components/marc/confirmation-dialog";
 import { ResponsiveDetailsSheet } from "@/components/marc/responsive-sheet";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +30,7 @@ import {
   correctStaffIdAction,
 } from "@/lib/members/actions";
 import { formatMemberIdInput } from "@/lib/members/member-id";
+import { banMemberAction } from "@/lib/admin/member-bans-actions";
 
 export function MemberActions({
   member,
@@ -53,6 +55,7 @@ export function MemberActions({
   const canEditRank = roleRank > member.role_rank;
   const canEditDepartment = ["manager", "admin", "superadmin"].includes(roleKey) && roleRank >= member.role_rank;
   const canCorrectIds = ["admin", "superadmin"].includes(roleKey) && roleRank > member.role_rank;
+  const canBanMember = roleKey === "superadmin" && member.role_key !== "superadmin";
 
   async function updateRole() {
     const result = await updateMemberRoleAction(member.user_id, selectedRole, member.updated_at);
@@ -122,6 +125,8 @@ export function MemberActions({
           />
         ) : null}
 
+        {canBanMember ? <BanMemberDialog member={member} /> : null}
+
         {roles.length > 0 && canEditRank ? (
           <ResponsiveDetailsSheet
             title="Tukar role"
@@ -168,7 +173,7 @@ export function MemberActions({
                   <SelectTrigger><SelectValue placeholder="Pilih bahagian" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Tiada bahagian</SelectItem>
-                    {departments.map((department) => <SelectItem key={department.code} value={department.code}>{department.code} — {department.name}</SelectItem>)}
+                    {departments.map((department) => <SelectItem key={department.code} value={department.code}>{department.code} - {department.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -228,5 +233,74 @@ export function MemberActions({
       ) : null}
       </div>
     </ResponsiveDetailsSheet>
+  );
+}
+
+function BanMemberDialog({ member }: { member: MemberRow }) {
+  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<"permanent" | "temporary">("temporary");
+  const [expiresAt, setExpiresAt] = useState("");
+  const [reason, setReason] = useState("");
+  const [pending, setPending] = useState(false);
+  const canSubmit = reason.trim().length > 0 && (mode === "permanent" || expiresAt !== "");
+
+  async function submit() {
+    if (!canSubmit) return;
+    setPending(true);
+    const result = await banMemberAction(
+      member.user_id,
+      reason.trim(),
+      mode === "temporary" ? new Date(expiresAt).toISOString() : undefined,
+    );
+    setPending(false);
+    if (result.ok) {
+      setOpen(false);
+      setReason("");
+      setExpiresAt("");
+    }
+  }
+
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive" className="justify-start"><ShieldBanIcon /> Gantung akaun</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Gantung akaun?</AlertDialogTitle>
+          <AlertDialogDescription>
+            {member.email ?? "Akaun ahli"} tidak akan boleh mengakses MARC sepanjang tempoh penggantungan.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <Label>Jenis penggantungan</Label>
+            <Select value={mode} onValueChange={(value) => setMode(value as "permanent" | "temporary")}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="temporary">Tidak permanent</SelectItem>
+                <SelectItem value="permanent">Permanent</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {mode === "temporary" ? (
+            <div className="grid gap-2">
+              <Label htmlFor={`ban-expires-${member.user_id}`}>Tamat pada</Label>
+              <Input id={`ban-expires-${member.user_id}`} type="datetime-local" value={expiresAt} onChange={(event) => setExpiresAt(event.target.value)} />
+            </div>
+          ) : null}
+          <div className="grid gap-2">
+            <Label htmlFor={`ban-reason-${member.user_id}`}>Sebab</Label>
+            <Input id={`ban-reason-${member.user_id}`} value={reason} onChange={(event) => setReason(event.target.value)} maxLength={500} />
+          </div>
+        </div>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={pending}>Batal</AlertDialogCancel>
+          <AlertDialogAction disabled={!canSubmit || pending} onClick={(event) => { event.preventDefault(); void submit(); }}>
+            {pending ? "Memproses…" : "Gantung akaun"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

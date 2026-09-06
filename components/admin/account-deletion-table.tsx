@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangleIcon, Trash2Icon } from "lucide-react";
+import type { ColumnDef } from "@tanstack/react-table";
 
+import { DataTable, DataTableColumnHeader } from "@/components/marc/data-table";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,41 +29,74 @@ import {
 export function AccountDeletionTable({ rows }: { rows: AccountDeletionRequest[] }) {
   const router = useRouter();
   const [message, setMessage] = useState("");
+  const columns: ColumnDef<AccountDeletionRequest>[] = [
+    {
+      id: "member",
+      accessorKey: "display_name",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Ahli" />,
+      cell: ({ row }) => (
+        <div className="grid min-w-48 gap-1">
+          <span className="font-medium">{row.original.display_name?.trim() || "Tanpa nama"}</span>
+          <span className="text-sm text-muted-foreground">{row.original.email}</span>
+          <span className="text-xs text-muted-foreground">
+            {row.original.member_id ?? "No. ahli belum dijana"}
+          </span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+      cell: ({ row }) => (
+        <span className="whitespace-nowrap text-sm capitalize">{row.original.status}</span>
+      ),
+    },
+    {
+      accessorKey: "requested_at",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Diminta pada" />,
+      cell: ({ row }) => (
+        <span className="whitespace-nowrap text-sm text-muted-foreground">
+          {formatDate(row.original.requested_at)}
+        </span>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Tindakan",
+      enableSorting: false,
+      cell: ({ row }) => (
+        <DeleteRequestDialog
+          row={row.original}
+          onResult={(ok, resultMessage) => {
+            setMessage(resultMessage);
+            if (ok) router.refresh();
+          }}
+        />
+      ),
+    },
+  ];
 
   return (
     <div className="grid gap-4">
-      {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
-      {rows.length === 0 ? (
-        <div className="rounded-xl border bg-card px-6 py-12 text-center text-sm text-muted-foreground">
-          Tiada permintaan pemadaman akaun.
-        </div>
-      ) : (
-        <div className="overflow-hidden rounded-xl border bg-card">
-          <div className="divide-y">
-            {rows.map((row) => (
-              <div key={row.user_id} className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-                <div className="grid gap-1">
-                  <p className="font-medium">{row.display_name?.trim() || "Tanpa nama"}</p>
-                  <p className="text-sm text-muted-foreground">{row.email}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {row.member_id ?? "No. ahli belum dijana"} · Permintaan{" "}
-                    {new Date(row.requested_at).toLocaleDateString("ms-MY")}
-                  </p>
-                </div>
-                <DeleteRequestDialog
-                  row={row}
-                  onResult={(ok, resultMessage) => {
-                    setMessage(resultMessage);
-                    if (ok) router.refresh();
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {message ? <Alert><AlertDescription>{message}</AlertDescription></Alert> : null}
+      <DataTable
+        columns={columns}
+        data={rows ?? []}
+        emptyMessage="Tiada permintaan pemadaman akaun."
+        enablePagination={false}
+        className="min-w-0"
+      />
     </div>
   );
+}
+
+function formatDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return new Intl.DateTimeFormat("ms-MY", {
+    dateStyle: "medium",
+    timeZone: "Asia/Kuala_Lumpur",
+  }).format(date);
 }
 
 function DeleteRequestDialog({
@@ -131,36 +167,52 @@ function DeleteRequestDialog({
 export function AccountDeletionTargetTable({ rows }: { rows: AccountDeletionRequest[] }) {
   const router = useRouter();
   const [message, setMessage] = useState("");
+  const columns: ColumnDef<AccountDeletionRequest>[] = [
+    {
+      id: "member",
+      accessorKey: "display_name",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Ahli" />,
+      cell: ({ row }) => (
+        <div className="grid min-w-48 gap-1">
+          <span className="font-medium">{row.original.display_name?.trim() || "Tanpa nama"}</span>
+          <span className="text-sm text-muted-foreground">{row.original.email}</span>
+          <span className="text-xs text-muted-foreground">
+            {row.original.member_id ?? "No. ahli belum dijana"} · {row.original.role_key}
+          </span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "account_status",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Status akaun" />,
+      cell: ({ row }) => <span className="whitespace-nowrap text-sm capitalize">{row.original.account_status}</span>,
+    },
+    {
+      id: "actions",
+      header: "Tindakan",
+      enableSorting: false,
+      cell: ({ row }) => (
+        <DirectDeleteDialog
+          row={row.original}
+          onResult={(ok, resultMessage) => {
+            setMessage(resultMessage);
+            if (ok) router.refresh();
+          }}
+        />
+      ),
+    },
+  ];
 
   return (
     <div className="grid gap-4">
-      {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
-      <div className="overflow-hidden rounded-xl border bg-card">
-        {rows.length === 0 ? (
-          <p className="px-6 py-12 text-center text-sm text-muted-foreground">Tiada akaun boleh dipadam.</p>
-        ) : (
-          <div className="divide-y">
-            {rows.map((row) => (
-              <div key={row.user_id} className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-                <div className="grid gap-1">
-                  <p className="font-medium">{row.display_name?.trim() || "Tanpa nama"}</p>
-                  <p className="text-sm text-muted-foreground">{row.email}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {row.member_id ?? "No. ahli belum dijana"} · {row.role_key}
-                  </p>
-                </div>
-                <DirectDeleteDialog
-                  row={row}
-                  onResult={(ok, resultMessage) => {
-                    setMessage(resultMessage);
-                    if (ok) router.refresh();
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {message ? <Alert><AlertDescription>{message}</AlertDescription></Alert> : null}
+      <DataTable
+        columns={columns}
+        data={rows ?? []}
+        emptyMessage="Tiada akaun boleh dipadam."
+        enablePagination={false}
+        className="min-w-0"
+      />
     </div>
   );
 }

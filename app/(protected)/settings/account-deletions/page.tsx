@@ -5,6 +5,7 @@ import {
   AccountDeletionTargetTable,
 } from "@/components/admin/account-deletion-table";
 import { PageBreadcrumb } from "@/components/marc/page-breadcrumb";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { wajibSesi } from "@/lib/auth/session";
 import {
   listAccountDeletionRequests,
@@ -34,24 +35,24 @@ export default async function AccountDeletionsPage() {
           tidak boleh dibuat asal.
         </p>
       </header>
-      <section className="grid gap-3">
-        <div className="grid gap-1">
-          <h2 className="font-heading text-xl font-semibold">Permintaan ahli</h2>
+      <Tabs defaultValue="requests" className="min-w-0">
+        <TabsList className="w-full sm:w-fit">
+          <TabsTrigger value="requests">Permintaan ahli</TabsTrigger>
+          <TabsTrigger value="administrative">Pemadaman pentadbiran</TabsTrigger>
+        </TabsList>
+        <TabsContent value="requests" className="grid gap-3">
           <p className="text-sm text-muted-foreground">
             Ahli yang telah meminta akaun dan data mereka dipadam.
           </p>
-        </div>
-        <AccountDeletionTable rows={requests} />
-      </section>
-      <section className="grid gap-3">
-        <div className="grid gap-1">
-          <h2 className="font-heading text-xl font-semibold">Padam akaun pengguna</h2>
+          <AccountDeletionTable rows={requests} />
+        </TabsContent>
+        <TabsContent value="administrative" className="grid gap-3">
           <p className="text-sm text-muted-foreground">
             Pemadaman yang dimulakan superadmin. Sebab dan tindakan akan direkodkan dalam audit.
           </p>
-        </div>
-        <AccountDeletionTargetTable rows={accounts} />
-      </section>
+          <AccountDeletionTargetTable rows={accounts} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

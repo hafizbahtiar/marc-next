@@ -64,7 +64,7 @@ const columns: ColumnDef<PaymentRow>[] = [
     cell: ({ row }) => row.original.receiptType && row.original.receiptId ? (
       <ReceiptButton type={row.original.receiptType} id={row.original.receiptId} />
     ) : (
-      <span className="text-xs text-muted-foreground">—</span>
+      <span className="text-xs text-muted-foreground">-</span>
     ),
   },
 ];

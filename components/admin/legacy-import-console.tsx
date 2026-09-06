@@ -118,7 +118,7 @@ export function LegacyImportConsole({ batches }: { batches: LegacyImportBatch[] 
                           Import baris lulus
                         </Button>
                       ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
+                        <span className="text-xs text-muted-foreground">-</span>
                       )}
                     </td>
                   </tr>
@@ -162,7 +162,7 @@ export function LegacyImportConsole({ batches }: { batches: LegacyImportBatch[] 
                         <p className="text-xs text-muted-foreground">{row.member_id || "No. ahli tiada"}</p>
                       </td>
                       <td className="px-3 py-3">{row.email}</td>
-                      <td className="px-3 py-3">{row.department_code || "—"}</td>
+                      <td className="px-3 py-3">{row.department_code || "-"}</td>
                       <td className="px-3 py-3">
                         {row.user_id ? (
                           <span className="text-emerald-700 dark:text-emerald-400">Dipadankan</span>
