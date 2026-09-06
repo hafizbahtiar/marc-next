@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   importLegacyBatchAction,
   dryRunLegacyImportAction,
@@ -516,20 +516,23 @@ function ResolveSheet({
             </div>
             <div className="grid gap-2">
               <Label htmlFor={`bahagian-${row.id}`}>Pilih bahagian</Label>
-              <NativeSelect
-                id={`bahagian-${row.id}`}
-                className="w-full"
+              <Select
                 value={pilihan}
                 disabled={pending}
-                onChange={(event) => setPilihan(event.target.value)}
+                onValueChange={setPilihan}
               >
-                {departments.map((item) => (
-                  <NativeSelectOption key={item.code} value={item.code}>
-                    {item.code} - {item.name}
-                  </NativeSelectOption>
-                ))}
-                <NativeSelectOption value={BAHARU}>+ Cipta bahagian baharu</NativeSelectOption>
-              </NativeSelect>
+                <SelectTrigger id={`bahagian-${row.id}`} className="w-full">
+                  <SelectValue placeholder="Pilih bahagian" />
+                </SelectTrigger>
+                <SelectContent>
+                  {departments.map((item) => (
+                    <SelectItem key={item.code} value={item.code}>
+                      {item.code} - {item.name}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value={BAHARU}>+ Cipta bahagian baharu</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             {pilihan === BAHARU ? (
               <>

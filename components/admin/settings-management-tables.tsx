@@ -65,7 +65,7 @@ export function CategoryTable({ rows }: { rows: ActivityCategory[] }) {
       ),
     },
   ], [execute, pending, run]);
-  return <ManagementTableShell message={message} action={
+  const action = (
     <ResponsiveFormSheet
       title="Kategori baharu"
       description="Tambah kategori untuk aktiviti."
@@ -74,7 +74,8 @@ export function CategoryTable({ rows }: { rows: ActivityCategory[] }) {
       fields={[{ name: "key", label: "Key", placeholder: "contoh: mesyuarat" }, { name: "name", label: "Nama kategori" }]}
       onSubmit={(values) => execute(() => createCategoryAction(values.key, values.name))}
     />
-  }><DataTable columns={columns} data={rows} searchKey="name" searchPlaceholder="Cari kategori…" getRowId={(row) => row.id} /></ManagementTableShell>;
+  );
+  return <ManagementTableShell message={message}><DataTable columns={columns} data={rows} searchKey="name" searchPlaceholder="Cari kategori…" getRowId={(row) => row.id} toolbar={action} /></ManagementTableShell>;
 }
 
 export function DomainTable({ rows }: { rows: BlockedDomain[] }) {
@@ -104,7 +105,7 @@ export function DomainTable({ rows }: { rows: BlockedDomain[] }) {
       ),
     },
   ];
-  return <ManagementTableShell message={message} action={
+  const action = (
     <ResponsiveFormSheet
       title="Sekat domain emel"
       description="Pendaftaran menggunakan domain ini akan disekat."
@@ -113,7 +114,8 @@ export function DomainTable({ rows }: { rows: BlockedDomain[] }) {
       fields={[{ name: "domain", label: "Domain emel", placeholder: "contoh: example.com" }]}
       onSubmit={(values) => execute(() => addBlockedDomainAction(values.domain.trim().toLowerCase()))}
     />
-  }><DataTable columns={columns} data={rows} searchKey="domain" searchPlaceholder="Cari domain…" getRowId={(row) => row.domain} /></ManagementTableShell>;
+  );
+  return <ManagementTableShell message={message}><DataTable columns={columns} data={rows} searchKey="domain" searchPlaceholder="Cari domain…" getRowId={(row) => row.domain} toolbar={action} /></ManagementTableShell>;
 }
 
 export function DepartmentTable({ rows }: { rows: Department[] }) {
@@ -153,7 +155,7 @@ export function DepartmentTable({ rows }: { rows: Department[] }) {
       ),
     },
   ];
-  return <ManagementTableShell message={message} action={
+  const action = (
     <ResponsiveFormSheet
       title="Bahagian baharu"
       description="Tambah bahagian atau jabatan organisasi."
@@ -162,9 +164,10 @@ export function DepartmentTable({ rows }: { rows: Department[] }) {
       fields={[{ name: "code", label: "Kod", placeholder: "contoh: IT" }, { name: "name", label: "Nama bahagian" }]}
       onSubmit={(values) => execute(() => createDepartmentAction(values.code.trim().toUpperCase(), values.name.trim()))}
     />
-  }><DataTable columns={columns} data={rows} searchKey="name" searchPlaceholder="Cari bahagian…" getRowId={(row) => row.code} /></ManagementTableShell>;
+  );
+  return <ManagementTableShell message={message}><DataTable columns={columns} data={rows} searchKey="name" searchPlaceholder="Cari bahagian…" getRowId={(row) => row.code} toolbar={action} /></ManagementTableShell>;
 }
 
-function ManagementTableShell({ message, action, children }: { message: string; action: React.ReactNode; children: React.ReactNode }) {
-  return <div className="grid gap-3">{message ? <p className="text-sm text-muted-foreground">{message}</p> : null}<div className="flex justify-end">{action}</div>{children}</div>;
+function ManagementTableShell({ message, children }: { message: string; children: React.ReactNode }) {
+  return <div className="grid gap-3">{message ? <p className="text-sm text-muted-foreground">{message}</p> : null}{children}</div>;
 }
