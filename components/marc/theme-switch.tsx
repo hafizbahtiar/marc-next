@@ -54,8 +54,11 @@ export function ThemeSwitch() {
     // penjuru skrin yang PALING JAUH - kalau tidak, satu bucu kekal
     // dalam tema lama apabila animasi tamat.
     const { top, left, width, height } = event.currentTarget.getBoundingClientRect();
-    const x = left + width / 2;
-    const y = top + height / 2;
+    // Koordinat pointer kekal tepat apabila butang berada dalam portal menu
+    // atau viewport mudah alih yang mempunyai toolbar dinamik. Rect menjadi
+    // fallback untuk pengaktifan melalui papan kekunci.
+    const x = event.clientX > 0 ? event.clientX : left + width / 2;
+    const y = event.clientY > 0 ? event.clientY : top + height / 2;
     const jejari = Math.hypot(
       Math.max(x, window.innerWidth - x),
       Math.max(y, window.innerHeight - y),
