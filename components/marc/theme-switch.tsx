@@ -37,10 +37,10 @@ export function ThemeSwitch() {
     const guna = () => {
       document.documentElement.classList.toggle("dark", baharu === "dark");
       try {
+        document.cookie = `${KUNCI_TEMA}=${baharu}; Path=/; Max-Age=31536000; SameSite=Lax`;
         localStorage.setItem(KUNCI_TEMA, baharu);
       } catch {
-        // Mod peribadi, atau storan tapak disekat. Tema tetap bertukar
-        // untuk sesi ini; ia cuma tak diingati.
+        // Jika storan disekat, tema tetap bertukar untuk sesi ini.
       }
     };
 

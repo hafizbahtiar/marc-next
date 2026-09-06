@@ -15,7 +15,7 @@ import { KUNCI_TEMA } from "@/lib/tema";
  * bukan pilihan ketiga yang disimpan.
  */
 export function InitialThemeScript() {
-  const skrip = `try{var t=localStorage.getItem(${JSON.stringify(KUNCI_TEMA)});var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.toggle("dark",d)}catch(e){}`;
+  const skrip = `try{var t=localStorage.getItem(${JSON.stringify(KUNCI_TEMA)})||((document.cookie.match(/(?:^|; )${KUNCI_TEMA}=(dark|light)(?:;|$)/)||[])[1]);var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.toggle("dark",d)}catch(e){}`;
 
   return <script dangerouslySetInnerHTML={{ __html: skrip }} />;
 }
