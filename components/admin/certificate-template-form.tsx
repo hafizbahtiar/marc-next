@@ -180,7 +180,11 @@ function CertificatePreview({ values }: { values: CertificateTemplateInput }) {
           role="img"
           aria-label={`Pratonton sijil ${title}`}
           xmlSpace="preserve"
-          className="w-full rounded-xl border shadow-sm"
+          // aspect + h-auto WAJIB: <svg> tanpa atribut width/height default
+          // kepada 100%x100%, dan sebagai grid item ia diregangkan ikut tinggi
+          // baris grid, bukan ikut nisbah viewBox - itu sebab ia jadi kotak.
+          // 297/210 = A4 landskap, saiz sebenar sijil.
+          className="block aspect-[297/210] h-auto w-full rounded-xl border shadow-sm"
           style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
         >
           <rect x="0" y="0" width="297" height="210" fill="#ffffff" />

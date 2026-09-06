@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { AwardIcon, CheckCircle2Icon, PencilIcon } from "lucide-react";
 import { notFound } from "next/navigation";
+import type { ColumnDef } from "@tanstack/react-table";
 
+import { DataTable, DataTableColumnHeader } from "@/components/marc/data-table";
 import { PageBreadcrumb } from "@/components/marc/page-breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { CertificateTemplate } from "@/lib/admin/certificate-templates-api";
 import { listCertificateTemplates } from "@/lib/admin/certificate-templates-api";
 import { isManagement } from "@/lib/api/types";
 import { wajibSesi } from "@/lib/auth/session";
@@ -29,44 +31,70 @@ export default async function CertificateTemplatesPage() {
         </p>
       </header>
 
-      {templates.length === 0 ? (
-        <div className="rounded-2xl border border-dashed px-6 py-16 text-center">
-          <p className="font-medium">Tiada template sijil</p>
-          <p className="mt-1 text-sm text-muted-foreground">Template akan dipaparkan selepas disediakan oleh sistem.</p>
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {templates.map((template) => (
-            <Card key={template.id} className={template.is_active ? "border-primary/50" : undefined}>
-              <CardHeader className="flex-row items-start justify-between gap-4">
-                <div className="grid gap-2">
-                  <CardTitle className="text-lg">{template.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Dikemas kini {formatDate(template.updated_at)}
-                  </p>
-                </div>
-                {template.is_active ? (
-                  <Badge><CheckCircle2Icon /> Aktif</Badge>
-                ) : (
-                  <Badge variant="secondary">Draf</Badge>
-                )}
-              </CardHeader>
-              <CardContent className="flex items-center justify-between gap-3">
-                <div className="h-16 w-28 rounded-md border" style={{ backgroundColor: template.primary_color }} />
-                <Button asChild variant="outline">
-                  <Link href={`/settings/certificate-templates/${encodeURIComponent(template.id)}/edit`}>
-                    <PencilIcon />
-                    Edit template
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      <DataTable
+        columns={templateColumns}
+        data={templates}
+        emptyMessage="Tiada template sijil ditemui."
+        enablePagination={false}
+        className="min-w-0"
+      />
     </div>
   );
 }
+
+const templateColumns: ColumnDef<CertificateTemplate>[] = [
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Template" />
+    ),
+    cell: ({ row }) => (
+      <div className="grid min-w-48 gap-1">
+        <span className="font-medium">{row.original.name}</span>
+        <span className="text-xs text-muted-foreground">{row.original.title}</span>
+      </div>
+    ),
+  },
+  {
+    id: "colors",
+    header: "Warna",
+    cell: ({ row }) => (
+      <div className="flex items-center gap-1.5" aria-label={`Warna ${row.original.primary_color} dan ${row.original.secondary_color}`}>
+        <span className="size-6 rounded-full border" style={{ backgroundColor: row.original.primary_color }} />
+        <span className="size-6 rounded-full border" style={{ backgroundColor: row.original.secondary_color }} />
+      </div>
+    ),
+  },
+  {
+    accessorKey: "is_active",
+    header: "Status",
+    cell: ({ row }) => row.original.is_active
+      ? <Badge><CheckCircle2Icon /> Aktif</Badge>
+      : <Badge variant="secondary">Draf</Badge>,
+  },
+  {
+    accessorKey: "updated_at",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Dikemas kini" />
+    ),
+    cell: ({ row }) => (
+      <span className="whitespace-nowrap text-sm text-muted-foreground">{formatDate(row.original.updated_at)}</span>
+    ),
+  },
+  {
+    id: "actions",
+    header: "Tindakan",
+    enableSorting: false,
+    cell: ({ row }) => (
+      <Button asChild variant="outline" size="sm">
+        <Link href={`/settings/certificate-templates/${encodeURIComponent(row.original.id)}/edit`}>
+          <PencilIcon />
+          Edit
+        </Link>
+      </Button>
+    ),
+  },
+];
 
 function formatDate(value: string) {
   const date = new Date(value);
