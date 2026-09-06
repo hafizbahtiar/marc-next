@@ -11,6 +11,7 @@ import { ResponsiveDetailsSheet } from "@/components/marc/responsive-sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MaskedInput } from "@/components/ui/masked-input";
 import {
   Select,
   SelectContent,
@@ -27,6 +28,7 @@ import {
   correctMemberIdAction,
   correctStaffIdAction,
 } from "@/lib/members/actions";
+import { formatMemberIdInput } from "@/lib/members/member-id";
 
 export function MemberActions({
   member,
@@ -203,7 +205,19 @@ export function MemberActions({
               <form className="grid gap-4" onSubmit={(event) => { event.preventDefault(); void correctMemberId(); }}>
                 <div className="grid gap-2">
                   <Label htmlFor={`member-id-${member.user_id}`}>Nombor ahli</Label>
-                  <Input id={`member-id-${member.user_id}`} value={memberId} onChange={(event) => setMemberId(event.target.value)} maxLength={128} required />
+                  <MaskedInput
+                    id={`member-id-${member.user_id}`}
+                    value={memberId}
+                    formatValue={formatMemberIdInput}
+                    onValueChange={setMemberId}
+                    maxLength={128}
+                    placeholder="MARC-AB1C/2026-SA"
+                    autoComplete="off"
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Format baharu: MARC-{`{staff}`}/2026-{`{kod}`}. Format lama akan dikekalkan.
+                  </p>
                 </div>
                 <Button type="submit" disabled={!memberId.trim()}><PencilIcon /> Simpan ID ahli</Button>
               </form>

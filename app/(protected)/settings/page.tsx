@@ -4,6 +4,7 @@ import {
   Building2Icon,
   CreditCardIcon,
   AwardIcon,
+  FileUpIcon,
   Layers3Icon,
   MailWarningIcon,
 } from "lucide-react";
@@ -80,6 +81,14 @@ export default async function SettingsPage() {
                 description="Urus reka bentuk global sijil aktiviti"
                 href="/settings/certificate-templates"
               />
+              {profile.role_key === "superadmin" ? (
+                <SettingNavItem
+                  icon={FileUpIcon}
+                  label="Import ahli lama"
+                  description="Semak dan padankan data ahli MARC lama"
+                  href="/settings/legacy-import"
+                />
+              ) : null}
             </SettingsCard>
           ) : null}
 
