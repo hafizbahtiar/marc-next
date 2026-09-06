@@ -25,13 +25,13 @@ export async function createCategoryAction(key: string, name: string) {
   return withToken((token) => api.createActivityCategory(token, { key, name, sort_order: 0 }), "Kategori dicipta.");
 }
 
-export async function toggleCategoryAction(id: string, isActive: boolean) {
-  return withToken((token) => api.updateActivityCategory(token, id, { is_active: isActive }), "Status kategori dikemas kini.");
+export async function toggleCategoryAction(id: string, isActive: boolean, updatedAt: string) {
+  return withToken((token) => api.updateActivityCategory(token, id, { is_active: isActive, updated_at: updatedAt }), "Status kategori dikemas kini.");
 }
 
-export async function updateCategoryAction(id: string, name: string, sortOrder: number) {
+export async function updateCategoryAction(id: string, name: string, sortOrder: number, updatedAt: string) {
   return withToken(
-    (token) => api.updateActivityCategory(token, id, { name, sort_order: sortOrder }),
+    (token) => api.updateActivityCategory(token, id, { name, sort_order: sortOrder, updated_at: updatedAt }),
     "Kategori dikemas kini.",
   );
 }

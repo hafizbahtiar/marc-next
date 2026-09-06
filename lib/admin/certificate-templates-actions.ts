@@ -42,9 +42,10 @@ export async function updateCertificateTemplateAction(
 
 export async function publishCertificateTemplateAction(
   id: string,
+  updatedAt: string,
 ): Promise<CertificateTemplateActionResult<CertificateTemplate>> {
   try {
-    const data = await publishCertificateTemplate(await getToken(), id);
+    const data = await publishCertificateTemplate(await getToken(), id, updatedAt);
     revalidatePath("/settings/certificate-templates");
     revalidatePath(`/settings/certificate-templates/${id}/edit`);
     return { ok: true, data };

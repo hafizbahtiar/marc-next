@@ -84,6 +84,7 @@ function laluanAwamProxy(pathname: string): boolean {
     pathname === ROUTES.lupaKataLaluan ||
     pathname === ROUTES.tetapKataLaluan ||
     pathname === ROUTES.sahkanEmel ||
+    pathname === ROUTES.claimAccount ||
     pathname === ROUTES.tamatSesi ||
     pathname === ROUTES.pelayanLuarTalian ||
     pathname === ROUTES.sokongMARC ||

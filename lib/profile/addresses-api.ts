@@ -17,8 +17,8 @@ export type Address = {
   state: string;
 };
 
-export function listAddresses(accessToken: string): Promise<Address[]> {
-  return apiFetch<Address[]>("/me/addresses", { accessToken });
+export async function listAddresses(accessToken: string): Promise<Address[]> {
+  return (await apiFetch<Address[] | null>("/me/addresses", { accessToken })) ?? [];
 }
 
 export function createAddress(

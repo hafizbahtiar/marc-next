@@ -16,6 +16,7 @@ import {
 } from "@/lib/admin/certificate-templates-actions";
 
 const DEFAULT_TEMPLATE_VALUES: CertificateTemplateInput = {
+  updated_at: "",
   name: "Template MARC Standard",
   primary_color: "#E21E28",
   secondary_color: "#223145",
@@ -50,7 +51,7 @@ export function CertificateTemplateForm({ template }: { template: CertificateTem
         return;
       }
       if (publish) {
-        const published = await publishCertificateTemplateAction(template.id);
+        const published = await publishCertificateTemplateAction(template.id, values.updated_at);
         if (!published.ok) {
           setError(published.error);
           return;
@@ -97,7 +98,7 @@ export function CertificateTemplateForm({ template }: { template: CertificateTem
         </section>
 
         <div className="flex flex-wrap justify-end gap-2">
-          <Button type="button" variant="ghost" onClick={() => setValues(DEFAULT_TEMPLATE_VALUES)}>
+          <Button type="button" variant="ghost" onClick={() => setValues((current) => ({ ...DEFAULT_TEMPLATE_VALUES, updated_at: current.updated_at }))}>
             <RotateCcwIcon />
             Reset kepada default
           </Button>
@@ -258,6 +259,7 @@ function CertificatePreview({ values }: { values: CertificateTemplateInput }) {
 function toInput(template: CertificateTemplate): CertificateTemplateInput {
   return {
     ...DEFAULT_TEMPLATE_VALUES,
+    updated_at: template.updated_at,
     name: template.name,
     primary_color: template.primary_color,
     secondary_color: template.secondary_color,

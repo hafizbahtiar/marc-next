@@ -29,13 +29,27 @@ export type PaymentHistory = {
   outstanding_registration_fee?: boolean;
 };
 
-export function getPaymentHistory(accessToken: string): Promise<PaymentHistory> {
-  return apiFetch<PaymentHistory>("/me/payments", { accessToken });
+export async function getPaymentHistory(accessToken: string): Promise<PaymentHistory> {
+  const history = await apiFetch<PaymentHistory>("/me/payments", { accessToken });
+  return {
+    ...history,
+    registration_fee: history.registration_fee ?? [],
+    activity_fees: history.activity_fees ?? [],
+    donations: history.donations ?? [],
+  };
 }
 
 export type RegistrationCheckoutResponse = {
   redirect_url: string;
 };
+
+export type PaymentConfig = {
+  gateway_charge_cents: number;
+};
+
+export function getPaymentConfig(accessToken: string): Promise<PaymentConfig> {
+  return apiFetch<PaymentConfig>("/payment-config", { accessToken });
+}
 
 export function checkoutRegistrationPayment(
   accessToken: string,

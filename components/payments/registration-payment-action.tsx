@@ -3,11 +3,18 @@
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { checkoutRegistrationPaymentAction } from "@/lib/payments/actions";
 
-export function RegistrationPaymentAction({ amountCents }: { amountCents: number | null }) {
+export function RegistrationPaymentAction({
+  amountCents,
+  gatewayChargeCents = 0,
+}: {
+  amountCents: number | null;
+  gatewayChargeCents?: number;
+}) {
   const [phone, setPhone] = useState("");
   const [needsPhone, setNeedsPhone] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -37,6 +44,26 @@ export function RegistrationPaymentAction({ amountCents }: { amountCents: number
 
   return (
     <div className="grid gap-3">
+      <div className="rounded-xl border bg-muted/20 p-4">
+        <dl className="grid gap-2 text-sm">
+          <div className="flex items-center justify-between gap-4">
+            <dt className="text-muted-foreground">Yuran pendaftaran</dt>
+            <dd className="font-medium">{formatCurrency(amountCents)}</dd>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <dt className="text-muted-foreground">Caj pemprosesan (anggaran)</dt>
+            <dd className="font-medium">{formatCurrency(gatewayChargeCents)}</dd>
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between gap-4">
+            <dt className="font-semibold">Jumlah anggaran</dt>
+            <dd className="font-semibold">{formatCurrency(amountCents + gatewayChargeCents)}</dd>
+          </div>
+        </dl>
+        <p className="mt-3 text-xs leading-5 text-muted-foreground">
+          Pecahan ini ialah anggaran. Jumlah akhir dan kaedah bayaran akan disahkan di halaman ToyyibPay.
+        </p>
+      </div>
       {needsPhone ? (
         <div className="grid gap-1.5">
           <label htmlFor="registration-payment-phone" className="text-sm font-medium">

@@ -18,10 +18,7 @@ export type CertificateTemplate = {
   footer_text: string;
 };
 
-export type CertificateTemplateInput = Omit<
-  CertificateTemplate,
-  "id" | "is_active" | "updated_at"
->;
+export type CertificateTemplateInput = Omit<CertificateTemplate, "id" | "is_active">;
 
 export function listCertificateTemplates(token: string) {
   return apiFetch<{ templates: CertificateTemplate[] }>("/admin/certificate-templates", {
@@ -43,9 +40,10 @@ export function updateCertificateTemplate(token: string, id: string, body: Certi
   });
 }
 
-export function publishCertificateTemplate(token: string, id: string) {
+export function publishCertificateTemplate(token: string, id: string, updatedAt: string) {
   return apiFetch<CertificateTemplate>(`/admin/certificate-templates/${encodeURIComponent(id)}/publish`, {
     method: "POST",
+    body: { updated_at: updatedAt },
     accessToken: token,
   });
 }

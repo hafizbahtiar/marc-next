@@ -4,8 +4,11 @@ import {
   Building2Icon,
   CreditCardIcon,
   AwardIcon,
+  FileUpIcon,
   Layers3Icon,
   MailWarningIcon,
+  ShieldBanIcon,
+  UserRoundXIcon,
 } from "lucide-react";
 
 import { SessionList } from "@/components/auth/session-list";
@@ -80,6 +83,14 @@ export default async function SettingsPage() {
                 description="Urus reka bentuk global sijil aktiviti"
                 href="/settings/certificate-templates"
               />
+              {profile.role_key === "superadmin" ? (
+                <SettingNavItem
+                  icon={FileUpIcon}
+                  label="Import ahli lama"
+                  description="Semak dan padankan data ahli MARC lama"
+                  href="/settings/legacy-import"
+                />
+              ) : null}
             </SettingsCard>
           ) : null}
 
@@ -96,6 +107,18 @@ export default async function SettingsPage() {
                 label="Bahagian/jabatan"
                 description="Urus struktur organisasi"
                 href="/settings/departments"
+              />
+              <SettingNavItem
+                icon={UserRoundXIcon}
+                label="Pemadaman akaun"
+                description="Semak dan proses permintaan pemadaman data"
+                href="/settings/account-deletions"
+              />
+              <SettingNavItem
+                icon={ShieldBanIcon}
+                label="Akaun digantung"
+                description="Urus ban sementara dan permanent"
+                href="/settings/banned-members"
               />
             </SettingsCard>
           ) : null}

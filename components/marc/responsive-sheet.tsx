@@ -92,17 +92,26 @@ export function ResponsiveDetailsSheet({
   description,
   trigger,
   children,
+  open,
+  onOpenChange,
 }: {
   title: string;
   description?: string;
   trigger: React.ReactNode;
   children: React.ReactNode;
+  /**
+   * Opsional. Ditinggalkan, sheet menguruskan dirinya sendiri seperti
+   * sebelum ini - pemanggil sedia ada tak perlu berubah. Diberi, ia
+   * membenarkan pemanggil MENUTUP sheet selepas tindakan berjaya.
+   */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const isMobile = useIsMobile();
 
   if (isMobile) {
     return (
-      <Drawer>
+      <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerTrigger asChild>{trigger}</DrawerTrigger>
         <DrawerContent>
           <DrawerHeader className="text-left">
@@ -116,7 +125,7 @@ export function ResponsiveDetailsSheet({
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
       <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">
         <SheetHeader>

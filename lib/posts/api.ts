@@ -35,12 +35,12 @@ export function createPost(
   return apiFetch<Post>("/posts", { method: "POST", body, accessToken });
 }
 
-export function updatePost(accessToken: string, id: string, content: string): Promise<Post> {
-  return apiFetch<Post>(`/posts/${id}`, { method: "PATCH", body: { content }, accessToken });
+export function updatePost(accessToken: string, id: string, content: string, updatedAt: string): Promise<Post> {
+  return apiFetch<Post>(`/posts/${id}`, { method: "PATCH", body: { content, updated_at: updatedAt }, accessToken });
 }
 
-export function deletePost(accessToken: string, id: string): Promise<void> {
-  return apiFetch<void>(`/posts/${id}`, { method: "DELETE", accessToken });
+export function deletePost(accessToken: string, id: string, updatedAt: string): Promise<void> {
+  return apiFetch<void>(`/posts/${id}`, { method: "DELETE", body: { updated_at: updatedAt }, accessToken });
 }
 
 export function likePost(accessToken: string, id: string): Promise<void> {
@@ -76,16 +76,16 @@ export function unlikeComment(accessToken: string, id: string): Promise<void> {
   return apiFetch<void>(`/comments/${id}/like`, { method: "DELETE", accessToken });
 }
 
-export function updateComment(accessToken: string, id: string, content: string): Promise<Comment> {
+export function updateComment(accessToken: string, id: string, content: string, updatedAt: string): Promise<Comment> {
   return apiFetch<Comment>(`/comments/${id}`, {
     method: "PATCH",
-    body: { content },
+    body: { content, updated_at: updatedAt },
     accessToken,
   });
 }
 
-export function deleteComment(accessToken: string, id: string): Promise<void> {
-  return apiFetch<void>(`/comments/${id}`, { method: "DELETE", accessToken });
+export function deleteComment(accessToken: string, id: string, updatedAt: string): Promise<void> {
+  return apiFetch<void>(`/comments/${id}`, { method: "DELETE", body: { updated_at: updatedAt }, accessToken });
 }
 
 export function requestUploadUrl(
