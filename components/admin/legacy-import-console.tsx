@@ -2,20 +2,60 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircleIcon, CheckCircle2Icon, FileUpIcon, UploadCloudIcon } from "lucide-react";
+import { AlertCircleIcon, CheckCircle2Icon, FileUpIcon, PlusIcon, UploadCloudIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { importLegacyBatchAction, dryRunLegacyImportAction } from "@/lib/admin/legacy-import-actions";
+import { Label } from "@/components/ui/label";
+import {
+  importLegacyBatchAction,
+  dryRunLegacyImportAction,
+  resolveLegacyImportDepartmentAction,
+  updateLegacyImportRowAction,
+} from "@/lib/admin/legacy-import-actions";
 import type { LegacyImportBatch } from "@/lib/admin/legacy-import-api";
+
+/**
+ * Konflik No. ID. yang boleh diselesaikan dengan membetulkan No. ID.
+ * pada baris itu sendiri.
+ *
+ * Ketiga-tiganya dikumpulkan kerana tiada satu pun boleh diautomasikan -
+ * sistem tak tahu nilai yang betul. Placeholder ("XXXX"/"MS") perlu No.
+ * ID. sebenar; pendua perlu manusia menentukan baris mana yang mana;
+ * dan No. ID. yang sudah dipakai akaun lain perlu keputusan. Jadi
+ * shortcut-nya ialah medan suntingan, bukan butang satu klik.
+ */
+const STAFF_ID_CONFLICTS = new Set(["placeholder_staff_id", "duplicate_staff_id", "existing_staff_id"]);
+
+/**
+ * Kod bahagian TAK boleh mengandungi '/' - ia memecahkan routing
+ * /admin/departments/:code di backend. Nilai CSV seperti
+ * "PEJ. TKPE (P) / BKP" jadi cadangan kod yang dibersihkan, dan
+ * superadmin boleh kemas lagi sebelum simpan.
+ */
+function cadangKod(nilai: string) {
+  return nilai.trim().replace(/\s*\/\s*/g, "-").replace(/\s+/g, " ").slice(0, 64);
+}
+
+type DialogBahagian = { batchId: string; from: string; code: string; name: string };
 
 export function LegacyImportConsole({ batches }: { batches: LegacyImportBatch[] }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ kind: "error" | "success"; text: string }>();
   const [report, setReport] = useState<Record<string, unknown>>();
+  const [staffDraft, setStaffDraft] = useState<{ rowId: string; value: string }>();
+  const [dialogBahagian, setDialogBahagian] = useState<DialogBahagian>();
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,6 +81,37 @@ export function LegacyImportConsole({ batches }: { batches: LegacyImportBatch[] 
           : { kind: "error", text: result.error },
       );
       if (result.ok) router.refresh();
+    });
+  }
+
+  function simpanStaffID(rowId: string, value: string) {
+    startTransition(async () => {
+      const result = await updateLegacyImportRowAction(rowId, value);
+      if (!result.ok) {
+        setMessage({ kind: "error", text: result.error });
+        return;
+      }
+      setStaffDraft(undefined);
+      setMessage({ kind: "success", text: "No. ID. dikemas kini dan konflik dikira semula." });
+      router.refresh();
+    });
+  }
+
+  function simpanBahagian(input: DialogBahagian) {
+    startTransition(async () => {
+      const result = await resolveLegacyImportDepartmentAction(
+        input.batchId,
+        input.from,
+        input.code,
+        input.name,
+      );
+      if (!result.ok) {
+        setMessage({ kind: "error", text: result.error });
+        return;
+      }
+      setDialogBahagian(undefined);
+      setMessage({ kind: "success", text: `Bahagian ${input.code} ditambah dan baris dikemas kini.` });
+      router.refresh();
     });
   }
 
@@ -154,6 +225,8 @@ export function LegacyImportConsole({ batches }: { batches: LegacyImportBatch[] 
               <tbody>
                 {batch.rows?.map((row) => {
                   const hasConflict = row.conflicts.length > 0 || row.status === "conflict";
+                  const perluEditStaffID = row.conflicts.some((conflict) => STAFF_ID_CONFLICTS.has(conflict.code));
+                  const draf = staffDraft?.rowId === row.id ? staffDraft.value : row.legacy_staff_id;
                   return (
                     <tr key={row.id} className={hasConflict ? "border-b bg-destructive/5 align-top" : "border-b align-top"}>
                       <td className="px-3 py-3">{row.source_row}</td>
@@ -172,13 +245,55 @@ export function LegacyImportConsole({ batches }: { batches: LegacyImportBatch[] 
                       </td>
                       <td className="px-3 py-3">
                         {hasConflict ? (
-                          <div className="grid gap-1 text-destructive">
+                          <div className="grid gap-2 text-destructive">
                             <span className="font-medium">Konflik</span>
                             {row.conflicts.map((conflict) => (
-                              <span key={conflict.code} className="text-xs">
-                                {conflict.message}
-                              </span>
+                              <div key={conflict.code} className="grid gap-1">
+                                <span className="text-xs">{conflict.message}</span>
+                                {conflict.code === "unknown_department" ? (
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="outline"
+                                    className="w-fit"
+                                    disabled={pending}
+                                    onClick={() =>
+                                      setDialogBahagian({
+                                        batchId: batch.id,
+                                        from: row.department_code,
+                                        code: cadangKod(row.department_code),
+                                        name: row.department_code,
+                                      })
+                                    }
+                                  >
+                                    <PlusIcon />
+                                    Tambah bahagian
+                                  </Button>
+                                ) : null}
+                              </div>
                             ))}
+                            {perluEditStaffID ? (
+                              <div className="flex flex-wrap items-center gap-2 pt-1">
+                                <Input
+                                  aria-label={`No. ID. untuk baris ${row.source_row}`}
+                                  className="h-8 w-44"
+                                  value={draf}
+                                  disabled={pending}
+                                  onChange={(event) =>
+                                    setStaffDraft({ rowId: row.id, value: event.target.value })
+                                  }
+                                />
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  disabled={pending || draf.trim() === "" || draf === row.legacy_staff_id}
+                                  onClick={() => simpanStaffID(row.id, draf)}
+                                >
+                                  Simpan No. ID.
+                                </Button>
+                              </div>
+                            ) : null}
                           </div>
                         ) : (
                           <span className="text-emerald-700 dark:text-emerald-400">
@@ -194,6 +309,64 @@ export function LegacyImportConsole({ batches }: { batches: LegacyImportBatch[] 
           </CardContent>
         </Card>
       ))}
+
+      <Dialog
+        open={dialogBahagian !== undefined}
+        onOpenChange={(open) => {
+          if (!open) setDialogBahagian(undefined);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Tambah bahagian</DialogTitle>
+            <DialogDescription>
+              Bahagian baharu akan dicipta dan semua baris dalam batch yang merujuk
+              &ldquo;{dialogBahagian?.from}&rdquo; akan ditukar kepada kod ini. Kod tidak boleh
+              mengandungi &lsquo;/&rsquo;.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3">
+            <div className="grid gap-2">
+              <Label htmlFor="kod-bahagian">Kod</Label>
+              <Input
+                id="kod-bahagian"
+                value={dialogBahagian?.code ?? ""}
+                disabled={pending}
+                onChange={(event) =>
+                  setDialogBahagian((current) =>
+                    current ? { ...current, code: event.target.value } : current,
+                  )
+                }
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="nama-bahagian">Nama</Label>
+              <Input
+                id="nama-bahagian"
+                value={dialogBahagian?.name ?? ""}
+                disabled={pending}
+                onChange={(event) =>
+                  setDialogBahagian((current) =>
+                    current ? { ...current, name: event.target.value } : current,
+                  )
+                }
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" disabled={pending} onClick={() => setDialogBahagian(undefined)}>
+              Batal
+            </Button>
+            <Button
+              type="button"
+              disabled={pending || !dialogBahagian?.code.trim() || !dialogBahagian?.name.trim()}
+              onClick={() => dialogBahagian && simpanBahagian(dialogBahagian)}
+            >
+              Simpan bahagian
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

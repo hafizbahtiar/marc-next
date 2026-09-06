@@ -66,7 +66,7 @@ export function LoginForm({ next }: { next: string }) {
       </p>
       <p className="text-center text-sm text-muted-foreground">
         Ahli lama MARC?{" "}
-        <Link href={ROUTES.tuntutAkaun} className="font-medium text-primary underline-offset-4 hover:underline">
+        <Link href={ROUTES.claimAccount} className="font-medium text-primary underline-offset-4 hover:underline">
           Tuntut akaun
         </Link>
       </p>

@@ -116,3 +116,39 @@ export function importLegacyBatch(accessToken: string, id: string) {
     { method: "POST", accessToken },
   );
 }
+
+/**
+ * Membetulkan No. ID. pada satu baris staging. Backend mengira semula
+ * SELURUH batch selepas ini, jadi pemanggil mesti muat semula batch -
+ * membetulkan satu baris pendua turut membersihkan pasangannya.
+ */
+export function updateLegacyImportRow(
+  accessToken: string,
+  rowId: string,
+  body: { legacy_staff_id: string },
+) {
+  return apiFetch<{ batch_id: string }>(
+    `/admin/legacy-member-import/rows/${encodeURIComponent(rowId)}`,
+    { method: "PATCH", body, accessToken },
+  );
+}
+
+/**
+ * Mencipta bahagian yang hilang DAN menulis semula baris batch yang
+ * merujuk nilai CSV asal (`from`) kepada `code`.
+ *
+ * Dua langkah ini satu operasi kerana kod bahagian tak boleh
+ * mengandungi '/'. Nilai seperti "PEJ. TKPE (P) / BKP" mesti ditukar
+ * kepada kod bersih, dan baris CSV kena ikut sekali - kalau tidak baris
+ * itu kekal merujuk teks lama dan konfliknya tak selesai.
+ */
+export function resolveLegacyImportDepartment(
+  accessToken: string,
+  batchId: string,
+  body: { from: string; code: string; name: string },
+) {
+  return apiFetch<{ code: string; name: string }>(
+    `/admin/legacy-member-import/${encodeURIComponent(batchId)}/resolve-department`,
+    { method: "POST", body, accessToken },
+  );
+}

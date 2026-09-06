@@ -7,6 +7,8 @@ import { accessToken } from "@/lib/auth/session";
 
 import {
   importLegacyBatch,
+  resolveLegacyImportDepartment,
+  updateLegacyImportRow,
   uploadLegacyImport,
 } from "./legacy-import-api";
 
@@ -40,6 +42,42 @@ export async function dryRunLegacyImportAction(formData: FormData): Promise<Lega
 export async function importLegacyBatchAction(id: string): Promise<LegacyImportActionResult> {
   try {
     return { ok: true, data: await importLegacyBatch(await token(), id) };
+  } catch (error) {
+    return { ok: false, error: message(error) };
+  } finally {
+    revalidatePath("/settings/legacy-import");
+  }
+}
+
+export async function updateLegacyImportRowAction(
+  rowId: string,
+  staffId: string,
+): Promise<LegacyImportActionResult> {
+  try {
+    const trimmed = staffId.trim();
+    if (!trimmed) return { ok: false, error: "No. ID. tidak boleh kosong." };
+    return { ok: true, data: await updateLegacyImportRow(await token(), rowId, { legacy_staff_id: trimmed }) };
+  } catch (error) {
+    return { ok: false, error: message(error) };
+  } finally {
+    revalidatePath("/settings/legacy-import");
+  }
+}
+
+export async function resolveLegacyImportDepartmentAction(
+  batchId: string,
+  from: string,
+  code: string,
+  name: string,
+): Promise<LegacyImportActionResult> {
+  try {
+    const kod = code.trim();
+    const nama = name.trim();
+    if (!kod || !nama) return { ok: false, error: "Kod dan nama bahagian diperlukan." };
+    if (kod.includes("/")) {
+      return { ok: false, error: "Kod bahagian tidak boleh mengandungi '/'." };
+    }
+    return { ok: true, data: await resolveLegacyImportDepartment(await token(), batchId, { from, code: kod, name: nama }) };
   } catch (error) {
     return { ok: false, error: message(error) };
   } finally {

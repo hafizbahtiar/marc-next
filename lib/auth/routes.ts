@@ -10,7 +10,7 @@ export const ROUTES = {
   daftar: "/register",
   lupaKataLaluan: "/forgot-password",
   tetapKataLaluan: "/reset-password",
-  tuntutAkaun: "/claim-account",
+  claimAccount: "/claim-account",
   sahkanEmel: "/verify-email",
   utama: "/",
   sokongMARC: "/donate",
@@ -50,7 +50,7 @@ export const LALUAN_TETAMU: readonly string[] = [
 export const LALUAN_TOKEN: readonly string[] = [
   ROUTES.tetapKataLaluan,
   ROUTES.sahkanEmel,
-  ROUTES.tuntutAkaun,
+  ROUTES.claimAccount,
 ];
 
 export function laluanAwam(pathname: string): boolean {
