@@ -134,8 +134,12 @@ export function updateLegacyImportRow(
 }
 
 /**
- * Mencipta bahagian yang hilang DAN menulis semula baris batch yang
- * merujuk nilai CSV asal (`from`) kepada `code`.
+ * Menyelesaikan konflik bahagian: pilih bahagian SEDIA ADA (merge) atau
+ * cipta yang baharu, kemudian tulis semula baris batch yang merujuk
+ * nilai CSV asal (`from`) kepada kod itu.
+ *
+ * `name` hanya dihantar untuk bahagian baharu. Untuk merge ia
+ * ditinggalkan supaya nama bahagian sedia ada tak tertulis ganti.
  *
  * Dua langkah ini satu operasi kerana kod bahagian tak boleh
  * mengandungi '/'. Nilai seperti "PEJ. TKPE (P) / BKP" mesti ditukar
@@ -145,9 +149,9 @@ export function updateLegacyImportRow(
 export function resolveLegacyImportDepartment(
   accessToken: string,
   batchId: string,
-  body: { from: string; code: string; name: string },
+  body: { from: string; code: string; name?: string },
 ) {
-  return apiFetch<{ code: string; name: string }>(
+  return apiFetch<{ code: string }>(
     `/admin/legacy-member-import/${encodeURIComponent(batchId)}/resolve-department`,
     { method: "POST", body, accessToken },
   );

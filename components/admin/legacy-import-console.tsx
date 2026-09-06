@@ -1,61 +1,116 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircleIcon, CheckCircle2Icon, FileUpIcon, PlusIcon, UploadCloudIcon } from "lucide-react";
+import type { ColumnDef } from "@tanstack/react-table";
+import {
+  AlertCircleIcon,
+  CheckCircle2Icon,
+  CopyIcon,
+  FileUpIcon,
+  UploadCloudIcon,
+  WrenchIcon,
+} from "lucide-react";
 
+import { DataTable, DataTableColumnHeader, type DataTableFilter } from "@/components/marc/data-table";
+import { ResponsiveDetailsSheet } from "@/components/marc/responsive-sheet";
+import { StatusBadge, type StatusTone } from "@/components/marc/status-badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import {
   importLegacyBatchAction,
   dryRunLegacyImportAction,
   resolveLegacyImportDepartmentAction,
   updateLegacyImportRowAction,
 } from "@/lib/admin/legacy-import-actions";
-import type { LegacyImportBatch } from "@/lib/admin/legacy-import-api";
+import { ringkasanKonflik, teksRingkasanKonflik } from "@/lib/admin/legacy-import-conflicts";
+import type { LegacyImportBatch, LegacyImportRow } from "@/lib/admin/legacy-import-api";
+
+type Mesej = { kind: "error" | "success"; text: string };
+type Bahagian = { code: string; name: string };
 
 /**
- * Konflik No. ID. yang boleh diselesaikan dengan membetulkan No. ID.
- * pada baris itu sendiri.
- *
- * Ketiga-tiganya dikumpulkan kerana tiada satu pun boleh diautomasikan -
- * sistem tak tahu nilai yang betul. Placeholder ("XXXX"/"MS") perlu No.
- * ID. sebenar; pendua perlu manusia menentukan baris mana yang mana;
- * dan No. ID. yang sudah dipakai akaun lain perlu keputusan. Jadi
- * shortcut-nya ialah medan suntingan, bukan butang satu klik.
+ * Konflik No. ID. yang diselesaikan dengan membetulkan No. ID. baris itu
+ * sendiri. Ketiga-tiganya tak boleh diautomasikan - sistem tak tahu
+ * nilai yang betul: placeholder perlu No. ID. sebenar, pendua perlu
+ * manusia menentukan baris mana yang mana, dan No. ID. milik akaun lain
+ * perlu keputusan.
  */
 const STAFF_ID_CONFLICTS = new Set(["placeholder_staff_id", "duplicate_staff_id", "existing_staff_id"]);
 
+/** Pilihan "cipta baharu" dalam pemilih bahagian. */
+const BAHARU = "__baharu__";
+
+const STATUS_LABEL: Record<string, string> = {
+  valid: "Lulus",
+  conflict: "Konflik",
+  imported: "Diimport",
+  claimed: "Dituntut",
+};
+
+/**
+ * `statusTone` yang dikongsi tak mengenali status import warisan, jadi
+ * pemetaan dibuat di sini dan bukan dengan memaksa nilai kita ke dalam
+ * senarainya.
+ */
+function toneStatus(status: string): StatusTone {
+  if (status === "valid") return "success";
+  if (status === "conflict") return "danger";
+  if (status === "imported" || status === "claimed") return "info";
+  return "neutral";
+}
+
 /**
  * Kod bahagian TAK boleh mengandungi '/' - ia memecahkan routing
- * /admin/departments/:code di backend. Nilai CSV seperti
- * "PEJ. TKPE (P) / BKP" jadi cadangan kod yang dibersihkan, dan
- * superadmin boleh kemas lagi sebelum simpan.
+ * /admin/departments/:code di backend.
  */
 function cadangKod(nilai: string) {
   return nilai.trim().replace(/\s*\/\s*/g, "-").replace(/\s+/g, " ").slice(0, 64);
 }
 
-type DialogBahagian = { batchId: string; from: string; code: string; name: string };
+/**
+ * Cadangkan bahagian sedia ada bila nilai CSV mengandungi kodnya, cth
+ * "PEJ. TKPE (P) / BKP" -> "BKP". Padanan pada sempadan perkataan supaya
+ * "UU" tak tersilap padan dengan "BAHAGIAN UUUM".
+ */
+function padananBahagian(nilai: string, departments: Bahagian[]) {
+  const perkataan = new Set(
+    nilai
+      .toUpperCase()
+      .split(/[^A-Z0-9]+/)
+      .filter(Boolean),
+  );
+  return departments.find((item) => perkataan.has(item.code.toUpperCase()))?.code;
+}
 
-export function LegacyImportConsole({ batches }: { batches: LegacyImportBatch[] }) {
+const rowFilters: DataTableFilter[] = [
+  {
+    columnId: "status",
+    title: "Status",
+    options: [
+      { value: "conflict", label: "Konflik" },
+      { value: "valid", label: "Lulus" },
+      { value: "imported", label: "Diimport" },
+      { value: "claimed", label: "Dituntut" },
+    ],
+  },
+];
+
+export function LegacyImportConsole({
+  batches,
+  departments,
+}: {
+  batches: LegacyImportBatch[];
+  departments: Bahagian[];
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{ kind: "error" | "success"; text: string }>();
+  const [message, setMessage] = useState<Mesej>();
   const [report, setReport] = useState<Record<string, unknown>>();
-  const [staffDraft, setStaffDraft] = useState<{ rowId: string; value: string }>();
-  const [dialogBahagian, setDialogBahagian] = useState<DialogBahagian>();
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -72,48 +127,72 @@ export function LegacyImportConsole({ batches }: { batches: LegacyImportBatch[] 
     });
   }
 
-  function runImport(id: string) {
-    startTransition(async () => {
-      const result = await importLegacyBatchAction(id);
-      setMessage(
-        result.ok
-          ? { kind: "success", text: "Baris yang telah dipadankan dengan akaun berjaya diimport." }
-          : { kind: "error", text: result.error },
-      );
-      if (result.ok) router.refresh();
-    });
-  }
+  const runImport = useCallback(
+    (id: string) => {
+      startTransition(async () => {
+        const result = await importLegacyBatchAction(id);
+        setMessage(
+          result.ok
+            ? { kind: "success", text: "Baris yang telah dipadankan dengan akaun berjaya diimport." }
+            : { kind: "error", text: result.error },
+        );
+        if (result.ok) router.refresh();
+      });
+    },
+    [router],
+  );
 
-  function simpanStaffID(rowId: string, value: string) {
-    startTransition(async () => {
-      const result = await updateLegacyImportRowAction(rowId, value);
-      if (!result.ok) {
-        setMessage({ kind: "error", text: result.error });
-        return;
-      }
-      setStaffDraft(undefined);
-      setMessage({ kind: "success", text: "No. ID. dikemas kini dan konflik dikira semula." });
-      router.refresh();
-    });
-  }
-
-  function simpanBahagian(input: DialogBahagian) {
-    startTransition(async () => {
-      const result = await resolveLegacyImportDepartmentAction(
-        input.batchId,
-        input.from,
-        input.code,
-        input.name,
-      );
-      if (!result.ok) {
-        setMessage({ kind: "error", text: result.error });
-        return;
-      }
-      setDialogBahagian(undefined);
-      setMessage({ kind: "success", text: `Bahagian ${input.code} ditambah dan baris dikemas kini.` });
-      router.refresh();
-    });
-  }
+  const batchColumns = useMemo<ColumnDef<LegacyImportBatch>[]>(
+    () => [
+      {
+        accessorKey: "source_filename",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Fail" />,
+        cell: ({ row }) => <span className="font-medium">{row.original.source_filename}</span>,
+      },
+      {
+        accessorKey: "status",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+        cell: ({ row }) => (
+          <StatusBadge
+            label={STATUS_LABEL[row.original.status] ?? row.original.status}
+            tone={toneStatus(row.original.status)}
+          />
+        ),
+      },
+      {
+        id: "baris",
+        header: "Baris",
+        enableSorting: false,
+        cell: ({ row }) => `${row.original.valid_rows}/${row.original.total_rows}`,
+      },
+      {
+        accessorKey: "conflict_rows",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Konflik" />,
+      },
+      {
+        id: "tindakan",
+        header: "Tindakan",
+        enableSorting: false,
+        enableHiding: false,
+        cell: ({ row }) =>
+          row.original.status !== "imported" && row.original.valid_rows > 0 ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={pending}
+              onClick={() => runImport(row.original.id)}
+            >
+              <FileUpIcon />
+              Import baris lulus
+            </Button>
+          ) : (
+            <span className="text-xs text-muted-foreground">-</span>
+          ),
+      },
+    ],
+    [pending, runImport],
+  );
 
   return (
     <div className="grid gap-5">
@@ -161,212 +240,365 @@ export function LegacyImportConsole({ batches }: { batches: LegacyImportBatch[] 
         <CardHeader>
           <CardTitle className="text-base">Batch import terdahulu</CardTitle>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
-          {batches.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Belum ada dry-run.</p>
-          ) : (
-            <table className="w-full min-w-[720px] text-sm">
-              <thead className="border-b text-left text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2 font-medium">Fail</th>
-                  <th className="px-3 py-2 font-medium">Status</th>
-                  <th className="px-3 py-2 font-medium">Baris</th>
-                  <th className="px-3 py-2 font-medium">Konflik</th>
-                  <th className="px-3 py-2 font-medium">Tindakan</th>
-                </tr>
-              </thead>
-              <tbody>
-                {batches.map((batch) => (
-                  <tr key={batch.id} className="border-b last:border-0">
-                    <td className="px-3 py-3 font-medium">{batch.source_filename}</td>
-                    <td className="px-3 py-3">{batch.status}</td>
-                    <td className="px-3 py-3">{batch.valid_rows}/{batch.total_rows}</td>
-                    <td className="px-3 py-3">{batch.conflict_rows}</td>
-                    <td className="px-3 py-3">
-                      {batch.status !== "imported" && batch.valid_rows > 0 ? (
-                        <Button type="button" size="sm" variant="outline" disabled={pending} onClick={() => runImport(batch.id)}>
-                          <FileUpIcon />
-                          Import baris lulus
-                        </Button>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">-</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+        <CardContent>
+          <DataTable
+            columns={batchColumns}
+            data={batches}
+            getRowId={(batch) => batch.id}
+            emptyMessage="Belum ada dry-run."
+            enablePagination={false}
+          />
         </CardContent>
       </Card>
 
       {batches.map((batch) => (
-        <Card key={`${batch.id}-rows`}>
-          <CardHeader>
-            <CardTitle className="text-base">
-              Senarai row: {batch.source_filename}
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Semua {batch.total_rows} row dipaparkan. Row merah mempunyai konflik dan tidak akan diimport.
-            </p>
-          </CardHeader>
-          <CardContent className="overflow-x-auto">
-            <table className="w-full min-w-[980px] text-sm">
-              <thead className="border-b text-left text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2 font-medium">Row</th>
-                  <th className="px-3 py-2 font-medium">Ahli</th>
-                  <th className="px-3 py-2 font-medium">Emel</th>
-                  <th className="px-3 py-2 font-medium">Bahagian</th>
-                  <th className="px-3 py-2 font-medium">Akaun</th>
-                  <th className="px-3 py-2 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {batch.rows?.map((row) => {
-                  const hasConflict = row.conflicts.length > 0 || row.status === "conflict";
-                  const perluEditStaffID = row.conflicts.some((conflict) => STAFF_ID_CONFLICTS.has(conflict.code));
-                  const draf = staffDraft?.rowId === row.id ? staffDraft.value : row.legacy_staff_id;
-                  return (
-                    <tr key={row.id} className={hasConflict ? "border-b bg-destructive/5 align-top" : "border-b align-top"}>
-                      <td className="px-3 py-3">{row.source_row}</td>
-                      <td className="px-3 py-3">
-                        <p className="font-medium">{row.display_name || "Tanpa nama"}</p>
-                        <p className="text-xs text-muted-foreground">{row.member_id || "No. ahli tiada"}</p>
-                      </td>
-                      <td className="px-3 py-3">{row.email}</td>
-                      <td className="px-3 py-3">{row.department_code || "-"}</td>
-                      <td className="px-3 py-3">
-                        {row.user_id ? (
-                          <span className="text-emerald-700 dark:text-emerald-400">Dipadankan</span>
-                        ) : (
-                          <span className="text-muted-foreground">Belum ada akaun</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-3">
-                        {hasConflict ? (
-                          <div className="grid gap-2 text-destructive">
-                            <span className="font-medium">Konflik</span>
-                            {row.conflicts.map((conflict) => (
-                              <div key={conflict.code} className="grid gap-1">
-                                <span className="text-xs">{conflict.message}</span>
-                                {conflict.code === "unknown_department" ? (
-                                  <Button
-                                    type="button"
-                                    size="sm"
-                                    variant="outline"
-                                    className="w-fit"
-                                    disabled={pending}
-                                    onClick={() =>
-                                      setDialogBahagian({
-                                        batchId: batch.id,
-                                        from: row.department_code,
-                                        code: cadangKod(row.department_code),
-                                        name: row.department_code,
-                                      })
-                                    }
-                                  >
-                                    <PlusIcon />
-                                    Tambah bahagian
-                                  </Button>
-                                ) : null}
-                              </div>
-                            ))}
-                            {perluEditStaffID ? (
-                              <div className="flex flex-wrap items-center gap-2 pt-1">
-                                <Input
-                                  aria-label={`No. ID. untuk baris ${row.source_row}`}
-                                  className="h-8 w-44"
-                                  value={draf}
-                                  disabled={pending}
-                                  onChange={(event) =>
-                                    setStaffDraft({ rowId: row.id, value: event.target.value })
-                                  }
-                                />
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant="outline"
-                                  disabled={pending || draf.trim() === "" || draf === row.legacy_staff_id}
-                                  onClick={() => simpanStaffID(row.id, draf)}
-                                >
-                                  Simpan No. ID.
-                                </Button>
-                              </div>
-                            ) : null}
-                          </div>
-                        ) : (
-                          <span className="text-emerald-700 dark:text-emerald-400">
-                            {row.status === "imported" ? "Sudah diimport" : "Lulus"}
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
+        <BatchRowsCard
+          key={`${batch.id}-rows`}
+          batch={batch}
+          departments={departments}
+          onMessage={setMessage}
+        />
       ))}
+    </div>
+  );
+}
 
-      <Dialog
-        open={dialogBahagian !== undefined}
-        onOpenChange={(open) => {
-          if (!open) setDialogBahagian(undefined);
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Tambah bahagian</DialogTitle>
-            <DialogDescription>
-              Bahagian baharu akan dicipta dan semua baris dalam batch yang merujuk
-              &ldquo;{dialogBahagian?.from}&rdquo; akan ditukar kepada kod ini. Kod tidak boleh
-              mengandungi &lsquo;/&rsquo;.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-3">
-            <div className="grid gap-2">
-              <Label htmlFor="kod-bahagian">Kod</Label>
-              <Input
-                id="kod-bahagian"
-                value={dialogBahagian?.code ?? ""}
-                disabled={pending}
-                onChange={(event) =>
-                  setDialogBahagian((current) =>
-                    current ? { ...current, code: event.target.value } : current,
-                  )
-                }
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="nama-bahagian">Nama</Label>
-              <Input
-                id="nama-bahagian"
-                value={dialogBahagian?.name ?? ""}
-                disabled={pending}
-                onChange={(event) =>
-                  setDialogBahagian((current) =>
-                    current ? { ...current, name: event.target.value } : current,
-                  )
-                }
-              />
-            </div>
+function BatchRowsCard({
+  batch,
+  departments,
+  onMessage,
+}: {
+  batch: LegacyImportBatch;
+  departments: Bahagian[];
+  onMessage: (mesej: Mesej) => void;
+}) {
+  // `batch.rows ?? []` menghasilkan array BAHARU setiap render, yang
+  // membatalkan memo di bawah setiap kali. Distabilkan di sini.
+  const rows = useMemo(() => batch.rows ?? [], [batch.rows]);
+  const ringkasan = useMemo(() => ringkasanKonflik(rows), [rows]);
+
+  const columns = useMemo<ColumnDef<LegacyImportRow>[]>(
+    () => [
+      {
+        accessorKey: "source_row",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Row" />,
+      },
+      {
+        accessorKey: "display_name",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Ahli" />,
+        cell: ({ row }) => (
+          <div className="min-w-36">
+            <p className="font-medium">{row.original.display_name || "Tanpa nama"}</p>
+            <p className="text-xs text-muted-foreground">{row.original.member_id || "No. ahli tiada"}</p>
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" disabled={pending} onClick={() => setDialogBahagian(undefined)}>
-              Batal
-            </Button>
+        ),
+      },
+      { accessorKey: "email", header: "Emel" },
+      {
+        accessorKey: "department_code",
+        header: "Bahagian",
+        cell: ({ row }) => row.original.department_code || "-",
+      },
+      {
+        id: "akaun",
+        header: "Akaun",
+        enableSorting: false,
+        cell: ({ row }) =>
+          row.original.user_id ? (
+            <StatusBadge label="Dipadankan" tone="success" />
+          ) : (
+            <span className="text-xs text-muted-foreground">Belum ada akaun</span>
+          ),
+      },
+      {
+        accessorKey: "status",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+        cell: ({ row }) => (
+          <StatusBadge
+            label={STATUS_LABEL[row.original.status] ?? row.original.status}
+            tone={toneStatus(row.original.status)}
+          />
+        ),
+      },
+      {
+        id: "konflik",
+        header: "Konflik",
+        enableSorting: false,
+        enableHiding: false,
+        cell: ({ row }) =>
+          row.original.conflicts.length === 0 ? (
+            <span className="text-xs text-muted-foreground">-</span>
+          ) : (
+            <ResolveSheet
+              row={row.original}
+              batchId={batch.id}
+              departments={departments}
+              onMessage={onMessage}
+            />
+          ),
+      },
+    ],
+    [batch.id, departments, onMessage],
+  );
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Senarai row: {batch.source_filename}</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          {batch.total_rows} row. Baris berkonflik tidak akan diimport sehingga diselesaikan.
+        </p>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        <RingkasanKonflikSection items={ringkasan} onMessage={onMessage} />
+        <DataTable
+          columns={columns}
+          data={rows}
+          searchKey="display_name"
+          searchPlaceholder="Cari nama ahli…"
+          filters={rowFilters}
+          getRowId={(row) => row.id}
+          emptyMessage="Tiada row."
+          initialPageSize={20}
+          pageSizeOptions={[10, 20, 50, 100]}
+        />
+      </CardContent>
+    </Card>
+  );
+}
+
+/**
+ * Ringkasan konflik unik - dibina untuk DISALIN dan dihantar kepada
+ * client, jadi ia dikumpulkan mengikut mesej penuh (yang membawa nilai
+ * spesifik seperti nama bahagian), bukan kod konflik.
+ */
+function RingkasanKonflikSection({
+  items,
+  onMessage,
+}: {
+  items: { message: string; count: number }[];
+  onMessage: (mesej: Mesej) => void;
+}) {
+  if (items.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed px-4 py-3 text-sm text-muted-foreground">
+        Tiada konflik dalam batch ini.
+      </div>
+    );
+  }
+
+  async function salin() {
+    try {
+      await navigator.clipboard.writeText(teksRingkasanKonflik(items));
+      onMessage({ kind: "success", text: "Ringkasan konflik disalin." });
+    } catch {
+      onMessage({ kind: "error", text: "Pelayar tidak membenarkan salinan automatik." });
+    }
+  }
+
+  return (
+    <div className="rounded-lg border bg-muted/30 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="text-sm font-medium">Konflik unik ({items.length})</p>
+          <p className="text-xs text-muted-foreground">Senarai untuk dimaklumkan kepada client.</p>
+        </div>
+        <Button type="button" size="sm" variant="outline" onClick={salin}>
+          <CopyIcon />
+          Salin
+        </Button>
+      </div>
+      <ul className="mt-3 grid gap-1.5">
+        {items.map((item) => (
+          <li key={item.message} className="flex items-start justify-between gap-3 text-sm">
+            <span>{item.message}</span>
+            <span className="shrink-0 text-xs text-muted-foreground">{item.count} baris</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ResolveSheet({
+  row,
+  batchId,
+  departments,
+  onMessage,
+}: {
+  row: LegacyImportRow;
+  batchId: string;
+  departments: Bahagian[];
+  onMessage: (mesej: Mesej) => void;
+}) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [pending, startTransition] = useTransition();
+  const [staffID, setStaffID] = useState(row.legacy_staff_id);
+  const [pilihan, setPilihan] = useState(
+    () => padananBahagian(row.department_code, departments) ?? BAHARU,
+  );
+  const [kod, setKod] = useState(() => cadangKod(row.department_code));
+  const [nama, setNama] = useState(row.department_code);
+
+  const perluBahagian = row.conflicts.some((conflict) => conflict.code === "unknown_department");
+  const perluStaffID = row.conflicts.some((conflict) => STAFF_ID_CONFLICTS.has(conflict.code));
+
+  function simpanBahagian() {
+    startTransition(async () => {
+      const baharu = pilihan === BAHARU;
+      const result = await resolveLegacyImportDepartmentAction(
+        batchId,
+        row.department_code,
+        baharu ? kod : pilihan,
+        baharu ? nama : undefined,
+      );
+      if (!result.ok) {
+        onMessage({ kind: "error", text: result.error });
+        return;
+      }
+      setOpen(false);
+      onMessage({
+        kind: "success",
+        text: baharu
+          ? `Bahagian ${kod} ditambah dan baris dikemas kini.`
+          : `Baris dipetakan ke bahagian ${pilihan}.`,
+      });
+      router.refresh();
+    });
+  }
+
+  function simpanStaffID() {
+    startTransition(async () => {
+      const result = await updateLegacyImportRowAction(row.id, staffID);
+      if (!result.ok) {
+        onMessage({ kind: "error", text: result.error });
+        return;
+      }
+      setOpen(false);
+      onMessage({ kind: "success", text: "No. ID. dikemas kini dan konflik dikira semula." });
+      router.refresh();
+    });
+  }
+
+  return (
+    <ResponsiveDetailsSheet
+      open={open}
+      onOpenChange={setOpen}
+      title={`Selesaikan konflik - row ${row.source_row}`}
+      description={row.display_name || "Tanpa nama"}
+      trigger={
+        <Button type="button" size="sm" variant="outline">
+          <WrenchIcon />
+          Selesaikan ({row.conflicts.length})
+        </Button>
+      }
+    >
+      <div className="grid gap-5">
+        <div className="grid gap-2">
+          <p className="text-sm font-medium">Konflik</p>
+          <ul className="grid gap-1">
+            {row.conflicts.map((conflict) => (
+              <li key={conflict.code} className="text-sm text-destructive">
+                {conflict.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {perluBahagian ? (
+          <div className="grid gap-3 rounded-lg border p-4">
+            <div>
+              <p className="text-sm font-medium">Bahagian</p>
+              <p className="text-xs text-muted-foreground">
+                Semua baris dalam batch yang merujuk &ldquo;{row.department_code}&rdquo; akan ditukar.
+              </p>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor={`bahagian-${row.id}`}>Pilih bahagian</Label>
+              <NativeSelect
+                id={`bahagian-${row.id}`}
+                className="w-full"
+                value={pilihan}
+                disabled={pending}
+                onChange={(event) => setPilihan(event.target.value)}
+              >
+                {departments.map((item) => (
+                  <NativeSelectOption key={item.code} value={item.code}>
+                    {item.code} - {item.name}
+                  </NativeSelectOption>
+                ))}
+                <NativeSelectOption value={BAHARU}>+ Cipta bahagian baharu</NativeSelectOption>
+              </NativeSelect>
+            </div>
+            {pilihan === BAHARU ? (
+              <>
+                <div className="grid gap-2">
+                  <Label htmlFor={`kod-${row.id}`}>Kod baharu</Label>
+                  <Input
+                    id={`kod-${row.id}`}
+                    value={kod}
+                    disabled={pending}
+                    onChange={(event) => setKod(event.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">Kod tidak boleh mengandungi &lsquo;/&rsquo;.</p>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor={`nama-${row.id}`}>Nama</Label>
+                  <Input
+                    id={`nama-${row.id}`}
+                    value={nama}
+                    disabled={pending}
+                    onChange={(event) => setNama(event.target.value)}
+                  />
+                </div>
+              </>
+            ) : null}
             <Button
               type="button"
-              disabled={pending || !dialogBahagian?.code.trim() || !dialogBahagian?.name.trim()}
-              onClick={() => dialogBahagian && simpanBahagian(dialogBahagian)}
+              className="w-fit"
+              disabled={pending || (pilihan === BAHARU && (kod.trim() === "" || nama.trim() === ""))}
+              onClick={simpanBahagian}
             >
-              Simpan bahagian
+              {pilihan === BAHARU ? "Cipta bahagian" : "Petakan ke bahagian ini"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+          </div>
+        ) : null}
+
+        {perluStaffID ? (
+          <div className="grid gap-3 rounded-lg border p-4">
+            <div>
+              <p className="text-sm font-medium">No. ID.</p>
+              <p className="text-xs text-muted-foreground">
+                Tiada nilai yang boleh diteka sistem - masukkan No. ID. sebenar.
+              </p>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor={`staff-${row.id}`}>No. ID.</Label>
+              <Input
+                id={`staff-${row.id}`}
+                value={staffID}
+                disabled={pending}
+                onChange={(event) => setStaffID(event.target.value)}
+              />
+            </div>
+            <Button
+              type="button"
+              className="w-fit"
+              disabled={pending || staffID.trim() === "" || staffID === row.legacy_staff_id}
+              onClick={simpanStaffID}
+            >
+              Simpan No. ID.
+            </Button>
+          </div>
+        ) : null}
+
+        {!perluBahagian && !perluStaffID ? (
+          <p className="text-sm text-muted-foreground">
+            Konflik ini perlu dibetulkan dalam fail CSV asal, kemudian jalankan dry-run baharu.
+          </p>
+        ) : null}
+      </div>
+    </ResponsiveDetailsSheet>
   );
 }

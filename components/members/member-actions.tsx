@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MoreHorizontalIcon, PencilIcon, ShieldBanIcon, ShieldCheckIcon, UserRoundIcon } from "lucide-react";
@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { ConfirmationDialog } from "@/components/marc/confirmation-dialog";
 import { ResponsiveDetailsSheet } from "@/components/marc/responsive-sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import type { MemberRow } from "@/lib/api/types";
 import type { AssignableDepartment, MemberRole } from "@/lib/members/api";
 import {
@@ -87,7 +89,7 @@ export function MemberActions({
   }
 
   return (
-    <ResponsiveDetailsSheet
+    <ResponsiveMemberActionMenu
       title={`Tindakan ahli: ${name}`}
       description="Pilih tindakan yang ingin dilakukan untuk ahli ini."
       trigger={
@@ -232,7 +234,42 @@ export function MemberActions({
         </>
       ) : null}
       </div>
-    </ResponsiveDetailsSheet>
+    </ResponsiveMemberActionMenu>
+  );
+}
+
+function ResponsiveMemberActionMenu({
+  title,
+  description,
+  trigger,
+  children,
+}: {
+  title: string;
+  description?: string;
+  trigger: ReactNode;
+  children: ReactNode;
+}) {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <ResponsiveDetailsSheet title={title} description={description} trigger={trigger}>
+        {children}
+      </ResponsiveDetailsSheet>
+    );
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-80 p-3">
+        <div className="mb-3 grid gap-1 border-b pb-3">
+          <p className="font-medium">{title}</p>
+          {description ? <p className="text-xs text-muted-foreground">{description}</p> : null}
+        </div>
+        {children}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 

@@ -64,20 +64,31 @@ export async function updateLegacyImportRowAction(
   }
 }
 
+/**
+ * `name` ditinggalkan bila superadmin memilih bahagian sedia ada -
+ * backend menganggapnya merge dan tak menyentuh nama bahagian itu.
+ */
 export async function resolveLegacyImportDepartmentAction(
   batchId: string,
   from: string,
   code: string,
-  name: string,
+  name?: string,
 ): Promise<LegacyImportActionResult> {
   try {
     const kod = code.trim();
-    const nama = name.trim();
-    if (!kod || !nama) return { ok: false, error: "Kod dan nama bahagian diperlukan." };
+    const nama = name?.trim();
+    if (!kod) return { ok: false, error: "Kod bahagian diperlukan." };
     if (kod.includes("/")) {
       return { ok: false, error: "Kod bahagian tidak boleh mengandungi '/'." };
     }
-    return { ok: true, data: await resolveLegacyImportDepartment(await token(), batchId, { from, code: kod, name: nama }) };
+    return {
+      ok: true,
+      data: await resolveLegacyImportDepartment(await token(), batchId, {
+        from,
+        code: kod,
+        ...(nama ? { name: nama } : {}),
+      }),
+    };
   } catch (error) {
     return { ok: false, error: message(error) };
   } finally {
