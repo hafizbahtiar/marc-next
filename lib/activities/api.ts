@@ -144,15 +144,20 @@ export function listActivities(
   });
   if (options.categoryId) params.set("category_id", options.categoryId);
   if (options.cursor) params.set("cursor", options.cursor);
-  return apiFetch<ActivityListResponse>(`/activities?${params.toString()}`, { accessToken: token });
+  return apiFetch<ActivityListResponse>(`/activities?${params.toString()}`, { accessToken: token }).then((response) => ({
+    ...response,
+    activities: response.activities ?? [],
+  }));
 }
 
-export function getActivity(token: string, id: string): Promise<Activity> {
-  return apiFetch<Activity>(`/activities/${encodeURIComponent(id)}`, { accessToken: token });
+export async function getActivity(token: string, id: string): Promise<Activity> {
+  const activity = await apiFetch<Activity>(`/activities/${encodeURIComponent(id)}`, { accessToken: token });
+  return { ...activity, sessions: activity.sessions ?? [] };
 }
 
-export function listActivityCategories(token: string): Promise<{ categories: ActivityCategory[] }> {
-  return apiFetch<{ categories: ActivityCategory[] }>("/activity-categories", { accessToken: token });
+export async function listActivityCategories(token: string): Promise<{ categories: ActivityCategory[] }> {
+  const response = await apiFetch<{ categories: ActivityCategory[] | null }>("/activity-categories", { accessToken: token });
+  return { categories: response.categories ?? [] };
 }
 
 export function registerActivity(token: string, id: string): Promise<RegistrationResponse> {

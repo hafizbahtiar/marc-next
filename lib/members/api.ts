@@ -109,6 +109,7 @@ export type MemberDetail = MemberRow & {
   }> | null;
 };
 
-export function getMemberDetail(accessToken: string, userId: string): Promise<MemberDetail> {
-  return apiFetch<MemberDetail>(`/members/${encodeURIComponent(userId)}`, { accessToken });
+export async function getMemberDetail(accessToken: string, userId: string): Promise<MemberDetail> {
+  const member = await apiFetch<MemberDetail>(`/members/${encodeURIComponent(userId)}`, { accessToken });
+  return { ...member, addresses: member.addresses ?? [] };
 }

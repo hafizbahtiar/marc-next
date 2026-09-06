@@ -29,8 +29,14 @@ export type PaymentHistory = {
   outstanding_registration_fee?: boolean;
 };
 
-export function getPaymentHistory(accessToken: string): Promise<PaymentHistory> {
-  return apiFetch<PaymentHistory>("/me/payments", { accessToken });
+export async function getPaymentHistory(accessToken: string): Promise<PaymentHistory> {
+  const history = await apiFetch<PaymentHistory>("/me/payments", { accessToken });
+  return {
+    ...history,
+    registration_fee: history.registration_fee ?? [],
+    activity_fees: history.activity_fees ?? [],
+    donations: history.donations ?? [],
+  };
 }
 
 export type RegistrationCheckoutResponse = {
