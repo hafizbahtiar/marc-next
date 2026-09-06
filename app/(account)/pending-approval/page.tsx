@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { ROUTES } from "@/lib/auth/routes";
 import { dapatkanSesi } from "@/lib/auth/session";
+import { getPaymentConfig } from "@/lib/payments/api";
 
 export const metadata: Metadata = { title: "Menunggu kelulusan" };
 
@@ -16,6 +17,12 @@ export default async function PendingApprovalPage() {
   if (!sesi) redirect(ROUTES.tamatSesi);
 
   const p = sesi.profile;
+  let gatewayChargeCents = 0;
+  try {
+    gatewayChargeCents = (await getPaymentConfig(sesi.accessToken)).gateway_charge_cents;
+  } catch {
+    // Pecahan caj ialah maklumat tambahan; checkout masih boleh diteruskan.
+  }
   // Halaman ini ialah destinasi gate untuk status `pending` SAHAJA.
   // Apabila pengurusan meluluskan akaun, lawatan seterusnya mesti jatuh
   // ke tempatnya yang betul dan bukan tersangkut pada skrin menunggu.
@@ -103,7 +110,10 @@ export default async function PendingApprovalPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <RegistrationPaymentAction amountCents={p.registration_fee_cents} />
+            <RegistrationPaymentAction
+              amountCents={p.registration_fee_cents}
+              gatewayChargeCents={gatewayChargeCents}
+            />
           </CardContent>
         </Card>
       ) : null}

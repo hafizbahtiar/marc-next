@@ -1,9 +1,13 @@
 import { HeartHandshakeIcon } from "lucide-react";
 
 import { DuitNowQrCard } from "@/components/donation/duitnow-qr-card";
+import { StripeDonationForm } from "@/components/donation/stripe-donation-form";
 import { PageBreadcrumb } from "@/components/marc/page-breadcrumb";
 
 export default function DonatePage() {
+  const stripePublishableKey =
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? process.env.STRIPE_PUBLISHABLE_KEY ?? "";
+
   return (
     <main className="min-h-svh bg-muted/25 px-4 py-6 sm:px-6 sm:py-10">
       <div className="mx-auto grid w-full max-w-6xl gap-6">
@@ -21,7 +25,10 @@ export default function DonatePage() {
           </p>
         </header>
         <div className="w-full max-w-2xl">
-          <DuitNowQrCard />
+          <div className="grid gap-6">
+            <StripeDonationForm publishableKey={stripePublishableKey} />
+            <DuitNowQrCard />
+          </div>
         </div>
       </div>
     </main>

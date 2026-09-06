@@ -37,6 +37,14 @@ export type RegistrationCheckoutResponse = {
   redirect_url: string;
 };
 
+export type PaymentConfig = {
+  gateway_charge_cents: number;
+};
+
+export function getPaymentConfig(accessToken: string): Promise<PaymentConfig> {
+  return apiFetch<PaymentConfig>("/payment-config", { accessToken });
+}
+
 export function checkoutRegistrationPayment(
   accessToken: string,
   phone?: string,
