@@ -10,6 +10,16 @@ import {
 } from "@/lib/auth/cookies";
 import { labelPeranti } from "@/lib/auth/device";
 import { laluanTetamu, ROUTES } from "@/lib/auth/routes";
+import type { TokenPair } from "@/lib/api/types";
+
+/**
+ * Navigation selepas idle boleh menghasilkan beberapa permintaan RSC serentak.
+ * Refresh token ialah single-use, jadi semua permintaan itu mesti berkongsi
+ * satu refresh yang sedang berjalan, bukan menghantar token yang sama berkali-kali.
+ * Map ini sengaja hanya hidup sepanjang instance proxy semasa; setiap respons
+ * tetap menulis pasangan token yang sama kepada pelayar.
+ */
+const refreshSedangBerjalan = new Map<string, Promise<TokenPair>>();
 
 /**
  * Proxy (Middleware dalam Next 15 dan ke bawah) memegang SATU tanggungjawab
@@ -85,15 +95,7 @@ function laluanAwamProxy(pathname: string): boolean {
 
 async function putarToken(request: NextRequest, rt: string) {
   try {
-    const tokens = await authApi.refresh(
-      rt,
-      labelPeranti(request.headers.get("user-agent")),
-      // `next/headers` tiada di sini, jadi rantaian diserahkan terus
-      // daripada permintaan. Tanpanya, backend merekod alamat pelayan
-      // Next sebagai `created_ip` sesi - dan skrin "peranti yang log
-      // masuk" memaparkan IP yang sama untuk setiap peranti.
-      request.headers.get("x-forwarded-for"),
-    );
+    const tokens = await refreshTokenSekali(request, rt);
 
     // Kuki ditulis DUA KALI dengan sengaja. `request.cookies` ialah apa
     // yang komponen pelayan baca dalam render ini; `response.cookies`
@@ -137,6 +139,26 @@ async function putarToken(request: NextRequest, rt: string) {
     url.search = "";
     return NextResponse.rewrite(url, { status: 503 });
   }
+}
+
+function refreshTokenSekali(request: NextRequest, rt: string): Promise<TokenPair> {
+  const sedangBerjalan = refreshSedangBerjalan.get(rt);
+  if (sedangBerjalan) return sedangBerjalan;
+
+  const refresh = authApi.refresh(
+    rt,
+    labelPeranti(request.headers.get("user-agent")),
+    // `next/headers` tiada di sini, jadi rantaian diserahkan terus
+    // daripada permintaan. Tanpanya, backend merekod alamat pelayan
+    // Next sebagai `created_ip` sesi - dan skrin "peranti yang log
+    // masuk" memaparkan IP yang sama untuk setiap peranti.
+    request.headers.get("x-forwarded-for"),
+  ).finally(() => {
+    refreshSedangBerjalan.delete(rt);
+  });
+
+  refreshSedangBerjalan.set(rt, refresh);
+  return refresh;
 }
 
 export const config = {
