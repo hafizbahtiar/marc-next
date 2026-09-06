@@ -1,26 +1,32 @@
 "use client";
 
-import { useCallback, useMemo, useState, useTransition } from "react";
+import { useCallback, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
+import { toast } from "sonner";
 import {
   AlertCircleIcon,
   CheckCircle2Icon,
   CopyIcon,
   FileUpIcon,
+  FileTextIcon,
   UploadCloudIcon,
   WrenchIcon,
+  XIcon,
 } from "lucide-react";
 
 import { DataTable, DataTableColumnHeader, type DataTableFilter } from "@/components/marc/data-table";
-import { ResponsiveDetailsSheet } from "@/components/marc/responsive-sheet";
 import { StatusBadge, type StatusTone } from "@/components/marc/status-badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentMedia, AttachmentTitle } from "@/components/ui/attachment";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import {
   importLegacyBatchAction,
   dryRunLegacyImportAction,
@@ -62,6 +68,17 @@ function toneStatus(status: string): StatusTone {
   if (status === "conflict") return "danger";
   if (status === "imported" || status === "claimed") return "info";
   return "neutral";
+}
+
+function initials(value: string | null | undefined) {
+  const parts = value?.trim().split(/\s+/).filter(Boolean) ?? [];
+  return (parts.length > 1 ? `${parts[0][0]}${parts[parts.length - 1][0]}` : parts[0]?.slice(0, 2) || "?").toUpperCase();
+}
+
+function formatFileSize(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 /**
@@ -111,6 +128,8 @@ export function LegacyImportConsole({
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<Mesej>();
   const [report, setReport] = useState<Record<string, unknown>>();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -123,6 +142,7 @@ export function LegacyImportConsole({
       }
       setReport(result.data);
       setMessage({ kind: "success", text: "Dry-run selesai. Semak konflik sebelum import." });
+      toast.success("Dry-run CSV selesai.");
       router.refresh();
     });
   }
@@ -136,7 +156,10 @@ export function LegacyImportConsole({
             ? { kind: "success", text: "Baris yang telah dipadankan dengan akaun berjaya diimport." }
             : { kind: "error", text: result.error },
         );
-        if (result.ok) router.refresh();
+        if (result.ok) {
+          toast.success("Baris lulus berjaya diimport.");
+          router.refresh();
+        }
       });
     },
     [router],
@@ -215,10 +238,39 @@ export function LegacyImportConsole({
           <form className="flex flex-col gap-3 sm:flex-row sm:items-end" onSubmit={submit}>
             <div className="grid flex-1 gap-2">
               <label htmlFor="legacy-member-csv" className="text-sm font-medium">Fail CSV ahli lama</label>
-              <Input id="legacy-member-csv" name="file" type="file" accept=".csv,text/csv" required />
+              <Input
+                ref={fileInputRef}
+                id="legacy-member-csv"
+                name="file"
+                type="file"
+                accept=".csv,text/csv"
+                required
+                onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
+              />
+              {selectedFile ? (
+                <Attachment size="sm" state={pending ? "uploading" : "idle"} className="w-full">
+                  <AttachmentMedia><FileTextIcon /></AttachmentMedia>
+                  <AttachmentContent>
+                    <AttachmentTitle>{selectedFile.name}</AttachmentTitle>
+                    <AttachmentDescription>{formatFileSize(selectedFile.size)}</AttachmentDescription>
+                  </AttachmentContent>
+                  <AttachmentActions>
+                    <AttachmentAction
+                      aria-label="Buang fail CSV"
+                      disabled={pending}
+                      onClick={() => {
+                        setSelectedFile(null);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                    >
+                      <XIcon />
+                    </AttachmentAction>
+                  </AttachmentActions>
+                </Attachment>
+              ) : null}
             </div>
             <Button type="submit" disabled={pending}>
-              <UploadCloudIcon />
+              {pending ? <Spinner /> : <UploadCloudIcon />}
               {pending ? "Menyemak…" : "Semak CSV"}
             </Button>
           </form>
@@ -288,8 +340,15 @@ function BatchRowsCard({
         header: ({ column }) => <DataTableColumnHeader column={column} title="Ahli" />,
         cell: ({ row }) => (
           <div className="min-w-36">
-            <p className="font-medium">{row.original.display_name || "Tanpa nama"}</p>
-            <p className="text-xs text-muted-foreground">{row.original.member_id || "No. ahli tiada"}</p>
+            <div className="flex items-center gap-2">
+              <Avatar size="sm">
+                <AvatarFallback>{initials(row.original.display_name || row.original.member_id)}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <p className="truncate font-medium">{row.original.display_name || "Tanpa nama"}</p>
+                <p className="text-xs text-muted-foreground">{row.original.member_id || "No. ahli tiada"}</p>
+              </div>
+            </div>
           </div>
         ),
       },
@@ -482,18 +541,21 @@ function ResolveSheet({
   }
 
   return (
-    <ResponsiveDetailsSheet
+    <Dialog
       open={open}
       onOpenChange={setOpen}
-      title={`Selesaikan konflik - row ${row.source_row}`}
-      description={row.display_name || "Tanpa nama"}
-      trigger={
+    >
+      <DialogTrigger asChild>
         <Button type="button" size="sm" variant="outline">
           <WrenchIcon />
           Selesaikan ({row.conflicts.length})
         </Button>
-      }
-    >
+      </DialogTrigger>
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Selesaikan konflik - row {row.source_row}</DialogTitle>
+          <DialogDescription>{row.display_name || "Tanpa nama"}</DialogDescription>
+        </DialogHeader>
       <div className="grid gap-5">
         <div className="grid gap-2">
           <p className="text-sm font-medium">Konflik</p>
@@ -602,6 +664,7 @@ function ResolveSheet({
           </p>
         ) : null}
       </div>
-    </ResponsiveDetailsSheet>
+      </DialogContent>
+    </Dialog>
   );
 }

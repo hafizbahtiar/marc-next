@@ -76,6 +76,7 @@ export type DataTableProps<TData, TValue> = {
   loadingRows?: number;
   error?: string | null;
   emptyMessage?: string;
+  emptyAction?: React.ReactNode;
   onRetry?: () => void;
   onRowClick?: (row: TData) => void;
   toolbar?: React.ReactNode | ((table: TableInstance<TData>) => React.ReactNode);
@@ -100,6 +101,7 @@ export function DataTable<TData, TValue>({
   emptyMessage = "Tiada rekod.",
   onRetry,
   onRowClick,
+  emptyAction,
   toolbar,
   footer,
   className,
@@ -236,6 +238,7 @@ export function DataTable<TData, TValue>({
                           </EmptyMedia>
                           <EmptyTitle>{emptyMessage}</EmptyTitle>
                         </EmptyHeader>
+                        {emptyAction ? <div className="mt-3">{emptyAction}</div> : null}
                       </Empty>
                     </TableCell>
                   </TableRow>

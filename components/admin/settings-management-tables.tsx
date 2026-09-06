@@ -75,7 +75,7 @@ export function CategoryTable({ rows }: { rows: ActivityCategory[] }) {
       onSubmit={(values) => execute(() => createCategoryAction(values.key, values.name))}
     />
   );
-  return <ManagementTableShell message={message}><DataTable columns={columns} data={rows} searchKey="name" searchPlaceholder="Cari kategori…" getRowId={(row) => row.id} toolbar={action} /></ManagementTableShell>;
+  return <ManagementTableShell message={message}><DataTable columns={columns} data={rows} searchKey="name" searchPlaceholder="Cari kategori…" getRowId={(row) => row.id} toolbar={action} emptyAction={action} /></ManagementTableShell>;
 }
 
 export function DomainTable({ rows }: { rows: BlockedDomain[] }) {
@@ -115,7 +115,7 @@ export function DomainTable({ rows }: { rows: BlockedDomain[] }) {
       onSubmit={(values) => execute(() => addBlockedDomainAction(values.domain.trim().toLowerCase()))}
     />
   );
-  return <ManagementTableShell message={message}><DataTable columns={columns} data={rows} searchKey="domain" searchPlaceholder="Cari domain…" getRowId={(row) => row.domain} toolbar={action} /></ManagementTableShell>;
+  return <ManagementTableShell message={message}><DataTable columns={columns} data={rows} searchKey="domain" searchPlaceholder="Cari domain…" getRowId={(row) => row.domain} toolbar={action} emptyAction={action} /></ManagementTableShell>;
 }
 
 export function DepartmentTable({ rows }: { rows: Department[] }) {
@@ -165,7 +165,7 @@ export function DepartmentTable({ rows }: { rows: Department[] }) {
       onSubmit={(values) => execute(() => createDepartmentAction(values.code.trim().toUpperCase(), values.name.trim()))}
     />
   );
-  return <ManagementTableShell message={message}><DataTable columns={columns} data={rows} searchKey="name" searchPlaceholder="Cari bahagian…" getRowId={(row) => row.code} toolbar={action} /></ManagementTableShell>;
+  return <ManagementTableShell message={message}><DataTable columns={columns} data={rows} searchKey="name" searchPlaceholder="Cari bahagian…" getRowId={(row) => row.code} toolbar={action} emptyAction={action} /></ManagementTableShell>;
 }
 
 function ManagementTableShell({ message, children }: { message: string; children: React.ReactNode }) {
