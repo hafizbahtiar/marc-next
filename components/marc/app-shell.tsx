@@ -32,14 +32,8 @@ export function AppShell({
     <div className="flex min-h-svh flex-col bg-muted/25">
       <header className="sticky top-0 z-10 border-b bg-background/90 backdrop-blur-md">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6">
-          {/*
-            Jata sahaja, bukan logo penuh: pada 32px wordmark terbina
-            dalam varian penuh menjadi comotan. Label teks di sebelahnya
-            yang membawa nama itu.
-          */}
           <Link href={ROUTES.utama} className="flex items-center gap-2.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring">
-            <Logo varian="jata" className="h-8" />
-            <span className="text-sm font-semibold tracking-[0.18em]">MARC</span>
+            <Logo varian="penuh" className="h-10" />
           </Link>
 
           <nav className="hidden items-center gap-1 rounded-lg bg-muted/60 p-1 text-sm font-medium md:flex">

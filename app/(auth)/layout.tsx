@@ -44,7 +44,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
 
         <div className="relative">
           <div className="flex items-center gap-3">
-            <Logo varian="jata" className="h-12 w-12" priority />
+            <Logo varian="penuh" className="h-20 w-20" priority />
             <div>
               <p className="text-lg font-semibold tracking-[0.2em]">MARC</p>
               <p className="mt-1 text-[10px] tracking-[0.16em] text-brand-navy-foreground/55 uppercase">
@@ -68,7 +68,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
       <main className="relative flex flex-col justify-center px-6 py-10 sm:px-10">
         <div className="mx-auto w-full max-w-sm">
           <Link href="/" className="mb-8 inline-flex items-center gap-3 lg:hidden">
-            <Logo varian="jata" className="h-14 w-14" priority />
+            <Logo varian="penuh" className="h-20 w-20" priority />
             <span className="text-lg font-semibold tracking-[0.2em]">MARC</span>
           </Link>
           {children}
