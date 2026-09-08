@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   // reset kata laluan). Mengindeksnya tak berguna dan menjemput crawler
   // untuk menebus token sebelum ahli sempat membukanya.
   robots: { index: false, follow: false },
-  icons: { icon: "/marc-jata.png", apple: "/marc-jata.png" },
+  icons: { icon: "/marc-logo-penuh.png", apple: "/marc-logo-penuh.png" },
 };
 
 export const viewport: Viewport = {
